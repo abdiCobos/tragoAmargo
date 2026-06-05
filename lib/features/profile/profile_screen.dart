@@ -1,0 +1,138 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import '../../core/theme/app_theme.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/storage_service.dart';
+
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthProvider>(
+      builder: (context, auth, _) {
+        if (!auth.isAuthenticated) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.person_outline, size: 80, color: AppColors.tertiary),
+                const SizedBox(height: 16),
+                const Text('Inicia sesión para ver tu perfil',
+                    style: TextStyle(color: AppColors.textSecondary)),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/login');
+                  },
+                  child: const Text('Iniciar Sesión'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final user = auth.user!;
+        final appUser = auth.appUser;
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundColor: AppColors.surface,
+                    backgroundImage: user.photoURL != null
+                        ? NetworkImage(user.photoURL!)
+                        : null,
+                    child: user.photoURL == null
+                        ? const Icon(Icons.person, size: 50, color: AppColors.tertiary)
+                        : null,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: AppColors.secondary,
+                      child: IconButton(
+                        icon: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
+                        onPressed: () => _changePhoto(context),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                user.displayName ?? 'Usuario',
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(user.email ?? '',
+                  style: const TextStyle(color: AppColors.textSecondary)),
+              const SizedBox(height: 32),
+              _buildInfoTile(Icons.favorite, 'Favoritos',
+                  '${appUser?.favoriteShops.length ?? 0} cafeterías'),
+              _buildInfoTile(Icons.coffee, 'Reseñas escritas', '—'),
+              _buildInfoTile(
+                  Icons.calendar_today, 'Miembro desde',
+                  _formatDate(appUser?.createdAt ?? DateTime.now())),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    await auth.signOut();
+                    if (context.mounted) {
+                      Navigator.pushNamedAndRemoveUntil(context, '/login', (r) => false);
+                    }
+                  },
+                  icon: const Icon(Icons.logout, color: AppColors.error),
+                  label: const Text('Cerrar Sesión', style: TextStyle(color: AppColors.error)),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.error),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoTile(IconData icon, String label, String value) {
+    return ListTile(
+      leading: Icon(icon, color: AppColors.secondary),
+      title: Text(label),
+      trailing: Text(value, style: const TextStyle(color: AppColors.textSecondary)),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> _changePhoto(BuildContext context) async {
+    final picker = ImagePicker();
+    final photo = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    if (photo != null && context.mounted) {
+      final storage = context.read<StorageService>();
+      final auth = context.read<AuthProvider>();
+      final user = auth.user;
+      if (user == null) return;
+      await storage.uploadUserPhoto(user.uid, File(photo.path));
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Foto actualizada')),
+      );
+    }
+  }
+}

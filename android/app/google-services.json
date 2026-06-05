@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1041702706373",
+    "project_id": "tragoamargo-ee5c5",
+    "storage_bucket": "tragoamargo-ee5c5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041702706373:android:759bec3446d79af31624ac",
+        "android_client_info": {
+          "package_name": "trago.amargo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1041702706373-h3ddo2neui3rpghdjhg6t11g2qub001p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "trago.amargo",
+            "certificate_hash": "6f0345df65ab39571fb17c2435fc497b4c484224"
+          }
+        },
+        {
+          "client_id": "1041702706373-a8v69p06lqktd9e5hpgum86g13r0onqq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHC0tIqmzMVi8FISHNBtAU0djIGQWDUMw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1041702706373-a8v69p06lqktd9e5hpgum86g13r0onqq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

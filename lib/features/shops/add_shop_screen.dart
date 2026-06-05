@@ -17,19 +17,22 @@ class AddShopScreen extends StatefulWidget {
 class _AddShopScreenState extends State<AddShopScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
   final _originController = TextEditingController();
   final _addressController = TextEditingController();
+  final _descriptionController = TextEditingController();
   final _phoneController = TextEditingController();
   final _instagramController = TextEditingController();
 
-  final List<String> _roastLevels = [];
-  final List<String> _brewingMethods = [];
+  final _roastLevels = <String>[];
+  final _brewingMethods = <String>[];
   String _priceRange = r'$';
   bool _hasWiFi = false;
   bool _hasOutdoorSeating = false;
-  final List<File> _photos = [];
-  final Map<String, TextEditingController> _openingHours = {};
+  final _photos = <File>[];
+  final _openingHours = <String, TextEditingController>{};
+
+  bool _showExtras = false;
+  bool _showHours = false;
 
   final _roastOptions = ['Claro', 'Medio', 'Oscuro', 'Espresso'];
   final _brewingOptions = ['V60', 'Chemex', 'Aeropress', 'French Press', 'Espresso', 'Cold Brew', 'Sifón'];
@@ -46,9 +49,9 @@ class _AddShopScreenState extends State<AddShopScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _descriptionController.dispose();
     _originController.dispose();
     _addressController.dispose();
+    _descriptionController.dispose();
     _phoneController.dispose();
     _instagramController.dispose();
     for (final ctrl in _openingHours.values) {
@@ -59,33 +62,18 @@ class _AddShopScreenState extends State<AddShopScreen> {
 
   Future<void> _pickPhotos() async {
     final picker = ImagePicker();
-    final images = await picker.pickMultiImage(imageQuality: 85);
+    final images = await picker.pickMultiImage(imageQuality: 80);
     if (images.isNotEmpty) {
-      setState(() {
-        _photos.addAll(images.map((x) => File(x.path)));
-      });
+      setState(() => _photos.addAll(images.map((x) => File(x.path))));
     }
   }
 
   Future<void> _takePhoto() async {
     final picker = ImagePicker();
-    final photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 85);
+    final photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
     if (photo != null) {
-      setState(() {
-        _photos.add(File(photo.path));
-      });
+      setState(() => _photos.add(File(photo.path)));
     }
-  }
-
-  Map<String, String> _getOpeningHours() {
-    final hours = <String, String>{};
-    for (final day in _days) {
-      final value = _openingHours[day]!.text.trim();
-      if (value.isNotEmpty) {
-        hours[day] = value;
-      }
-    }
-    return hours;
   }
 
   Future<void> _submit() async {
@@ -100,6 +88,12 @@ class _AddShopScreenState extends State<AddShopScreen> {
     final auth = context.read<AuthProvider>();
     final provider = context.read<CoffeeShopsProvider>();
 
+    final openingHours = <String, String>{};
+    for (final day in _days) {
+      final v = _openingHours[day]!.text.trim();
+      if (v.isNotEmpty) openingHours[day] = v;
+    }
+
     final shopId = await provider.addCoffeeShop(
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
@@ -109,7 +103,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
       priceRange: _priceRange,
       hasWiFi: _hasWiFi,
       hasOutdoorSeating: _hasOutdoorSeating,
-      openingHours: _getOpeningHours(),
+      openingHours: openingHours,
       phone: _phoneController.text.trim(),
       instagram: _instagramController.text.trim(),
       address: _addressController.text.trim(),
@@ -120,7 +114,10 @@ class _AddShopScreenState extends State<AddShopScreen> {
     if (shopId != null && mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Cafetería agregada con éxito!')),
+        const SnackBar(
+          content: Text('¡Cafetería agregada!'),
+          backgroundColor: AppColors.secondary,
+        ),
       );
     }
   }
@@ -136,39 +133,63 @@ class _AddShopScreenState extends State<AddShopScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.info_outline, color: AppColors.secondary),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Solo necesitas nombre, origen del café y dirección. El resto es opcional.',
+                        style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // ─── Obligatorios ───
+              const Text('Requerido',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Nombre de la cafetería'),
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de la cafetería *',
+                  prefixIcon: Icon(Icons.store),
+                ),
                 validator: (v) => Validators.required(v, 'El nombre'),
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                maxLines: 3,
-                decoration: const InputDecoration(labelText: 'Descripción'),
-              ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               TextFormField(
                 controller: _originController,
                 decoration: const InputDecoration(
-                  labelText: 'Origen y Altura del Café',
+                  labelText: 'Origen y Altura del Café *',
                   hintText: 'Ej: Etiopía Yirgacheffe, 1,900 msnm',
+                  prefixIcon: Icon(Icons.landscape),
                 ),
                 validator: (v) => Validators.required(v, 'El origen y altura'),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               TextFormField(
                 controller: _addressController,
                 decoration: const InputDecoration(
-                  labelText: 'Dirección',
+                  labelText: 'Dirección *',
                   hintText: 'Ej: Av. Reforma 123, Ciudad de México',
+                  prefixIcon: Icon(Icons.location_on_outlined),
                 ),
                 validator: (v) => Validators.required(v, 'La dirección'),
               ),
-              const SizedBox(height: 20),
-              const Text('Niveles de Tostado',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 8),
+              const SizedBox(height: 14),
+              const Text('Niveles de Tostado *',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 6),
               Wrap(
                 spacing: 8,
                 children: _roastOptions.map((r) {
@@ -176,163 +197,196 @@ class _AddShopScreenState extends State<AddShopScreen> {
                   return FilterChip(
                     label: Text(r),
                     selected: selected,
+                    selectedColor: AppColors.secondary.withValues(alpha: 0.3),
                     onSelected: (val) {
                       setState(() {
-                        if (val) {
-                          _roastLevels.add(r);
-                        } else {
-                          _roastLevels.remove(r);
-                        }
+                        if (val) {_roastLevels.add(r);} else {_roastLevels.remove(r);}
                       });
                     },
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 20),
-              const Text('Métodos de Preparación',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: _brewingOptions.map((m) {
-                  final selected = _brewingMethods.contains(m);
-                  return FilterChip(
-                    label: Text(m),
-                    selected: selected,
-                    onSelected: (val) {
-                      setState(() {
-                        if (val) {
-                          _brewingMethods.add(m);
-                        } else {
-                          _brewingMethods.remove(m);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
+
+              // ─── Opcional: Extras ───
+              const SizedBox(height: 28),
+              InkWell(
+                onTap: () => setState(() => _showExtras = !_showExtras),
+                child: Row(
+                  children: [
+                    Icon(_showExtras ? Icons.expand_less : Icons.expand_more,
+                        color: AppColors.textSecondary),
+                    const SizedBox(width: 8),
+                    const Text('Más detalles (opcional)',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  ],
+                ),
               ),
-              const SizedBox(height: 20),
-              const Text('Rango de Precio',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 8),
-              SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: r'$', label: Text(r'$')),
-                  ButtonSegment(value: r'$$', label: Text(r'$$')),
-                  ButtonSegment(value: r'$$$', label: Text(r'$$$')),
-                ],
-                selected: {_priceRange},
-                onSelectionChanged: (val) => setState(() => _priceRange = val.first),
-              ),
-              const SizedBox(height: 16),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('WiFi disponible'),
-                value: _hasWiFi,
-                onChanged: (v) => setState(() => _hasWiFi = v),
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Terraza / Al aire libre'),
-                value: _hasOutdoorSeating,
-                onChanged: (v) => setState(() => _hasOutdoorSeating = v),
-              ),
-              const SizedBox(height: 20),
-              const Text('Contacto',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(labelText: 'Teléfono', prefixIcon: Icon(Icons.phone)),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _instagramController,
-                decoration: const InputDecoration(
-                    labelText: 'Instagram (sin @)', prefixIcon: Icon(Icons.camera_alt)),
-              ),
-              const SizedBox(height: 20),
-              const Text('Horarios',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 8),
-              ..._days.map((day) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 100,
-                        child: Text(day[0].toUpperCase() + day.substring(1)),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _openingHours[day],
-                          decoration: InputDecoration(
-                            hintText: '7:00-21:00',
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          ),
-                        ),
-                      ),
-                    ],
+              if (_showExtras) ...[
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _descriptionController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Descripción',
+                    prefixIcon: Icon(Icons.description),
                   ),
-                );
-              }),
+                ),
+                const SizedBox(height: 14),
+                const Text('Métodos de Preparación',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8,
+                  children: _brewingOptions.map((m) {
+                    final selected = _brewingMethods.contains(m);
+                    return FilterChip(
+                      label: Text(m),
+                      selected: selected,
+                      onSelected: (val) {
+                        setState(() {
+                          if (val) {_brewingMethods.add(m);} else {_brewingMethods.remove(m);}
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 14),
+                const Text('Rango de Precio', style: TextStyle(fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(value: r'$', label: Text(r'$')),
+                    ButtonSegment(value: r'$$', label: Text(r'$$')),
+                    ButtonSegment(value: r'$$$', label: Text(r'$$$')),
+                  ],
+                  selected: {_priceRange},
+                  onSelectionChanged: (val) => setState(() => _priceRange = val.first),
+                ),
+                const SizedBox(height: 10),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('WiFi disponible'),
+                  value: _hasWiFi,
+                  onChanged: (v) => setState(() => _hasWiFi = v),
+                ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Terraza / Al aire libre'),
+                  value: _hasOutdoorSeating,
+                  onChanged: (v) => setState(() => _hasOutdoorSeating = v),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(labelText: 'Teléfono', prefixIcon: Icon(Icons.phone)),
+                ),
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: _instagramController,
+                  decoration: const InputDecoration(
+                      labelText: 'Instagram (sin @)', prefixIcon: Icon(Icons.camera_alt)),
+                ),
+              ],
+
+              // ─── Opcional: Horarios ───
               const SizedBox(height: 20),
-              const Text('Fotos', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              InkWell(
+                onTap: () => setState(() => _showHours = !_showHours),
+                child: Row(
+                  children: [
+                    Icon(_showHours ? Icons.expand_less : Icons.expand_more,
+                        color: AppColors.textSecondary),
+                    const SizedBox(width: 8),
+                    const Text('Horarios (opcional)',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+              if (_showHours)
+                ..._days.map((day) => Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 100,
+                            child: Text(day[0].toUpperCase() + day.substring(1)),
+                          ),
+                          Expanded(
+                            child: TextFormField(
+                              controller: _openingHours[day],
+                              decoration: InputDecoration(
+                                hintText: '7:00-21:00',
+                                isDense: true,
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+
+              // ─── Opcional: Fotos ───
+              const SizedBox(height: 20),
+              InkWell(
+                onTap: () => setState(() {}),
+                child: const Row(
+                  children: [
+                    Icon(Icons.photo_library_outlined, color: AppColors.secondary),
+                    SizedBox(width: 8),
+                    Text('Fotos (opcional)',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
               const SizedBox(height: 8),
               Row(
                 children: [
                   OutlinedButton.icon(
                     onPressed: _pickPhotos,
-                    icon: const Icon(Icons.photo_library),
+                    icon: const Icon(Icons.photo_library, size: 18),
                     label: const Text('Galería'),
                   ),
                   const SizedBox(width: 12),
                   OutlinedButton.icon(
                     onPressed: _takePhoto,
-                    icon: const Icon(Icons.camera_alt),
+                    icon: const Icon(Icons.camera_alt, size: 18),
                     label: const Text('Cámara'),
                   ),
                 ],
               ),
               if (_photos.isNotEmpty) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 SizedBox(
-                  height: 100,
+                  height: 80,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: _photos.length,
-                    itemBuilder: (_, i) {
-                      return Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                _photos[i],
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                    itemBuilder: (_, i) => Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(_photos[i],
+                                width: 80, height: 80, fit: BoxFit.cover),
                           ),
-                          Positioned(
-                            right: 4,
-                            top: 0,
-                            child: IconButton(
-                              icon: const Icon(Icons.close, color: AppColors.error, size: 20),
-                              onPressed: () => setState(() => _photos.removeAt(i)),
-                            ),
+                        ),
+                        Positioned(
+                          right: 4, top: -4,
+                          child: IconButton(
+                            icon: const Icon(Icons.close,
+                                color: AppColors.error, size: 18),
+                            onPressed: () => setState(() => _photos.removeAt(i)),
                           ),
-                        ],
-                      );
-                    },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
+
               const SizedBox(height: 32),
               Consumer<CoffeeShopsProvider>(
                 builder: (context, provider, _) {
@@ -357,9 +411,9 @@ class _AddShopScreenState extends State<AddShopScreen> {
                           onPressed: provider.isLoading ? null : _submit,
                           icon: provider.isLoading
                               ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                  width: 20, height: 20,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white),
                                 )
                               : const Icon(Icons.add_location),
                           label: const Text('Agregar Cafetería'),

@@ -151,13 +151,7 @@ class FirestoreService {
 
     final reviewRef =
         _firestore.collection(FirestoreCollections.reviews).doc();
-    batch.set(reviewRef, {
-      ...review.toMap(),
-      'shopId':
-          _firestore.collection(FirestoreCollections.coffeeShops).doc(review.shopId),
-      'userId':
-          _firestore.collection(FirestoreCollections.users).doc(review.userId),
-    });
+    batch.set(reviewRef, review.toMap());
 
     final shopRef = _firestore
         .collection(FirestoreCollections.coffeeShops)
@@ -172,6 +166,8 @@ class FirestoreService {
     final currentAvgFlavor =
         shopDoc.data()?['averageFlavor'] as double? ?? 0.0;
     final currentAvgRoast = shopDoc.data()?['averageRoast'] as double? ?? 0.0;
+    final currentAvgService =
+        shopDoc.data()?['averageService'] as double? ?? 0.0;
     final currentAvgRating =
         shopDoc.data()?['averageRating'] as double? ?? 0.0;
 
@@ -184,6 +180,8 @@ class FirestoreService {
           ((currentAvgFlavor * currentTotal) + review.flavorRating) / newTotal,
       'averageRoast':
           ((currentAvgRoast * currentTotal) + review.roastRating) / newTotal,
+      'averageService':
+          ((currentAvgService * currentTotal) + review.serviceRating) / newTotal,
       'averageRating':
           ((currentAvgRating * currentTotal) + review.overallRating) /
               newTotal,

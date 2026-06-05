@@ -34,6 +34,7 @@ class ReviewsProvider extends ChangeNotifier {
     required double qualityRating,
     required double flavorRating,
     required double roastRating,
+    required double serviceRating,
     required String comment,
   }) async {
     _isLoading = true;
@@ -50,6 +51,7 @@ class ReviewsProvider extends ChangeNotifier {
         qualityRating: qualityRating,
         flavorRating: flavorRating,
         roastRating: roastRating,
+        serviceRating: serviceRating,
         comment: comment,
         createdAt: DateTime.now(),
       );

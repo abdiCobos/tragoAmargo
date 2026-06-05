@@ -181,7 +181,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
                 controller: _addressController,
                 decoration: const InputDecoration(
                   labelText: 'Dirección *',
-                  hintText: 'Ej: Av. Reforma 123, Ciudad de México',
+                  hintText: 'Ej: Av. Juárez 123, Guadalajara',
                   prefixIcon: Icon(Icons.location_on_outlined),
                 ),
                 validator: (v) => Validators.required(v, 'La dirección'),
@@ -205,6 +205,16 @@ class _AddShopScreenState extends State<AddShopScreen> {
                     },
                   );
                 }).toList(),
+              ),
+
+              const SizedBox(height: 14),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('WiFi disponible *',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
+                value: _hasWiFi,
+                activeTrackColor: AppColors.secondary,
+                onChanged: (v) => setState(() => _hasWiFi = v),
               ),
 
               // ─── Opcional: Extras ───

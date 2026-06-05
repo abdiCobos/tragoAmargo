@@ -20,6 +20,7 @@ class CoffeeShop {
   final double averageQuality;
   final double averageFlavor;
   final double averageRoast;
+  final double averageService;
   final int totalReviews;
   final DateTime createdAt;
   final String? createdBy;
@@ -44,6 +45,7 @@ class CoffeeShop {
     this.averageQuality = 0.0,
     this.averageFlavor = 0.0,
     this.averageRoast = 0.0,
+    this.averageService = 0.0,
     this.totalReviews = 0,
     required this.createdAt,
     this.createdBy,
@@ -70,6 +72,7 @@ class CoffeeShop {
       averageQuality: (data['averageQuality'] ?? 0.0).toDouble(),
       averageFlavor: (data['averageFlavor'] ?? 0.0).toDouble(),
       averageRoast: (data['averageRoast'] ?? 0.0).toDouble(),
+      averageService: (data['averageService'] ?? 0.0).toDouble(),
       totalReviews: data['totalReviews'] ?? 0,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       createdBy: data['createdBy'],
@@ -96,6 +99,7 @@ class CoffeeShop {
       'averageQuality': averageQuality,
       'averageFlavor': averageFlavor,
       'averageRoast': averageRoast,
+      'averageService': averageService,
       'totalReviews': totalReviews,
       'createdAt': Timestamp.fromDate(createdAt),
       'createdBy': createdBy,
@@ -122,6 +126,7 @@ class CoffeeShop {
     double? averageQuality,
     double? averageFlavor,
     double? averageRoast,
+    double? averageService,
     int? totalReviews,
     DateTime? createdAt,
     String? createdBy,
@@ -146,6 +151,7 @@ class CoffeeShop {
       averageQuality: averageQuality ?? this.averageQuality,
       averageFlavor: averageFlavor ?? this.averageFlavor,
       averageRoast: averageRoast ?? this.averageRoast,
+      averageService: averageService ?? this.averageService,
       totalReviews: totalReviews ?? this.totalReviews,
       createdAt: createdAt ?? this.createdAt,
       createdBy: createdBy ?? this.createdBy,

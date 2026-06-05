@@ -19,6 +19,7 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
   double _qualityRating = 3;
   double _flavorRating = 3;
   double _roastRating = 3;
+  double _serviceRating = 3;
 
   @override
   void dispose() {
@@ -40,6 +41,7 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
       qualityRating: _qualityRating,
       flavorRating: _flavorRating,
       roastRating: _roastRating,
+      serviceRating: _serviceRating,
       comment: _commentController.text.trim(),
     );
 
@@ -86,6 +88,13 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
               'Qué tan bien manejan los niveles de tostado',
               _roastRating,
               (v) => setState(() => _roastRating = v),
+            ),
+            const SizedBox(height: 20),
+            _buildRatingSection(
+              'Servicio',
+              'Atención del personal y ambiente del lugar',
+              _serviceRating,
+              (v) => setState(() => _serviceRating = v),
             ),
             const SizedBox(height: 24),
             const Text('Comentario',

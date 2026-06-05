@@ -69,10 +69,16 @@ class ReviewCard extends StatelessWidget {
           Row(
             children: [
               _miniRating('Calidad', review.qualityRating),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               _miniRating('Sabrozura', review.flavorRating),
-              const SizedBox(width: 16),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
               _miniRating('Tostado', review.roastRating),
+              const SizedBox(width: 12),
+              _miniRating('Servicio', review.serviceRating),
             ],
           ),
           if (review.comment.isNotEmpty) ...[

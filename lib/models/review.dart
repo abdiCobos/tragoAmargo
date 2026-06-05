@@ -9,6 +9,7 @@ class Review {
   final double qualityRating;
   final double flavorRating;
   final double roastRating;
+  final double serviceRating;
   final double overallRating;
   final String comment;
   final List<String> photos;
@@ -23,12 +24,13 @@ class Review {
     required this.qualityRating,
     required this.flavorRating,
     required this.roastRating,
+    required this.serviceRating,
     double? overallRating,
     this.comment = '',
     this.photos = const [],
     required this.createdAt,
   }) : overallRating = overallRating ??
-            ((qualityRating + flavorRating + roastRating) / 3.0);
+            ((qualityRating + flavorRating + roastRating + serviceRating) / 4.0);
 
   factory Review.fromMap(String id, Map<String, dynamic> data) {
     return Review(
@@ -44,6 +46,7 @@ class Review {
       qualityRating: (data['qualityRating'] ?? 0.0).toDouble(),
       flavorRating: (data['flavorRating'] ?? 0.0).toDouble(),
       roastRating: (data['roastRating'] ?? 0.0).toDouble(),
+      serviceRating: (data['serviceRating'] ?? 0.0).toDouble(),
       overallRating: (data['overallRating'] ?? 0.0).toDouble(),
       comment: data['comment'] ?? '',
       photos: List<String>.from(data['photos'] ?? []),
@@ -60,6 +63,7 @@ class Review {
       'qualityRating': qualityRating,
       'flavorRating': flavorRating,
       'roastRating': roastRating,
+      'serviceRating': serviceRating,
       'overallRating': overallRating,
       'comment': comment,
       'photos': photos,

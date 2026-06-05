@@ -190,7 +190,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                           ),
                         ],
                       ],
-                      if (shop.averageQuality > 0 || shop.averageFlavor > 0 || shop.averageRoast > 0) ...[
+                      if (shop.averageQuality > 0 || shop.averageFlavor > 0 || shop.averageRoast > 0 || shop.averageService > 0) ...[
                         const SizedBox(height: 24),
                         const Divider(),
                         const SizedBox(height: 16),
@@ -201,6 +201,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         _buildRatingRow('Calidad del grano', shop.averageQuality),
                         _buildRatingRow('Sabrozura', shop.averageFlavor),
                         _buildRatingRow('Manejo del tostado', shop.averageRoast),
+                        _buildRatingRow('Servicio', shop.averageService),
                       ],
                       if (shopProvider.currentProducts.isNotEmpty) ...[
                         const SizedBox(height: 24),

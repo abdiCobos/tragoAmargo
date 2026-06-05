@@ -19,7 +19,7 @@ class MapScreen extends StatelessWidget {
 
         final center = shops.isNotEmpty
             ? LatLng(shops.first.location.latitude, shops.first.location.longitude)
-            : const LatLng(19.4326, -99.1332);
+            : const LatLng(20.6597, -103.3496);
 
         return FlutterMap(
           options: MapOptions(

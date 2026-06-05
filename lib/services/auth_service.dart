@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: '1041702706373-a8v69p06lqktd9e5hpgum86g13r0onqq.apps.googleusercontent.com',
+  );
 
   User? get currentUser => _auth.currentUser;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
@@ -17,16 +20,21 @@ class AuthService {
   }
 
   Future<UserCredential> signInWithGoogle() async {
-    final googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) throw Exception('Inicio de sesión cancelado');
+    if (kIsWeb) {
+      final provider = GoogleAuthProvider();
+      return await _auth.signInWithPopup(provider);
+    } else {
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) throw Exception('Inicio de sesión cancelado');
 
-    final googleAuth = await googleUser.authentication;
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-    return await _auth.signInWithCredential(credential);
+      return await _auth.signInWithCredential(credential);
+    }
   }
 
   Future<void> signOut() async {

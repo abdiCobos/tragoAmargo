@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
+import 'dart:async';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/validators.dart';
 import '../../providers/coffee_shops_provider.dart';
@@ -33,6 +34,8 @@ class _AddShopScreenState extends State<AddShopScreen> {
   final _openingHours = <String, TextEditingController>{};
   List<Map<String, dynamic>> _addressSuggestions = [];
   bool _showSuggestions = false;
+  bool _searchingAddress = false;
+  Timer? _searchTimer;
 
   bool _showExtras = false;
   bool _showHours = false;
@@ -59,20 +62,29 @@ class _AddShopScreenState extends State<AddShopScreen> {
     _phoneController.dispose();
     _instagramController.dispose();
     for (final ctrl in _openingHours.values) ctrl.dispose();
+    _searchTimer?.cancel();
     super.dispose();
   }
 
-  Future<void> _searchAddress(String query) async {
+  void _onAddressChanged(String query) {
+    _searchTimer?.cancel();
     if (query.length < 3) {
-      setState(() { _addressSuggestions = []; _showSuggestions = false; });
+      setState(() { _addressSuggestions = []; _showSuggestions = false; _searchingAddress = false; });
       return;
     }
+    _searchTimer = Timer(const Duration(milliseconds: 500), () => _searchAddress(query));
+  }
+
+  Future<void> _searchAddress(String query) async {
+    if (query.length < 3) return;
+    setState(() => _searchingAddress = true);
     final geo = context.read<GeocodingService>();
-    final results = await geo.searchPlaces(query);
+    final results = await geo.searchStructured(query);
     if (mounted) {
       setState(() {
         _addressSuggestions = results;
         _showSuggestions = results.isNotEmpty;
+        _searchingAddress = false;
       });
     }
   }
@@ -212,8 +224,10 @@ class _AddShopScreenState extends State<AddShopScreen> {
                       : null,
                 ),
                 validator: (v) => Validators.required(v, 'La dirección'),
-                onChanged: _searchAddress,
+                onChanged: _onAddressChanged,
               ),
+              if (_searchingAddress)
+                const Padding(padding: EdgeInsets.only(top: 8), child: LinearProgressIndicator()),
               if (_showSuggestions) ...[
                 const SizedBox(height: 4),
                 Container(

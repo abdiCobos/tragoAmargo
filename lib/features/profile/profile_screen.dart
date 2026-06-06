@@ -153,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(children: [
             const Icon(Icons.verified, size: 16, color: AppColors.secondary),
             const SizedBox(width: 6),
-            Expanded(child: Text(shop.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15))),
+            Expanded(child: Text(shop.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15), overflow: TextOverflow.ellipsis)),
           ]),
           const SizedBox(height: 4),
           Text(shop.address, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),

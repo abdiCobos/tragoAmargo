@@ -72,7 +72,7 @@ class GeocodingService {
   Future<List<Map<String, dynamic>>> searchPlaces(String query) async {
     try {
       final uri = Uri.parse(
-        '$_baseUrl/search?format=json&q=${Uri.encodeComponent(query)}&limit=5',
+        '$_baseUrl/search?format=jsonv2&q=${Uri.encodeComponent(query)}&limit=5&addressdetails=1&countrycodes=mx&accept-language=es',
       );
       final response = await http.get(uri, headers: {
         'User-Agent': AppConstants.userAgent,
@@ -82,9 +82,30 @@ class GeocodingService {
       if (response.statusCode == 200) {
         final results = jsonDecode(response.body) as List;
         return results.map((r) => {
-          'lat': double.parse(r['lat']),
-          'lon': double.parse(r['lon']),
-          'displayName': r['display_name'],
+          'lat': double.parse(r['lat'] as String),
+          'lon': double.parse(r['lon'] as String),
+          'displayName': r['display_name'] as String? ?? '',
+        }).toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  Future<List<Map<String, dynamic>>> searchStructured(String query) async {
+    try {
+      final uri = Uri.parse(
+        '$_baseUrl/search?format=jsonv2&q=${Uri.encodeComponent(query)}&limit=5&addressdetails=1&countrycodes=mx&accept-language=es',
+      );
+      final response = await http.get(uri, headers: {
+        'User-Agent': AppConstants.userAgent,
+        'Accept-Language': 'es',
+      });
+      if (response.statusCode == 200) {
+        final results = jsonDecode(response.body) as List;
+        return results.map((r) => {
+          'lat': double.parse(r['lat'] as String),
+          'lon': double.parse(r['lon'] as String),
+          'displayName': r['display_name'] as String? ?? '',
         }).toList();
       }
     } catch (_) {}

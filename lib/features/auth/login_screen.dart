@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (success && mounted) {
-      Navigator.pushReplacementNamed(context, AuthGate.homeRoute);
+      Navigator.pop(context, true);
     }
   }
 
@@ -53,6 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('Iniciar Sesión')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

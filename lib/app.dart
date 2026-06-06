@@ -15,7 +15,6 @@ import 'features/home/home_screen.dart';
 
 class AuthGate extends StatefulWidget {
   static const String homeRoute = '/home';
-
   const AuthGate({super.key});
 
   @override
@@ -26,18 +25,9 @@ class _AuthGateState extends State<AuthGate> {
   @override
   void initState() {
     super.initState();
-    final auth = context.read<AuthProvider>();
-    auth.addListener(_onAuthChanged);
-  }
-
-  void _onAuthChanged() {
-    if (!mounted) return;
-    final auth = context.read<AuthProvider>();
-    if (auth.isAuthenticated) {
-      Navigator.pushReplacementNamed(context, AuthGate.homeRoute);
-    } else if (auth.user == null && !auth.isLoading) {
-      Navigator.pushReplacementNamed(context, '/login');
-    }
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (mounted) Navigator.pushReplacementNamed(context, AuthGate.homeRoute);
+    });
   }
 
   @override
@@ -49,19 +39,11 @@ class _AuthGateState extends State<AuthGate> {
           children: [
             const Icon(Icons.coffee, size: 80, color: AppColors.primary),
             const SizedBox(height: 16),
-            const Text(
-              'Trago Amargo',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
-            ),
+            const Text('Trago Amargo',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary)),
             const SizedBox(height: 8),
-            const Text(
-              'Muchas cafeterías, poca calidad y sabor',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
-            ),
+            const Text('Muchas cafeterías, poca calidad y sabor',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 16)),
             const SizedBox(height: 32),
             const CircularProgressIndicator(color: AppColors.primary),
           ],

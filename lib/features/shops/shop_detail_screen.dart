@@ -192,8 +192,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                           icon: Icons.verified_outlined,
                           label: '¿Eres el dueño? Acredítate',
                           color: AppColors.star,
-                          onPressed: () => Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => ClaimShopScreen(shop: shop))),
+                          onPressed: () async {
+                            if (!await auth.requireLogin(context)) return;
+                            if (!context.mounted) return;
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (_) => ClaimShopScreen(shop: shop)));
+                          },
                         ),
                       if (isOwner) ...[
                         _actionButton(
@@ -268,8 +272,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         const SizedBox(height: 12),
                         ...shopProv.menuItems.map((item) => MenuItemCard(
                               item: item,
-                              onRate: isOwner ? null : () => Navigator.push(context,
-                                  MaterialPageRoute(builder: (_) => RateMenuItemScreen(item: item))),
+                              onRate: isOwner ? null : () async {
+                                if (!await auth.requireLogin(context)) return;
+                                if (!context.mounted) return;
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (_) => RateMenuItemScreen(item: item)));
+                              },
                               onDelete: isOwner ? () => _deleteMenuItem(item) : null,
                             )),
                       ],
@@ -296,8 +304,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                           children: [
                             Expanded(
                               child: ElevatedButton.icon(
-                                onPressed: () => Navigator.push(context,
-                                    MaterialPageRoute(builder: (_) => ReviewFormScreen(shopId: shop.id))),
+                                onPressed: () async {
+                                  if (!await auth.requireLogin(context)) return;
+                                  if (!context.mounted) return;
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (_) => ReviewFormScreen(shopId: shop.id)));
+                                },
                                 icon: const Icon(Icons.rate_review),
                                 label: const Text('Reseña'),
                               ),
@@ -305,7 +317,10 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: OutlinedButton.icon(
-                                onPressed: () => auth.toggleFavorite(shop.id),
+                                onPressed: () async {
+                                  if (!await auth.requireLogin(context)) return;
+                                  auth.toggleFavorite(shop.id);
+                                },
                                 icon: Icon(isFav ? Icons.favorite : Icons.favorite_border,
                                     color: isFav ? AppColors.error : AppColors.primary),
                                 label: Text(isFav ? 'Guardado' : 'Favorito'),

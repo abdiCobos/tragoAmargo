@@ -163,6 +163,12 @@ class AuthProvider extends ChangeNotifier {
     await claimShop(shopId);
   }
 
+  Future<bool> requireLogin(BuildContext context) async {
+    if (isAuthenticated) return true;
+    final result = await Navigator.pushNamed(context, '/login');
+    return result == true || isAuthenticated;
+  }
+
   String _getAuthErrorMessage(String code) {
     switch (code) {
       case 'user-not-found':

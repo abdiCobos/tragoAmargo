@@ -221,7 +221,10 @@ class _ShopListScreenState extends State<ShopListScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
+          final auth = context.read<AuthProvider>();
+          if (!await auth.requireLogin(context)) return;
+          if (!context.mounted) return;
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const AddShopScreen()),

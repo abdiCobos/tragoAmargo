@@ -184,8 +184,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final user = auth.user;
       if (user == null) return;
       final bytes = await photo.readAsBytes();
-      await storage.uploadUserPhoto(user.uid, bytes);
+      final url = await storage.uploadUserPhoto(user.uid, bytes);
+      await user.updatePhotoURL(url);
       if (!context.mounted) return;
+      setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Foto actualizada')),
       );

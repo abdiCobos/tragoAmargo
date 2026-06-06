@@ -37,7 +37,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
   bool _showExtras = false;
   bool _showHours = false;
 
-  final _roastOptions = ['Claro', 'Medio', 'Oscuro', 'Espresso'];
+  final _roastOptions = ['Claro', 'Medio', 'Oscuro'];
   final _brewingOptions = ['V60', 'Chemex', 'Aeropress', 'French Press', 'Espresso', 'Cold Brew', 'Sifón'];
   final _seatingOptions = ['', 'Mesas y sillas', 'Solo para llevar', 'Espacio público'];
   final _days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];

@@ -11,6 +11,7 @@ import '../../services/storage_service.dart';
 import '../../models/review.dart';
 import '../../models/coffee_shop.dart';
 import '../../models/menu_item.dart';
+import '../../models/notification.dart';
 import '../../widgets/loading_indicator.dart';
 import 'widgets/photo_gallery.dart';
 import 'widgets/product_card.dart';
@@ -589,6 +590,11 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                 if (controller.text.trim().isEmpty) return;
                 final fs = context.read<FirestoreService>();
                 fs.addReviewReply(review.id, auth.user?.displayName ?? 'Usuario', controller.text.trim());
+                fs.sendNotification(AppNotification(
+                  id: '', userId: review.userId, title: 'Respondieron tu reseña',
+                  body: '${auth.user?.displayName ?? 'Alguien'} respondió tu reseña en ${widget.shopId}',
+                  type: 'review_reply', shopId: widget.shopId, createdAt: DateTime.now(),
+                ));
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Respuesta publicada'), backgroundColor: AppColors.secondary),

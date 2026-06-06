@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
 import '../models/app_user.dart';
+import '../models/notification.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService;
@@ -41,6 +42,11 @@ class AuthProvider extends ChangeNotifier {
         );
         await _firestoreService.createUser(newUser);
         _appUser = newUser;
+        _firestoreService.sendNotification(AppNotification(
+          id: '', userId: firebaseUser.uid, title: '¡Bienvenido a Trago Amargo!',
+          body: 'Muchas cafeterías, poca calidad y sabor. Ayúdanos a encontrar las mejores.',
+          type: 'welcome', createdAt: DateTime.now(),
+        ));
       }
     } else {
       _appUser = null;

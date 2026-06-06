@@ -4,6 +4,8 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/reviews_provider.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/firestore_service.dart';
+import '../../../models/notification.dart';
 
 class ReviewFormScreen extends StatefulWidget {
   final String shopId;
@@ -68,6 +70,15 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
     );
 
     if (success && mounted) {
+      final fs = context.read<FirestoreService>();
+      final shop = await fs.getCoffeeShop(widget.shopId);
+      if (shop != null && shop.verifiedOwnerUid != null && shop.verifiedOwnerUid != auth.user!.uid) {
+        fs.sendNotification(AppNotification(
+          id: '', userId: shop.verifiedOwnerUid!, title: 'Nueva reseña en ${shop.name}',
+          body: '${auth.user?.displayName ?? 'Alguien'} calificó tu cafetería',
+          type: 'new_review', shopId: widget.shopId, createdAt: DateTime.now(),
+        ));
+      }
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

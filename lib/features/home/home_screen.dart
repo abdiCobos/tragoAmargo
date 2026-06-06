@@ -4,8 +4,9 @@ import '../shops/shop_list_screen.dart';
 import '../map/map_screen.dart';
 import '../favorites/favorites_screen.dart';
 import '../profile/profile_screen.dart';
+import '../notifications/notifications_screen.dart';
 import '../../providers/auth_provider.dart';
-import '../../core/theme/app_theme.dart';
+import '../../services/firestore_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ? AppBar(
                   title: const Text('Trago Amargo'),
                   actions: [
+                    if (auth.isAuthenticated) _notificationBell(context, auth),
                     if (!auth.isAuthenticated)
                       TextButton.icon(
                         onPressed: () async {
@@ -59,6 +61,33 @@ class _HomeScreenState extends State<HomeScreen> {
               BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Perfil'),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  Widget _notificationBell(BuildContext context, AuthProvider auth) {
+    return StreamBuilder<int>(
+      stream: context.read<FirestoreService>().getUnreadCountStream(auth.user!.uid),
+      initialData: 0,
+      builder: (_, snap) {
+        final count = snap.data ?? 0;
+        return Stack(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+            ),
+            if (count > 0)
+              Positioned(
+                right: 6, top: 6,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                  child: Text('$count', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                ),
+              ),
+          ],
         );
       },
     );

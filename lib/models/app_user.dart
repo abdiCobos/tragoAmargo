@@ -6,6 +6,7 @@ class AppUser {
   final String email;
   final String photoUrl;
   final List<String> favoriteShops;
+  final List<String> ownedShops;
   final DateTime createdAt;
 
   AppUser({
@@ -14,6 +15,7 @@ class AppUser {
     required this.email,
     this.photoUrl = '',
     this.favoriteShops = const [],
+    this.ownedShops = const [],
     required this.createdAt,
   });
 
@@ -28,6 +30,7 @@ class AppUser {
       displayName: displayName ?? '',
       email: email ?? '',
       photoUrl: photoUrl ?? '',
+      ownedShops: const [],
       createdAt: DateTime.now(),
     );
   }
@@ -39,6 +42,7 @@ class AppUser {
       email: data['email'] ?? '',
       photoUrl: data['photoUrl'] ?? '',
       favoriteShops: List<String>.from(data['favoriteShops'] ?? []),
+      ownedShops: List<String>.from(data['ownedShops'] ?? []),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
   }
@@ -50,6 +54,7 @@ class AppUser {
       'email': email,
       'photoUrl': photoUrl,
       'favoriteShops': favoriteShops,
+      'ownedShops': ownedShops,
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }
@@ -58,6 +63,7 @@ class AppUser {
     String? displayName,
     String? photoUrl,
     List<String>? favoriteShops,
+    List<String>? ownedShops,
   }) {
     return AppUser(
       uid: uid,
@@ -65,6 +71,7 @@ class AppUser {
       email: email,
       photoUrl: photoUrl ?? this.photoUrl,
       favoriteShops: favoriteShops ?? this.favoriteShops,
+      ownedShops: ownedShops ?? this.ownedShops,
       createdAt: createdAt,
     );
   }

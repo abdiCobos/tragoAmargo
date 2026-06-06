@@ -15,6 +15,9 @@ import 'widgets/photo_gallery.dart';
 import 'widgets/product_card.dart';
 import 'widgets/opening_hours_widget.dart';
 import '../reviews/review_form_screen.dart';
+import 'claim_shop_screen.dart';
+import 'add_product_screen.dart';
+import 'rate_product_screen.dart';
 
 class ShopDetailScreen extends StatefulWidget {
   final String shopId;
@@ -62,7 +65,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
           final shop = shopProv.selectedShop!;
           final isFav = auth.isFavorite(shop.id);
-          final isOwner = shop.createdBy != null && shop.createdBy == auth.user?.uid;
+          final isOwner = auth.isOwnerOfShop(shop.verifiedOwnerUid);
+          final isPendingClaim = shop.verifiedOwnerUid == null;
 
           return CustomScrollView(
             slivers: [
@@ -94,8 +98,30 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(shop.name,
-                          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(shop.name,
+                                    style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                                if (isOwner)
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.secondary.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: const Text('Dueño',
+                                        style: TextStyle(fontSize: 11, color: AppColors.secondary, fontWeight: FontWeight.bold)),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 8),
                       if (shop.averageRating > 0) ...[
                         Row(
@@ -134,27 +160,24 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                           ],
                         ],
                       ),
-                      if (isOwner && (shop.photos.isEmpty || shop.description.isEmpty || shop.brewingMethods.isEmpty)) ...[
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.secondary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.info_outline, color: AppColors.secondary, size: 18),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Toca el ícono de cámara arriba para agregar fotos.',
-                                  style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
-                                ),
-                              ),
-                            ],
-                          ),
+                      const SizedBox(height: 16),
+                      if (isPendingClaim)
+                        _actionButton(
+                          icon: Icons.verified_outlined,
+                          label: '¿Eres el dueño? Acredítate',
+                          color: AppColors.star,
+                          onPressed: () => Navigator.push(context,
+                              MaterialPageRoute(builder: (_) => ClaimShopScreen(shop: shop))),
                         ),
+                      if (isOwner) ...[
+                        _actionButton(
+                          icon: Icons.local_drink,
+                          label: 'Agregar bebida insignia',
+                          color: AppColors.secondary,
+                          onPressed: () => Navigator.push(context,
+                              MaterialPageRoute(builder: (_) => AddProductScreen(shopId: shop.id))),
+                        ),
+                        const SizedBox(height: 8),
                       ],
                       const SizedBox(height: 24),
                       const Divider(),
@@ -208,39 +231,45 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       ],
                       if (shopProv.currentProducts.isNotEmpty) ...[
                         const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),
-                        const Text('Productos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const Text('Bebidas insignia', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 12),
                         SizedBox(
-                          height: 180,
+                          height: 210,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: shopProv.currentProducts.length,
-                            itemBuilder: (_, i) => ProductCard(product: shopProv.currentProducts[i]),
+                            itemBuilder: (_, i) => ProductCard(
+                              product: shopProv.currentProducts[i],
+                              onRate: isOwner ? null : () => Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) => RateProductScreen(product: shopProv.currentProducts[i]))),
+                            ),
                           ),
                         ),
                       ],
-                      const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () => Navigator.push(context,
-                                  MaterialPageRoute(builder: (_) => ReviewFormScreen(shopId: shop.id))),
-                              icon: const Icon(Icons.rate_review),
-                              label: const Text('Reseña'),
+                      if (!isOwner) ...[
+                        const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: () => Navigator.push(context,
+                                    MaterialPageRoute(builder: (_) => ReviewFormScreen(shopId: shop.id))),
+                                icon: const Icon(Icons.rate_review),
+                                label: const Text('Reseña'),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: () => auth.toggleFavorite(shop.id),
-                              icon: Icon(isFav ? Icons.favorite : Icons.favorite_border,
-                                  color: isFav ? AppColors.error : AppColors.primary),
-                              label: Text(isFav ? 'Guardado' : 'Favorito'),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => auth.toggleFavorite(shop.id),
+                                icon: Icon(isFav ? Icons.favorite : Icons.favorite_border,
+                                    color: isFav ? AppColors.error : AppColors.primary),
+                                label: Text(isFav ? 'Guardado' : 'Favorito'),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 24),
                       Consumer<ReviewsProvider>(
                         builder: (context, reviews, _) {
@@ -268,6 +297,22 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _actionButton({required IconData icon, required String label, required Color color, required VoidCallback onPressed}) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, color: color),
+        label: Text(label, style: TextStyle(color: color)),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: color.withValues(alpha: 0.5)),
+          minimumSize: const Size(double.infinity, 48),
+        ),
       ),
     );
   }
@@ -388,9 +433,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              const Divider(),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16), const Divider(), const SizedBox(height: 8),
               const Text('Reseñas', style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               ...userReviews.take(5).map((r) => Padding(

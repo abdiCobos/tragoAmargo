@@ -44,6 +44,12 @@ class FirestoreService {
     }
   }
 
+  Future<void> addOwnedShop(String uid, String shopId) async {
+    await _firestore.collection(FirestoreCollections.users).doc(uid).update({
+      'ownedShops': FieldValue.arrayUnion([shopId]),
+    });
+  }
+
   // ─── Coffee Shops ───
 
   Stream<List<CoffeeShop>> getCoffeeShops({
@@ -140,6 +146,23 @@ class FirestoreService {
         .doc(shopId)
         .collection(FirestoreCollections.products)
         .add(product.toMap());
+  }
+
+  Future<void> updateProductRating({
+    required String shopId,
+    required String productId,
+    required double averageRating,
+    required int totalRatings,
+  }) async {
+    await _firestore
+        .collection(FirestoreCollections.coffeeShops)
+        .doc(shopId)
+        .collection(FirestoreCollections.products)
+        .doc(productId)
+        .update({
+      'averageRating': averageRating,
+      'totalRatings': totalRatings,
+    });
   }
 
   // ─── Reviews ───

@@ -126,4 +126,18 @@ class CoffeeShopsProvider extends ChangeNotifier {
       _error = e.toString(); _isLoading = false; notifyListeners(); return null;
     }
   }
+
+  Future<void> addProduct({
+    required String shopId,
+    required String name,
+    required double price,
+    required String description,
+    required String photoUrl,
+  }) async {
+    final product = Product(
+      id: '', shopId: shopId, name: name, price: price,
+      description: description, photo: photoUrl, createdAt: DateTime.now(),
+    );
+    await _firestoreService.addProduct(shopId, product);
+  }
 }

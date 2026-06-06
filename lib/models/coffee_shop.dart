@@ -24,6 +24,7 @@ class CoffeeShop {
   final int totalReviews;
   final DateTime createdAt;
   final String? createdBy;
+  final String? verifiedOwnerUid;
 
   CoffeeShop({
     required this.id,
@@ -49,6 +50,7 @@ class CoffeeShop {
     this.totalReviews = 0,
     required this.createdAt,
     this.createdBy,
+    this.verifiedOwnerUid,
   });
 
   factory CoffeeShop.fromMap(String id, Map<String, dynamic> data) {
@@ -76,6 +78,7 @@ class CoffeeShop {
       totalReviews: data['totalReviews'] ?? 0,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       createdBy: data['createdBy'],
+      verifiedOwnerUid: data['verifiedOwnerUid'],
     );
   }
 
@@ -104,6 +107,7 @@ class CoffeeShop {
       'totalReviews': totalReviews,
       'createdAt': Timestamp.fromDate(createdAt),
       'createdBy': createdBy,
+      'verifiedOwnerUid': verifiedOwnerUid,
     };
   }
 
@@ -131,6 +135,7 @@ class CoffeeShop {
     int? totalReviews,
     DateTime? createdAt,
     String? createdBy,
+    String? verifiedOwnerUid,
   }) {
     return CoffeeShop(
       id: id ?? this.id,
@@ -156,6 +161,7 @@ class CoffeeShop {
       totalReviews: totalReviews ?? this.totalReviews,
       createdAt: createdAt ?? this.createdAt,
       createdBy: createdBy ?? this.createdBy,
+      verifiedOwnerUid: verifiedOwnerUid ?? this.verifiedOwnerUid,
     );
   }
 }

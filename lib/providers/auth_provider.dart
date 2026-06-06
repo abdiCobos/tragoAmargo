@@ -141,6 +141,28 @@ class AuthProvider extends ChangeNotifier {
     return _appUser?.favoriteShops.contains(shopId) ?? false;
   }
 
+  bool isOwnerOf(String shopId) {
+    return _appUser?.ownedShops.contains(shopId) ?? false;
+  }
+
+  bool isOwnerOfShop(String? verifiedOwnerUid) {
+    if (verifiedOwnerUid == null || _user == null) return false;
+    return verifiedOwnerUid == _user!.uid;
+  }
+
+  Future<void> claimShop(String shopId) async {
+    if (_appUser == null) return;
+    final updated = List<String>.from(_appUser!.ownedShops);
+    if (!updated.contains(shopId)) updated.add(shopId);
+    _appUser = _appUser!.copyWith(ownedShops: updated);
+    await _firestoreService.updateUser(_appUser!);
+    notifyListeners();
+  }
+
+  Future<void> addOwnedShop(String shopId) async {
+    await claimShop(shopId);
+  }
+
   String _getAuthErrorMessage(String code) {
     switch (code) {
       case 'user-not-found':

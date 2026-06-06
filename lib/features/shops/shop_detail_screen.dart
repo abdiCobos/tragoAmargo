@@ -645,15 +645,19 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       auth.requireLogin(context);
       return;
     }
-    _showReportDialog('shop', shop.id, shop.name);
+    _showReportDialog('shop', shop.id, shop.name, auth);
   }
 
   void _reportReview(Review review) {
-    _showReportDialog('review', review.id, 'la reseña de ${review.userName}');
+    final auth = context.read<AuthProvider>();
+    if (!auth.isAuthenticated) {
+      auth.requireLogin(context);
+      return;
+    }
+    _showReportDialog('review', review.id, 'la reseña de ${review.userName}', auth);
   }
 
-  void _showReportDialog(String targetType, String targetId, String targetName) {
-    final auth = context.read<AuthProvider>();
+  void _showReportDialog(String targetType, String targetId, String targetName, AuthProvider auth) {
     final reasons = ['Contenido ofensivo', 'Información falsa', 'Spam', 'Otro'];
     String? selectedReason;
 

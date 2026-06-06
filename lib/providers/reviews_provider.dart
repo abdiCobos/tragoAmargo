@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../services/firestore_service.dart';
 import '../models/review.dart';
 
@@ -9,6 +10,7 @@ class ReviewsProvider extends ChangeNotifier {
   Review? _existingReview;
   bool _isLoading = false;
   String? _error;
+  StreamSubscription? _subscription;
 
   ReviewsProvider(this._firestoreService);
 
@@ -19,10 +21,11 @@ class ReviewsProvider extends ChangeNotifier {
   bool get isEditing => _existingReview != null;
 
   void loadReviews(String shopId) {
+    _subscription?.cancel();
     _isLoading = true;
     notifyListeners();
 
-    _firestoreService.getReviews(shopId).listen((reviews) {
+    _subscription = _firestoreService.getReviews(shopId).listen((reviews) {
       _reviews = reviews;
       _isLoading = false;
       notifyListeners();

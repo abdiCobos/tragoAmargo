@@ -324,20 +324,25 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              CircleAvatar(radius: 16, backgroundColor: AppColors.primary,
-                child: Text(review.userName.isNotEmpty ? review.userName[0].toUpperCase() : '?',
-                    style: const TextStyle(color: Colors.white, fontSize: 12)),
-              ),
-              const SizedBox(width: 8),
-              Text(review.userName,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-              const Spacer(),
-              Row(children: List.generate(5, (i) => Icon(
-                  i < review.overallRating.round() ? Icons.star : Icons.star_border,
-                  size: 14, color: AppColors.star))),
-            ],
+          GestureDetector(
+            onTap: () => _viewProfile(review),
+            child: Row(
+              children: [
+                CircleAvatar(radius: 16, backgroundColor: AppColors.primary,
+                  child: Text(review.userName.isNotEmpty ? review.userName[0].toUpperCase() : '?',
+                      style: const TextStyle(color: Colors.white, fontSize: 12)),
+                ),
+                const SizedBox(width: 8),
+                Text(review.userName,
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                const SizedBox(width: 4),
+                const Icon(Icons.arrow_forward_ios, size: 10, color: AppColors.textSecondary),
+                const Spacer(),
+                Row(children: List.generate(5, (i) => Icon(
+                    i < review.overallRating.round() ? Icons.star : Icons.star_border,
+                    size: 14, color: AppColors.star))),
+              ],
+            ),
           ),
           if (review.comment.isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -345,6 +350,70 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
           ],
         ],
       ),
+    );
+  }
+
+  void _viewProfile(Review review) async {
+    final fs = context.read<FirestoreService>();
+    final userReviews = await fs.getReviewsByUser(review.userId);
+    if (!mounted) return;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(radius: 24, backgroundColor: AppColors.primary,
+                    child: Text(review.userName.isNotEmpty ? review.userName[0].toUpperCase() : '?',
+                        style: const TextStyle(color: Colors.white, fontSize: 16)),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(review.userName,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text('${userReviews.length} reseñas escritas',
+                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 8),
+              const Text('Reseñas', style: TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              ...userReviews.take(5).map((r) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Row(children: List.generate(5, (i) => Icon(
+                            i < r.overallRating.round() ? Icons.star : Icons.star_border,
+                            size: 14, color: AppColors.star))),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(r.comment.isNotEmpty ? r.comment : 'Sin comentario',
+                              maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                        ),
+                      ],
+                    ),
+                  )),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -15,6 +15,14 @@
         {"fieldPath": "shopId", "order": "ASCENDING"},
         {"fieldPath": "userId", "order": "ASCENDING"}
       ]
+    },
+    {
+      "collectionGroup": "reviews",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "shopId", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
     }
   ],
   "fieldOverrides": []

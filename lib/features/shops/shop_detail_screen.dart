@@ -452,6 +452,35 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             const SizedBox(height: 8),
             Text(review.comment, style: const TextStyle(fontSize: 13)),
           ],
+          if (review.replies.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            const Divider(),
+            ...review.replies.map((r) => Padding(
+              padding: const EdgeInsets.only(top: 6, left: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${r['userName'] ?? 'Usuario'}: ',
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: AppColors.primary)),
+                  Expanded(
+                    child: Text(r['text'] ?? '',
+                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                  ),
+                ],
+              ),
+            )),
+          ],
+          const SizedBox(height: 6),
+          GestureDetector(
+            onTap: () => _replyToReview(review),
+            child: const Row(
+              children: [
+                Icon(Icons.reply, size: 14, color: AppColors.textSecondary),
+                SizedBox(width: 4),
+                Text('Responder', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -516,6 +545,40 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
           ),
         );
       },
+    );
+  }
+
+  Future<void> _replyToReview(Review review) async {
+    final auth = context.read<AuthProvider>();
+    if (!await auth.requireLogin(context)) return;
+    if (!mounted) return;
+
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Responder', style: TextStyle(fontSize: 18)),
+        content: TextField(
+          controller: controller,
+          maxLines: 3,
+          decoration: const InputDecoration(hintText: 'Escribe tu respuesta...'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: () {
+              if (controller.text.trim().isEmpty) return;
+              final fs = context.read<FirestoreService>();
+              fs.addReviewReply(review.id, auth.user?.displayName ?? 'Usuario', controller.text.trim());
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Respuesta publicada'), backgroundColor: AppColors.secondary),
+              );
+            },
+            child: const Text('Responder'),
+          ),
+        ],
+      ),
     );
   }
 }

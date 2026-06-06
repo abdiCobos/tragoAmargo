@@ -203,6 +203,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
                     itemBuilder: (context, index) {
                       final shop = provider.shops[index];
                       return ShopCard(
+                        index: index,
                         shop: shop,
                         onTap: () {
                           Navigator.push(

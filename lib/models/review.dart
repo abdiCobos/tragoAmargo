@@ -13,6 +13,7 @@ class Review {
   final double overallRating;
   final String comment;
   final List<String> photos;
+  final List<Map<String, dynamic>> replies;
   final DateTime createdAt;
 
   Review({
@@ -28,6 +29,7 @@ class Review {
     double? overallRating,
     this.comment = '',
     this.photos = const [],
+    this.replies = const [],
     required this.createdAt,
   }) : overallRating = overallRating ??
             ((qualityRating + flavorRating + roastRating + serviceRating) / 4.0);
@@ -50,6 +52,7 @@ class Review {
       overallRating: (data['overallRating'] ?? 0.0).toDouble(),
       comment: data['comment'] ?? '',
       photos: List<String>.from(data['photos'] ?? []),
+      replies: List<Map<String, dynamic>>.from(data['replies'] ?? []),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
   }
@@ -67,6 +70,7 @@ class Review {
       'overallRating': overallRating,
       'comment': comment,
       'photos': photos,
+      'replies': replies,
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }

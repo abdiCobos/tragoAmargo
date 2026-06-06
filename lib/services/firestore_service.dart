@@ -346,6 +346,16 @@ class FirestoreService {
     await _firestore.collection('owner_claims').add(claim.toMap());
   }
 
+  Future<void> addReviewReply(String reviewId, String userName, String text) async {
+    await _firestore.collection(FirestoreCollections.reviews).doc(reviewId).update({
+      'replies': FieldValue.arrayUnion([{
+        'userName': userName,
+        'text': text,
+        'createdAt': FieldValue.serverTimestamp(),
+      }]),
+    });
+  }
+
   Future<bool> hasPendingClaim(String shopId, String userId) async {
     final snapshot = await _firestore
         .collection('owner_claims')

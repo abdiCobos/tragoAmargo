@@ -659,42 +659,48 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   void _showReportDialog(String targetType, String targetId, String targetName, AuthProvider auth) {
     final reasons = ['Contenido ofensivo', 'Información falsa', 'Spam', 'Otro'];
-    String? selectedReason;
-
+    final selectedReason = ValueNotifier<String?>(null);
     final detailsCtrl = TextEditingController();
+
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(builder: (_, setD) => AlertDialog(
-        title: Text('Reportar $targetName'),
-        content: SizedBox(
-          width: 400,
-          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Motivo:', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            Wrap(spacing: 8, children: reasons.map((r) => ChoiceChip(
-              label: Text(r), selected: selectedReason == r,
-              onSelected: (v) => setD(() => selectedReason = v ? r : null),
-            )).toList()),
-            const SizedBox(height: 16),
-            TextField(controller: detailsCtrl, maxLines: 3,
-              decoration: const InputDecoration(hintText: 'Detalles adicionales...', isDense: true)),
-          ]),
+      builder: (ctx) => ValueListenableBuilder<String?>(
+        valueListenable: selectedReason,
+        builder: (_, reason, __) => AlertDialog(
+          title: Text('Reportar $targetName'),
+          content: SizedBox(
+            width: 400,
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text('Motivo:', style: TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              Wrap(spacing: 8, children: reasons.map((r) => ChoiceChip(
+                label: Text(r), selected: reason == r,
+                onSelected: (v) => selectedReason.value = v ? r : null,
+              )).toList()),
+              const SizedBox(height: 16),
+              TextField(controller: detailsCtrl, maxLines: 3,
+                decoration: const InputDecoration(hintText: 'Detalles adicionales...', isDense: true)),
+            ]),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+            ElevatedButton(
+              onPressed: reason == null ? null : () {
+                final fs = context.read<FirestoreService>();
+                fs.submitReport(Report(
+                  reporterId: auth.user!.uid,
+                  reporterName: auth.user?.displayName ?? 'Usuario',
+                  targetId: targetId, targetType: targetType,
+                  reason: reason, details: detailsCtrl.text,
+                ));
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reporte enviado')));
+              },
+              child: const Text('Enviar reporte'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
-          ElevatedButton(onPressed: selectedReason == null ? null : () {
-            final fs = context.read<FirestoreService>();
-            fs.submitReport(Report(
-              reporterId: auth.user!.uid,
-              reporterName: auth.user?.displayName ?? 'Usuario',
-              targetId: targetId, targetType: targetType,
-              reason: selectedReason!, details: detailsCtrl.text,
-            ));
-            Navigator.pop(ctx);
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reporte enviado')));
-          }, child: const Text('Enviar reporte')),
-        ],
-      )),
+      ),
     );
   }
 }

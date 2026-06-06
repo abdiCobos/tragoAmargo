@@ -22,6 +22,7 @@ import 'rate_product_screen.dart';
 import 'manage_menu_screen.dart';
 import 'rate_menu_item_screen.dart';
 import 'widgets/menu_item_card.dart';
+import 'edit_shop_screen.dart';
 
 class ShopDetailScreen extends StatefulWidget {
   final String shopId;
@@ -105,12 +106,22 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                   background: PhotoGallery(photos: shop.photos),
                 ),
                 actions: [
-                  if (isOwner)
+                  if (isOwner) ...[
                     IconButton(
                       icon: const Icon(Icons.add_a_photo, color: Colors.white),
                       tooltip: 'Agregar fotos',
                       onPressed: () => _addPhoto(shop),
                     ),
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.white),
+                      tooltip: 'Editar información',
+                      onPressed: () async {
+                        final result = await Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => EditShopScreen(shop: shop)));
+                        if (result == true && mounted) context.read<CoffeeShopsProvider>().selectShop(shop.id);
+                      },
+                    ),
+                  ],
                   IconButton(
                     icon: Icon(isFav ? Icons.favorite : Icons.favorite_border,
                         color: isFav ? AppColors.error : Colors.white),

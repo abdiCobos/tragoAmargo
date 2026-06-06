@@ -80,7 +80,6 @@ build/
 **/web/.env
 
 # Web related
-lib/generated_plugin_registrant.dart
 
 # Symbolication
 app.*.symbols

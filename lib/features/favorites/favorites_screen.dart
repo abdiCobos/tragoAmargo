@@ -43,7 +43,6 @@ class FavoritesScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final shop = favoriteShops[index];
               return ShopCard(
-                index: index,
                 shop: shop,
                 onTap: () {
                   Navigator.push(

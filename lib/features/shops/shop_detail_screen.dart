@@ -556,28 +556,37 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     final controller = TextEditingController();
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Responder', style: TextStyle(fontSize: 18)),
-        content: TextField(
-          controller: controller,
-          maxLines: 3,
-          decoration: const InputDecoration(hintText: 'Escribe tu respuesta...'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
-          TextButton(
-            onPressed: () {
-              if (controller.text.trim().isEmpty) return;
-              final fs = context.read<FirestoreService>();
-              fs.addReviewReply(review.id, auth.user?.displayName ?? 'Usuario', controller.text.trim());
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Respuesta publicada'), backgroundColor: AppColors.secondary),
-              );
-            },
-            child: const Text('Responder'),
+      builder: (ctx) => SizedBox(
+        width: 400,
+        child: AlertDialog(
+          title: const Text('Responder', style: TextStyle(fontSize: 18)),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: TextField(
+              controller: controller,
+              maxLines: 5, minLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'Escribe tu respuesta...',
+                contentPadding: EdgeInsets.all(12),
+              ),
+            ),
           ),
-        ],
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+            TextButton(
+              onPressed: () {
+                if (controller.text.trim().isEmpty) return;
+                final fs = context.read<FirestoreService>();
+                fs.addReviewReply(review.id, auth.user?.displayName ?? 'Usuario', controller.text.trim());
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Respuesta publicada'), backgroundColor: AppColors.secondary),
+                );
+              },
+              child: const Text('Responder'),
+            ),
+          ],
+        ),
       ),
     );
   }

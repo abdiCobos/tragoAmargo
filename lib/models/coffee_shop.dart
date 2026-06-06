@@ -15,6 +15,7 @@ class CoffeeShop {
   final String instagram;
   final GeoPoint location;
   final String address;
+  final String city;
   final List<String> photos;
   final double averageRating;
   final double averageQuality;
@@ -41,6 +42,7 @@ class CoffeeShop {
     this.instagram = '',
     required this.location,
     this.address = '',
+    this.city = '',
     this.photos = const [],
     this.averageRating = 0.0,
     this.averageQuality = 0.0,
@@ -69,6 +71,7 @@ class CoffeeShop {
       instagram: data['instagram'] ?? '',
       location: data['location'],
       address: data['address'] ?? '',
+      city: data['city'] ?? '',
       photos: List<String>.from(data['photos'] ?? []),
       averageRating: (data['averageRating'] ?? 0.0).toDouble(),
       averageQuality: (data['averageQuality'] ?? 0.0).toDouble(),
@@ -97,6 +100,7 @@ class CoffeeShop {
       'instagram': instagram,
       'location': location,
       'address': address,
+      'city': city,
       'addressLower': address.trim().toLowerCase(),
       'photos': photos,
       'averageRating': averageRating,
@@ -126,6 +130,7 @@ class CoffeeShop {
     String? instagram,
     GeoPoint? location,
     String? address,
+    String? city,
     List<String>? photos,
     double? averageRating,
     double? averageQuality,
@@ -152,6 +157,7 @@ class CoffeeShop {
       instagram: instagram ?? this.instagram,
       location: location ?? this.location,
       address: address ?? this.address,
+      city: city ?? this.city,
       photos: photos ?? this.photos,
       averageRating: averageRating ?? this.averageRating,
       averageQuality: averageQuality ?? this.averageQuality,

@@ -2,40 +2,83 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ─── Coffee Shops ──
     match /coffee_shops/{shopId} {
       allow read: if true;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null;
-      
+      allow create: if request.auth != null
+        && request.resource.data.verifiedOwnerUid == null;
+      allow update: if request.auth != null
+        && (resource.data.verifiedOwnerUid == request.auth.uid
+            || get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.createdBy == request.auth.uid);
+      allow delete: if false;
+
       match /products/{productId} {
         allow read: if true;
-        allow create: if request.auth != null;
-        allow update: if request.auth != null;
+        allow create, update: if request.auth != null
+          && get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.verifiedOwnerUid == request.auth.uid;
+        allow delete: if false;
       }
-      
+
       match /menu/{itemId} {
         allow read: if true;
-        allow create: if request.auth != null;
-        allow update: if request.auth != null;
-        allow delete: if request.auth != null;
+        allow create, update, delete: if request.auth != null
+          && get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.verifiedOwnerUid == request.auth.uid;
+      }
+
+      match /menu_items/{itemId} {
+        allow read: if true;
+        allow create, update, delete: if request.auth != null
+          && get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.verifiedOwnerUid == request.auth.uid;
       }
     }
-    
+
+    // ─── Owner Claims ──
     match /owner_claims/{claimId} {
-      allow read: if true;
-      allow create: if request.auth != null;
+      allow read: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+      allow update: if false;
     }
-    
+
+    // ─── Reviews ──
     match /reviews/{reviewId} {
       allow read: if true;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow delete: if false;
     }
-    
+
+    // ─── Users ──
     match /users/{uid} {
       allow read: if true;
       allow create: if request.auth != null && request.auth.uid == uid;
       allow update: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // ─── Notifications ──
+    match /notifications/{notifId} {
+      allow read: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+    }
+
+    // ─── Reports ──
+    match /reports/{reportId} {
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.reporterId;
+      allow read, update, delete: if false;
+    }
+
+    // ─── Default deny ──
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

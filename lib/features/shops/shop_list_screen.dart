@@ -105,6 +105,29 @@ class _ShopListScreenState extends State<ShopListScreen> {
                     },
                   ),
                   const SizedBox(height: 8),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  const Text('Proximidad (Ciudad)',
+                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Ej: Guadalajara, Zapopan...',
+                      prefixIcon: const Icon(Icons.location_city),
+                      isDense: true,
+                      suffixIcon: provider.cityFilter != null
+                          ? IconButton(icon: const Icon(Icons.clear), onPressed: () {
+                              setModalState(() {});
+                              provider.setCityFilter(null);
+                            })
+                          : null,
+                    ),
+                    onSubmitted: (v) {
+                      setModalState(() {});
+                      provider.setCityFilter(v.isEmpty ? null : v);
+                    },
+                  ),
+                  const SizedBox(height: 8),
                 ],
               ),
             );

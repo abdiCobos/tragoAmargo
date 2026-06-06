@@ -12,6 +12,7 @@ import '../../models/review.dart';
 import '../../models/coffee_shop.dart';
 import '../../models/menu_item.dart';
 import '../../models/notification.dart';
+import '../../models/report.dart';
 import '../../widgets/loading_indicator.dart';
 import 'widgets/photo_gallery.dart';
 import 'widgets/product_card.dart';
@@ -123,6 +124,11 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       },
                     ),
                   ],
+                  IconButton(
+                    icon: const Icon(Icons.flag_outlined, color: Colors.white),
+                    tooltip: 'Reportar',
+                    onPressed: () => _reportShop(shop),
+                  ),
                   IconButton(
                     icon: Icon(isFav ? Icons.favorite : Icons.favorite_border,
                         color: isFav ? AppColors.error : Colors.white),
@@ -483,15 +489,30 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             )),
           ],
           const SizedBox(height: 6),
-          GestureDetector(
-            onTap: () => _replyToReview(review),
-            child: const Row(
-              children: [
-                Icon(Icons.reply, size: 14, color: AppColors.textSecondary),
-                SizedBox(width: 4),
-                Text('Responder', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-              ],
-            ),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => _replyToReview(review),
+                child: const Row(
+                  children: [
+                    Icon(Icons.reply, size: 14, color: AppColors.textSecondary),
+                    SizedBox(width: 4),
+                    Text('Responder', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              GestureDetector(
+                onTap: () => _reportReview(review),
+                child: const Row(
+                  children: [
+                    Icon(Icons.flag_outlined, size: 14, color: AppColors.textSecondary),
+                    SizedBox(width: 4),
+                    Text('Reportar', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -605,6 +626,61 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _reportShop(CoffeeShop shop) {
+    final auth = context.read<AuthProvider>();
+    if (!auth.isAuthenticated) {
+      auth.requireLogin(context);
+      return;
+    }
+    _showReportDialog('shop', shop.id, shop.name);
+  }
+
+  void _reportReview(Review review) {
+    _showReportDialog('review', review.id, 'la reseña de ${review.userName}');
+  }
+
+  void _showReportDialog(String targetType, String targetId, String targetName) {
+    final auth = context.read<AuthProvider>();
+    final reasons = ['Contenido ofensivo', 'Información falsa', 'Spam', 'Otro'];
+    String? selectedReason;
+
+    final detailsCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(builder: (_, setD) => AlertDialog(
+        title: Text('Reportar $targetName'),
+        content: SizedBox(
+          width: 400,
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('Motivo:', style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Wrap(spacing: 8, children: reasons.map((r) => ChoiceChip(
+              label: Text(r), selected: selectedReason == r,
+              onSelected: (v) => setD(() => selectedReason = v ? r : null),
+            )).toList()),
+            const SizedBox(height: 16),
+            TextField(controller: detailsCtrl, maxLines: 3,
+              decoration: const InputDecoration(hintText: 'Detalles adicionales...', isDense: true)),
+          ]),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          ElevatedButton(onPressed: selectedReason == null ? null : () {
+            final fs = context.read<FirestoreService>();
+            fs.submitReport(Report(
+              reporterId: auth.user!.uid,
+              reporterName: auth.user?.displayName ?? 'Usuario',
+              targetId: targetId, targetType: targetType,
+              reason: selectedReason!, details: detailsCtrl.text,
+            ));
+            Navigator.pop(ctx);
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reporte enviado')));
+          }, child: const Text('Enviar reporte')),
+        ],
+      )),
     );
   }
 }

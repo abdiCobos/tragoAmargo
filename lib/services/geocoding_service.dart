@@ -47,6 +47,28 @@ class GeocodingService {
     return null;
   }
 
+  Future<Map<String, dynamic>?> getAddressDetails(LatLng point) async {
+    try {
+      final uri = Uri.parse(
+        '$_baseUrl/reverse?format=jsonv2&lat=${point.latitude}&lon=${point.longitude}',
+      );
+      final response = await http.get(uri, headers: {
+        'User-Agent': AppConstants.userAgent,
+        'Accept-Language': 'es',
+      });
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        final address = result['address'] as Map<String, dynamic>? ?? {};
+        return {
+          'city': address['city'] ?? address['town'] ?? address['village'] ?? address['municipality'] ?? '',
+          'state': address['state'] ?? '',
+          'displayName': result['display_name'] ?? '',
+        };
+      }
+    } catch (_) {}
+    return null;
+  }
+
   Future<List<Map<String, dynamic>>> searchPlaces(String query) async {
     try {
       final uri = Uri.parse(

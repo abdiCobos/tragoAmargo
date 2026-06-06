@@ -4,6 +4,7 @@ import '../models/coffee_shop.dart';
 import '../models/review.dart';
 import '../models/app_user.dart';
 import '../models/product.dart';
+import '../models/report.dart';
 import '../models/menu_item.dart';
 import '../models/owner_claim.dart';
 import '../models/notification.dart';
@@ -60,6 +61,7 @@ class FirestoreService {
     String? roastLevel,
     String? priceRange,
     bool? hasWiFi,
+    String? cityFilter,
   }) {
     Query query = _firestore
         .collection(FirestoreCollections.coffeeShops)
@@ -76,16 +78,23 @@ class FirestoreService {
     }
 
     return query.snapshots().map((snapshot) {
-      final shops = snapshot.docs.map((doc) {
+      var shops = snapshot.docs.map((doc) {
         return CoffeeShop.fromMap(doc.id, doc.data()! as Map<String, dynamic>);
       }).toList();
 
       if (searchQuery != null && searchQuery.isNotEmpty) {
-        final query = searchQuery.toLowerCase();
-        return shops.where((s) {
-          return s.name.toLowerCase().contains(query) ||
-              s.address.toLowerCase().contains(query) ||
-              s.description.toLowerCase().contains(query);
+        final q = searchQuery.toLowerCase();
+        shops = shops.where((s) {
+          return s.name.toLowerCase().contains(q) ||
+              s.address.toLowerCase().contains(q) ||
+              s.description.toLowerCase().contains(q);
+        }).toList();
+      }
+
+      if (cityFilter != null && cityFilter.isNotEmpty) {
+        final q = cityFilter.toLowerCase();
+        shops = shops.where((s) {
+          return s.city.toLowerCase() == q || s.address.toLowerCase().contains(q);
         }).toList();
       }
 
@@ -413,5 +422,11 @@ class FirestoreService {
       batch.update(doc.reference, {'read': true});
     }
     await batch.commit();
+  }
+
+  // ─── Reports ──
+
+  Future<void> submitReport(Report report) async {
+    await _firestore.collection('reports').add(report.toMap());
   }
 }

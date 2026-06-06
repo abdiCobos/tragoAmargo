@@ -6,8 +6,9 @@ import '../../../models/review.dart';
 
 class ReviewCard extends StatelessWidget {
   final Review review;
+  final VoidCallback? onReport;
 
-  const ReviewCard({super.key, required this.review});
+  const ReviewCard({super.key, required this.review, this.onReport});
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +62,13 @@ class ReviewCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(review.overallRating.toStringAsFixed(1),
                       style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (onReport != null) ...[
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.flag_outlined, size: 16, color: AppColors.textSecondary),
+                      onPressed: onReport, padding: EdgeInsets.zero, constraints: const BoxConstraints(),
+                    ),
+                  ],
                 ],
               ),
             ],

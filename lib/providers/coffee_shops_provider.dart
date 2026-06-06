@@ -23,6 +23,7 @@ class CoffeeShopsProvider extends ChangeNotifier {
   String? _roastFilter;
   String? _priceFilter;
   bool? _wifiFilter;
+  String? _cityFilter;
 
   CoffeeShopsProvider(this._firestoreService, this._geocodingService, this._storageService) {
     loadShops();
@@ -38,15 +39,17 @@ class CoffeeShopsProvider extends ChangeNotifier {
   String? get roastFilter => _roastFilter;
   String? get priceFilter => _priceFilter;
   bool? get wifiFilter => _wifiFilter;
-  bool get hasActiveFilters => _searchQuery != null || _roastFilter != null || _priceFilter != null || _wifiFilter != null;
+  String? get cityFilter => _cityFilter;
+  bool get hasActiveFilters => _searchQuery != null || _roastFilter != null || _priceFilter != null || _wifiFilter != null || _cityFilter != null;
 
   void setSearchQuery(String? query) { _searchQuery = query; loadShops(); }
   void setRoastFilter(String? roast) { _roastFilter = roast; loadShops(); }
   void setPriceFilter(String? price) { _priceFilter = price; loadShops(); }
   void setWifiFilter(bool? wifi) { _wifiFilter = wifi; loadShops(); }
+  void setCityFilter(String? city) { _cityFilter = city; loadShops(); }
 
   void clearFilters() {
-    _searchQuery = null; _roastFilter = null; _priceFilter = null; _wifiFilter = null;
+    _searchQuery = null; _roastFilter = null; _priceFilter = null; _wifiFilter = null; _cityFilter = null;
     loadShops();
   }
 
@@ -55,6 +58,7 @@ class CoffeeShopsProvider extends ChangeNotifier {
     _firestoreService.getCoffeeShops(
       searchQuery: _searchQuery, roastLevel: _roastFilter,
       priceRange: _priceFilter, hasWiFi: _wifiFilter,
+      cityFilter: _cityFilter,
     ).listen((shops) { _shops = shops; _isLoading = false; notifyListeners(); });
   }
 
@@ -87,16 +91,20 @@ class CoffeeShopsProvider extends ChangeNotifier {
         _isLoading = false; notifyListeners(); return null;
       }
       GeoPoint location;
+      String city = '';
       final latLng = await _geocodingService.searchAddress(address);
-      if (latLng != null) { location = GeoPoint(latLng.latitude, latLng.longitude); }
-      else { location = const GeoPoint(0, 0); }
+      if (latLng != null) {
+        location = GeoPoint(latLng.latitude, latLng.longitude);
+        final details = await _geocodingService.getAddressDetails(latLng);
+        if (details != null) city = details['city'] as String? ?? '';
+      } else { location = const GeoPoint(0, 0); }
 
       final docRef = await _firestoreService.addCoffeeShop(CoffeeShop(
         id: '', name: name, description: description,
         originAndAltitude: originAndAltitude, roastLevels: roastLevels,
         brewingMethods: brewingMethods, priceRange: priceRange,
         hasWiFi: hasWiFi, seatingMode: seatingMode, openingHours: openingHours,
-        phone: phone, instagram: instagram, location: location, address: address,
+        phone: phone, instagram: instagram, location: location, address: address, city: city,
         createdAt: DateTime.now(), createdBy: userId,
       ));
 
@@ -111,7 +119,7 @@ class CoffeeShopsProvider extends ChangeNotifier {
           originAndAltitude: originAndAltitude, roastLevels: roastLevels,
           brewingMethods: brewingMethods, priceRange: priceRange,
           hasWiFi: hasWiFi, seatingMode: seatingMode, openingHours: openingHours,
-          phone: phone, instagram: instagram, location: location, address: address,
+          phone: phone, instagram: instagram, location: location, address: address, city: city,
           photos: photoUrls, createdAt: DateTime.now(), createdBy: userId,
         ));
       }

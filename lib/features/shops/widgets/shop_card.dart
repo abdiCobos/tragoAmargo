@@ -12,6 +12,9 @@ class ShopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final imageWidth = screenWidth > 600 ? 140.0 : screenWidth * 0.32;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -28,7 +31,7 @@ class ShopCard extends StatelessWidget {
             ClipRRect(
               borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
               child: SizedBox(
-                width: 120, height: 140,
+                width: imageWidth, height: 140,
                 child: shop.photos.isNotEmpty
                     ? CachedNetworkImage(
                         imageUrl: shop.photos.first, fit: BoxFit.cover,

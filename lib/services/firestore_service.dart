@@ -5,6 +5,7 @@ import '../models/review.dart';
 import '../models/app_user.dart';
 import '../models/product.dart';
 import '../models/menu_item.dart';
+import '../models/owner_claim.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -337,5 +338,22 @@ class FirestoreService {
     }
 
     await batch.commit();
+  }
+
+  // ─── Owner Claims ───
+
+  Future<void> submitOwnerClaim(OwnerClaim claim) async {
+    await _firestore.collection('owner_claims').add(claim.toMap());
+  }
+
+  Future<bool> hasPendingClaim(String shopId, String userId) async {
+    final snapshot = await _firestore
+        .collection('owner_claims')
+        .where('shopId', isEqualTo: shopId)
+        .where('userId', isEqualTo: userId)
+        .where('status', isEqualTo: 'pending')
+        .limit(1)
+        .get();
+    return snapshot.docs.isNotEmpty;
   }
 }

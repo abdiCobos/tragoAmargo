@@ -131,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(width: double.infinity, height: 52, child: OutlinedButton.icon(
                   onPressed: () async {
                     await auth.signOut();
-                    if (context.mounted) Navigator.pushNamedAndRemoveUntil(context, '/login', (r) => false);
+                    if (context.mounted) Navigator.pushNamedAndRemoveUntil(context, '/home', (r) => false);
                   },
                   icon: const Icon(Icons.logout, color: AppColors.error),
                   label: const Text('Cerrar Sesión', style: TextStyle(color: AppColors.error)),

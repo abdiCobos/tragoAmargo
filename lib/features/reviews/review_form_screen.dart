@@ -22,6 +22,28 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
   double _serviceRating = 3;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = context.read<AuthProvider>();
+      final reviews = context.read<ReviewsProvider>();
+      if (auth.user != null) {
+        reviews.checkExistingReview(widget.shopId, auth.user!.uid).then((_) {
+          if (mounted && reviews.existingReview != null) {
+            setState(() {
+              _qualityRating = reviews.existingReview!.qualityRating;
+              _flavorRating = reviews.existingReview!.flavorRating;
+              _roastRating = reviews.existingReview!.roastRating;
+              _serviceRating = reviews.existingReview!.serviceRating;
+              _commentController.text = reviews.existingReview!.comment;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _commentController.dispose();
     super.dispose();
@@ -48,103 +70,113 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
     if (success && mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Reseña publicada!'), backgroundColor: AppColors.secondary),
+        SnackBar(
+          content: Text(reviews.isEditing ? '¡Reseña actualizada!' : '¡Reseña publicada!'),
+          backgroundColor: AppColors.secondary,
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Escribir Reseña')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(Icons.rate_review_outlined, size: 48, color: AppColors.primary),
-            const SizedBox(height: 16),
-            const Text(
-              '¿Qué tal tu experiencia?',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            _buildRatingSection(
-              'Calidad del grano',
-              'Evalúa la calidad y frescura del café',
-              _qualityRating,
-              (v) => setState(() => _qualityRating = v),
-            ),
-            const SizedBox(height: 20),
-            _buildRatingSection(
-              'Sabrozura',
-              'Qué tan sabroso está el café',
-              _flavorRating,
-              (v) => setState(() => _flavorRating = v),
-            ),
-            const SizedBox(height: 20),
-            _buildRatingSection(
-              'Manejo del tostado',
-              'Qué tan bien manejan los niveles de tostado',
-              _roastRating,
-              (v) => setState(() => _roastRating = v),
-            ),
-            const SizedBox(height: 20),
-            _buildRatingSection(
-              'Servicio',
-              'Atención del personal y ambiente del lugar',
-              _serviceRating,
-              (v) => setState(() => _serviceRating = v),
-            ),
-            const SizedBox(height: 24),
-            const Text('Comentario',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _commentController,
-              maxLines: 4,
-              decoration: const InputDecoration(
-                hintText: 'Comparte tu experiencia...',
-              ),
-            ),
-            const SizedBox(height: 32),
-            Consumer<ReviewsProvider>(
-              builder: (context, reviews, _) {
-                return SizedBox(
+    return Consumer<ReviewsProvider>(
+      builder: (context, reviews, _) {
+        final isEdit = reviews.existingReview != null;
+
+        return Scaffold(
+          appBar: AppBar(title: Text(isEdit ? 'Editar Reseña' : 'Escribir Reseña')),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (isEdit)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.edit, color: AppColors.secondary),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text('Ya tienes una reseña. Puedes editarla.',
+                              style: TextStyle(fontSize: 13)),
+                        ),
+                      ],
+                    ),
+                  ),
+                _buildRatingSection(
+                  'Calidad del grano',
+                  'Evalúa la calidad y frescura del café',
+                  _qualityRating,
+                  (v) => setState(() => _qualityRating = v),
+                ),
+                const SizedBox(height: 20),
+                _buildRatingSection(
+                  'Sabrozura',
+                  'Qué tan sabroso está el café',
+                  _flavorRating,
+                  (v) => setState(() => _flavorRating = v),
+                ),
+                const SizedBox(height: 20),
+                _buildRatingSection(
+                  'Manejo del tostado',
+                  'Qué tan bien manejan los niveles de tostado',
+                  _roastRating,
+                  (v) => setState(() => _roastRating = v),
+                ),
+                const SizedBox(height: 20),
+                _buildRatingSection(
+                  'Servicio',
+                  'Atención del personal y ambiente del lugar',
+                  _serviceRating,
+                  (v) => setState(() => _serviceRating = v),
+                ),
+                const SizedBox(height: 24),
+                const Text('Comentario',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _commentController,
+                  maxLines: 4,
+                  decoration: const InputDecoration(hintText: 'Comparte tu experiencia...'),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton(
                     onPressed: reviews.isLoading ? null : _submit,
                     child: reviews.isLoading
                         ? const SizedBox(
-                            width: 24,
-                            height: 24,
+                            width: 24, height: 24,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : const Text('Publicar Reseña'),
+                        : Text(isEdit ? 'Actualizar Reseña' : 'Publicar Reseña'),
                   ),
-                );
-              },
+                ),
+                const SizedBox(height: 40),
+              ],
             ),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildRatingSection(
-    String title,
-    String subtitle,
-    double currentRating,
-    ValueChanged<double> onChanged,
+    String title, String subtitle, double currentRating, ValueChanged<double> onChanged,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-        Text(subtitle,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+        Text(subtitle, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
         const SizedBox(height: 8),
         Row(
           children: [

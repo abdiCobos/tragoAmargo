@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/validators.dart';
 import '../../providers/coffee_shops_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/geocoding_service.dart';
 
 class AddShopScreen extends StatefulWidget {
   const AddShopScreen({super.key});
@@ -27,15 +28,18 @@ class _AddShopScreenState extends State<AddShopScreen> {
   final _brewingMethods = <String>[];
   String _priceRange = r'$';
   bool _hasWiFi = false;
-  bool _hasOutdoorSeating = false;
+  String _seatingMode = '';
   final _photos = <File>[];
   final _openingHours = <String, TextEditingController>{};
+  List<Map<String, dynamic>> _addressSuggestions = [];
+  bool _showSuggestions = false;
 
   bool _showExtras = false;
   bool _showHours = false;
 
   final _roastOptions = ['Claro', 'Medio', 'Oscuro', 'Espresso'];
   final _brewingOptions = ['V60', 'Chemex', 'Aeropress', 'French Press', 'Espresso', 'Cold Brew', 'Sifón'];
+  final _seatingOptions = ['', 'Mesas y sillas', 'Solo para llevar', 'Espacio público'];
   final _days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
 
   @override
@@ -54,26 +58,40 @@ class _AddShopScreenState extends State<AddShopScreen> {
     _descriptionController.dispose();
     _phoneController.dispose();
     _instagramController.dispose();
-    for (final ctrl in _openingHours.values) {
-      ctrl.dispose();
-    }
+    for (final ctrl in _openingHours.values) ctrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _searchAddress(String query) async {
+    if (query.length < 3) {
+      setState(() { _addressSuggestions = []; _showSuggestions = false; });
+      return;
+    }
+    final geo = context.read<GeocodingService>();
+    final results = await geo.searchPlaces(query);
+    if (mounted) {
+      setState(() {
+        _addressSuggestions = results;
+        _showSuggestions = results.isNotEmpty;
+      });
+    }
+  }
+
+  void _selectAddress(Map<String, dynamic> suggestion) {
+    _addressController.text = suggestion['displayName'] as String;
+    setState(() { _addressSuggestions = []; _showSuggestions = false; });
   }
 
   Future<void> _pickPhotos() async {
     final picker = ImagePicker();
     final images = await picker.pickMultiImage(imageQuality: 80);
-    if (images.isNotEmpty) {
-      setState(() => _photos.addAll(images.map((x) => File(x.path))));
-    }
+    if (images.isNotEmpty) setState(() => _photos.addAll(images.map((x) => File(x.path))));
   }
 
   Future<void> _takePhoto() async {
     final picker = ImagePicker();
     final photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
-    if (photo != null) {
-      setState(() => _photos.add(File(photo.path)));
-    }
+    if (photo != null) setState(() => _photos.add(File(photo.path)));
   }
 
   Future<void> _submit() async {
@@ -102,7 +120,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
       brewingMethods: _brewingMethods,
       priceRange: _priceRange,
       hasWiFi: _hasWiFi,
-      hasOutdoorSeating: _hasOutdoorSeating,
+      seatingMode: _seatingMode,
       openingHours: openingHours,
       phone: _phoneController.text.trim(),
       instagram: _instagramController.text.trim(),
@@ -114,10 +132,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
     if (shopId != null && mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Cafetería agregada!'),
-          backgroundColor: AppColors.secondary,
-        ),
+        const SnackBar(content: Text('Cafetería agregada'), backgroundColor: AppColors.secondary),
       );
     }
   }
@@ -136,8 +151,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.surface, borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Row(
                   children: [
@@ -154,10 +168,10 @@ class _AddShopScreenState extends State<AddShopScreen> {
               ),
               const SizedBox(height: 24),
 
-              // ─── Obligatorios ───
               const Text('Requerido',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
               const SizedBox(height: 12),
+
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -167,6 +181,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
                 validator: (v) => Validators.required(v, 'El nombre'),
               ),
               const SizedBox(height: 14),
+
               TextFormField(
                 controller: _originController,
                 decoration: const InputDecoration(
@@ -177,16 +192,45 @@ class _AddShopScreenState extends State<AddShopScreen> {
                 validator: (v) => Validators.required(v, 'El origen y altura'),
               ),
               const SizedBox(height: 14),
+
               TextFormField(
                 controller: _addressController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Dirección *',
                   hintText: 'Ej: Av. Juárez 123, Guadalajara',
-                  prefixIcon: Icon(Icons.location_on_outlined),
+                  prefixIcon: const Icon(Icons.location_on_outlined),
+                  suffixIcon: _showSuggestions
+                      ? const Icon(Icons.search, size: 20)
+                      : null,
                 ),
                 validator: (v) => Validators.required(v, 'La dirección'),
+                onChanged: _searchAddress,
               ),
+              if (_showSuggestions) ...[
+                const SizedBox(height: 4),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.divider),
+                  ),
+                  constraints: const BoxConstraints(maxHeight: 160),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: _addressSuggestions.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (_, i) => ListTile(
+                      dense: true,
+                      leading: const Icon(Icons.location_on, size: 18, color: AppColors.secondary),
+                      title: Text(_addressSuggestions[i]['displayName'] as String,
+                          style: const TextStyle(fontSize: 13)),
+                      onTap: () => _selectAddress(_addressSuggestions[i]),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 14),
+
               const Text('Niveles de Tostado *',
                   style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 6),
@@ -206,8 +250,8 @@ class _AddShopScreenState extends State<AddShopScreen> {
                   );
                 }).toList(),
               ),
-
               const SizedBox(height: 14),
+
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('WiFi disponible *',
@@ -216,8 +260,21 @@ class _AddShopScreenState extends State<AddShopScreen> {
                 activeTrackColor: AppColors.secondary,
                 onChanged: (v) => setState(() => _hasWiFi = v),
               ),
+              const SizedBox(height: 14),
 
-              // ─── Opcional: Extras ───
+              DropdownButtonFormField<String>(
+                initialValue: _seatingMode,
+                decoration: const InputDecoration(
+                  labelText: 'Tipo de espacio',
+                  prefixIcon: Icon(Icons.chair),
+                ),
+                items: _seatingOptions.map((o) => DropdownMenuItem(
+                  value: o,
+                  child: Text(o.isEmpty ? 'Seleccionar...' : o),
+                )).toList(),
+                onChanged: (v) => setState(() => _seatingMode = v ?? ''),
+              ),
+
               const SizedBox(height: 28),
               InkWell(
                 onTap: () => setState(() => _showExtras = !_showExtras),
@@ -234,24 +291,18 @@ class _AddShopScreenState extends State<AddShopScreen> {
               if (_showExtras) ...[
                 const SizedBox(height: 12),
                 TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: 'Descripción',
-                    prefixIcon: Icon(Icons.description),
-                  ),
+                  controller: _descriptionController, maxLines: 3,
+                  decoration: const InputDecoration(labelText: 'Descripción', prefixIcon: Icon(Icons.description)),
                 ),
                 const SizedBox(height: 14),
-                const Text('Métodos de Preparación',
-                    style: TextStyle(fontWeight: FontWeight.w600)),
+                const Text('Métodos de Preparación', style: TextStyle(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 8,
                   children: _brewingOptions.map((m) {
                     final selected = _brewingMethods.contains(m);
                     return FilterChip(
-                      label: Text(m),
-                      selected: selected,
+                      label: Text(m), selected: selected,
                       onSelected: (val) {
                         setState(() {
                           if (val) {_brewingMethods.add(m);} else {_brewingMethods.remove(m);}
@@ -273,33 +324,17 @@ class _AddShopScreenState extends State<AddShopScreen> {
                   onSelectionChanged: (val) => setState(() => _priceRange = val.first),
                 ),
                 const SizedBox(height: 10),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('WiFi disponible'),
-                  value: _hasWiFi,
-                  onChanged: (v) => setState(() => _hasWiFi = v),
-                ),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Terraza / Al aire libre'),
-                  value: _hasOutdoorSeating,
-                  onChanged: (v) => setState(() => _hasOutdoorSeating = v),
-                ),
-                const SizedBox(height: 10),
                 TextFormField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
+                  controller: _phoneController, keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(labelText: 'Teléfono', prefixIcon: Icon(Icons.phone)),
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _instagramController,
-                  decoration: const InputDecoration(
-                      labelText: 'Instagram (sin @)', prefixIcon: Icon(Icons.camera_alt)),
+                  decoration: const InputDecoration(labelText: 'Instagram (sin @)', prefixIcon: Icon(Icons.camera_alt)),
                 ),
               ],
 
-              // ─── Opcional: Horarios ───
               const SizedBox(height: 20),
               InkWell(
                 onTap: () => setState(() => _showHours = !_showHours),
@@ -318,18 +353,13 @@ class _AddShopScreenState extends State<AddShopScreen> {
                       padding: const EdgeInsets.only(top: 8),
                       child: Row(
                         children: [
-                          SizedBox(
-                            width: 100,
-                            child: Text(day[0].toUpperCase() + day.substring(1)),
-                          ),
+                          SizedBox(width: 100, child: Text(day[0].toUpperCase() + day.substring(1))),
                           Expanded(
                             child: TextFormField(
                               controller: _openingHours[day],
                               decoration: InputDecoration(
-                                hintText: '7:00-21:00',
-                                isDense: true,
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                hintText: '7:00-21:00', isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               ),
                             ),
                           ),
@@ -337,19 +367,12 @@ class _AddShopScreenState extends State<AddShopScreen> {
                       ),
                     )),
 
-              // ─── Opcional: Fotos ───
               const SizedBox(height: 20),
-              InkWell(
-                onTap: () => setState(() {}),
-                child: const Row(
-                  children: [
-                    Icon(Icons.photo_library_outlined, color: AppColors.secondary),
-                    SizedBox(width: 8),
-                    Text('Fotos (opcional)',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  ],
-                ),
-              ),
+              const Row(children: [
+                Icon(Icons.photo_library_outlined, color: AppColors.secondary),
+                SizedBox(width: 8),
+                Text('Fotos (opcional)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              ]),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -381,15 +404,13 @@ class _AddShopScreenState extends State<AddShopScreen> {
                           padding: const EdgeInsets.only(right: 8),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.file(_photos[i],
-                                width: 80, height: 80, fit: BoxFit.cover),
+                            child: Image.file(_photos[i], width: 80, height: 80, fit: BoxFit.cover),
                           ),
                         ),
                         Positioned(
                           right: 4, top: -4,
                           child: IconButton(
-                            icon: const Icon(Icons.close,
-                                color: AppColors.error, size: 18),
+                            icon: const Icon(Icons.close, color: AppColors.error, size: 18),
                             onPressed: () => setState(() => _photos.removeAt(i)),
                           ),
                         ),
@@ -413,20 +434,15 @@ class _AddShopScreenState extends State<AddShopScreen> {
                             color: AppColors.error.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text(provider.error!,
-                              style: const TextStyle(color: AppColors.error)),
+                          child: Text(provider.error!, style: const TextStyle(color: AppColors.error)),
                         ),
                       SizedBox(
-                        width: double.infinity,
-                        height: 52,
+                        width: double.infinity, height: 52,
                         child: ElevatedButton.icon(
                           onPressed: provider.isLoading ? null : _submit,
                           icon: provider.isLoading
-                              ? const SizedBox(
-                                  width: 20, height: 20,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2, color: Colors.white),
-                                )
+                              ? const SizedBox(width: 20, height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                               : const Icon(Icons.add_location),
                           label: const Text('Agregar Cafetería'),
                         ),

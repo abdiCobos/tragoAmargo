@@ -50,7 +50,7 @@ class _AuthGateState extends State<AuthGate> {
             const Icon(Icons.coffee, size: 80, color: AppColors.primary),
             const SizedBox(height: 16),
             const Text(
-              'Hablando de Café',
+              'Trago Amargo',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -59,7 +59,7 @@ class _AuthGateState extends State<AuthGate> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Donde cada taza cuenta una historia',
+              'Muchas cafeterías, poca calidad y sabor',
               style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
             ),
             const SizedBox(height: 32),

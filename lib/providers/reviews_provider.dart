@@ -6,14 +6,17 @@ class ReviewsProvider extends ChangeNotifier {
   final FirestoreService _firestoreService;
 
   List<Review> _reviews = [];
+  Review? _existingReview;
   bool _isLoading = false;
   String? _error;
 
   ReviewsProvider(this._firestoreService);
 
   List<Review> get reviews => _reviews;
+  Review? get existingReview => _existingReview;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  bool get isEditing => _existingReview != null;
 
   void loadReviews(String shopId) {
     _isLoading = true;
@@ -24,6 +27,12 @@ class ReviewsProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     });
+  }
+
+  Future<void> checkExistingReview(String shopId, String userId) async {
+    final review = await _firestoreService.getExistingReview(shopId, userId);
+    _existingReview = review;
+    notifyListeners();
   }
 
   Future<bool> addReview({
@@ -57,6 +66,7 @@ class ReviewsProvider extends ChangeNotifier {
       );
 
       await _firestoreService.addReview(review);
+      _existingReview = null;
       _isLoading = false;
       notifyListeners();
       return true;

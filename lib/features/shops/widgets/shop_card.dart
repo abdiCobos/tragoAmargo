@@ -104,9 +104,9 @@ class ShopCard extends StatelessWidget {
                         _buildTag(shop.priceRange),
                         const SizedBox(width: 6),
                         if (shop.hasWiFi) _buildTag('WiFi'),
-                        if (shop.hasOutdoorSeating) ...[
+                        if (shop.seatingMode.isNotEmpty) ...[
                           const SizedBox(width: 6),
-                          _buildTag('Terraza'),
+                          _buildTag(shop.seatingMode),
                         ],
                       ],
                     ),

@@ -111,7 +111,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                           _buildInfoChip(Icons.attach_money, shop.priceRange),
                           const SizedBox(width: 8),
                           if (shop.hasWiFi) _buildInfoChip(Icons.wifi, 'WiFi'),
-                          if (shop.hasOutdoorSeating) ...[
+                          if (shop.seatingMode.isNotEmpty) ...[
                             const SizedBox(width: 8),
                             _buildInfoChip(Icons.wb_sunny_outlined, 'Terraza'),
                           ],
@@ -224,17 +224,34 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       const SizedBox(height: 24),
                       const Divider(),
                       const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ReviewFormScreen(shopId: shop.id),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ReviewFormScreen(shopId: shop.id),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.rate_review),
+                              label: const Text('Reseña'),
                             ),
-                          );
-                        },
-                        icon: const Icon(Icons.rate_review),
-                        label: const Text('Escribir Reseña'),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => authProvider.toggleFavorite(shop.id),
+                              icon: Icon(
+                                isFav ? Icons.favorite : Icons.favorite_border,
+                                color: isFav ? AppColors.error : AppColors.primary,
+                              ),
+                              label: Text(isFav ? 'Guardado' : 'Favorito'),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 40),
                     ],

@@ -30,7 +30,7 @@ class MapScreen extends StatelessWidget {
           children: [
             TileLayer(
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.hablandodecafe.app',
+              userAgentPackageName: 'trago.amargo',
             ),
             RichAttributionWidget(
               popupInitialDisplayDuration: const Duration(seconds: 3),

@@ -146,11 +146,45 @@ class FirestoreService {
     });
   }
 
+  Future<Review?> getExistingReview(String shopId, String userId) async {
+    final snapshot = await _firestore
+        .collection(FirestoreCollections.reviews)
+        .where('shopId', isEqualTo: shopId)
+        .where('userId', isEqualTo: userId)
+        .limit(1)
+        .get();
+    if (snapshot.docs.isEmpty) return null;
+    return Review.fromMap(snapshot.docs.first.id, snapshot.docs.first.data());
+  }
+
+  Future<List<Review>> getReviewsByUser(String userId) async {
+    final snapshot = await _firestore
+        .collection(FirestoreCollections.reviews)
+        .where('userId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .get();
+    return snapshot.docs
+        .map((doc) => Review.fromMap(doc.id, doc.data()))
+        .toList();
+  }
+
   Future<void> addReview(Review review) async {
     final batch = _firestore.batch();
 
-    final reviewRef =
-        _firestore.collection(FirestoreCollections.reviews).doc();
+    final existing = await _firestore
+        .collection(FirestoreCollections.reviews)
+        .where('shopId', isEqualTo: review.shopId)
+        .where('userId', isEqualTo: review.userId)
+        .limit(1)
+        .get();
+
+    final isUpdate = existing.docs.isNotEmpty;
+    final previousTotal = isUpdate ? existing.docs.first['overallRating'] as double? ?? 0.0 : 0.0;
+
+    var reviewRef = isUpdate
+        ? existing.docs.first.reference
+        : _firestore.collection(FirestoreCollections.reviews).doc();
+
     batch.set(reviewRef, review.toMap());
 
     final shopRef = _firestore
@@ -160,7 +194,7 @@ class FirestoreService {
     final shopDoc = await shopRef.get();
     final currentTotal = shopDoc.data()?['totalReviews'] as int? ?? 0;
 
-    final newTotal = currentTotal + 1;
+    final newTotal = isUpdate ? currentTotal : currentTotal + 1;
     final currentAvgQuality =
         shopDoc.data()?['averageQuality'] as double? ?? 0.0;
     final currentAvgFlavor =
@@ -171,21 +205,42 @@ class FirestoreService {
     final currentAvgRating =
         shopDoc.data()?['averageRating'] as double? ?? 0.0;
 
-    batch.update(shopRef, {
-      'totalReviews': newTotal,
-      'averageQuality':
-          ((currentAvgQuality * currentTotal) + review.qualityRating) /
-              newTotal,
-      'averageFlavor':
-          ((currentAvgFlavor * currentTotal) + review.flavorRating) / newTotal,
-      'averageRoast':
-          ((currentAvgRoast * currentTotal) + review.roastRating) / newTotal,
-      'averageService':
-          ((currentAvgService * currentTotal) + review.serviceRating) / newTotal,
-      'averageRating':
-          ((currentAvgRating * currentTotal) + review.overallRating) /
-              newTotal,
-    });
+    if (isUpdate) {
+      final oldTotal = currentTotal > 0 ? currentTotal : 1;
+      batch.update(shopRef, {
+        'averageQuality':
+            ((currentAvgQuality * oldTotal) - (existing.docs.first['qualityRating'] as double? ?? 0.0) + review.qualityRating) /
+                oldTotal,
+        'averageFlavor':
+            ((currentAvgFlavor * oldTotal) - (existing.docs.first['flavorRating'] as double? ?? 0.0) + review.flavorRating) /
+                oldTotal,
+        'averageRoast':
+            ((currentAvgRoast * oldTotal) - (existing.docs.first['roastRating'] as double? ?? 0.0) + review.roastRating) /
+                oldTotal,
+        'averageService':
+            ((currentAvgService * oldTotal) - (existing.docs.first['serviceRating'] as double? ?? 0.0) + review.serviceRating) /
+                oldTotal,
+        'averageRating':
+            ((currentAvgRating * oldTotal) - previousTotal + review.overallRating) /
+                oldTotal,
+      });
+    } else {
+      batch.update(shopRef, {
+        'totalReviews': newTotal,
+        'averageQuality':
+            ((currentAvgQuality * currentTotal) + review.qualityRating) /
+                newTotal,
+        'averageFlavor':
+            ((currentAvgFlavor * currentTotal) + review.flavorRating) / newTotal,
+        'averageRoast':
+            ((currentAvgRoast * currentTotal) + review.roastRating) / newTotal,
+        'averageService':
+            ((currentAvgService * currentTotal) + review.serviceRating) / newTotal,
+        'averageRating':
+            ((currentAvgRating * currentTotal) + review.overallRating) /
+                newTotal,
+      });
+    }
 
     await batch.commit();
   }

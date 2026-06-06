@@ -5,9 +5,35 @@ import 'dart:io';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/storage_service.dart';
+import '../../services/firestore_service.dart';
+import '../../models/review.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  List<Review> _userReviews = [];
+
+  @override
+  void initState() {
+
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadReviews());
+  }
+
+  Future<void> _loadReviews() async {
+    final auth = context.read<AuthProvider>();
+    if (!auth.isAuthenticated) return;
+
+    setState(() { });
+    final firestore = context.read<FirestoreService>();
+    final reviews = await firestore.getReviewsByUser(auth.user!.uid);
+    if (mounted) setState(() { _userReviews = reviews; });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +50,7 @@ class ProfileScreen extends StatelessWidget {
                     style: TextStyle(color: AppColors.textSecondary)),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
                   child: const Text('Iniciar Sesión'),
                 ),
               ],
@@ -47,16 +71,13 @@ class ProfileScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 50,
                     backgroundColor: AppColors.surface,
-                    backgroundImage: user.photoURL != null
-                        ? NetworkImage(user.photoURL!)
-                        : null,
+                    backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
                     child: user.photoURL == null
                         ? const Icon(Icons.person, size: 50, color: AppColors.tertiary)
                         : null,
                   ),
                   Positioned(
-                    bottom: 0,
-                    right: 0,
+                    bottom: 0, right: 0,
                     child: CircleAvatar(
                       radius: 18,
                       backgroundColor: AppColors.secondary,
@@ -69,20 +90,23 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              Text(
-                user.displayName ?? 'Usuario',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
+              Text(user.displayName ?? 'Usuario',
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              Text(user.email ?? '',
-                  style: const TextStyle(color: AppColors.textSecondary)),
-              const SizedBox(height: 32),
-              _buildInfoTile(Icons.favorite, 'Favoritos',
-                  '${appUser?.favoriteShops.length ?? 0} cafeterías'),
-              _buildInfoTile(Icons.coffee, 'Reseñas escritas', '—'),
-              _buildInfoTile(
-                  Icons.calendar_today, 'Miembro desde',
-                  _formatDate(appUser?.createdAt ?? DateTime.now())),
+              Text(user.email ?? '', style: const TextStyle(color: AppColors.textSecondary)),
+              const SizedBox(height: 24),
+              _buildStatRow(Icons.favorite, '${appUser?.favoriteShops.length ?? 0}', 'Favoritos'),
+              _buildStatRow(Icons.rate_review, '${_userReviews.length}', 'Reseñas'),
+              _buildStatRow(Icons.calendar_today, _formatDate(appUser?.createdAt ?? DateTime.now()), 'Miembro desde'),
+              if (_userReviews.isNotEmpty) ...[
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+                const Text('Mis Reseñas',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                ..._userReviews.map((r) => _buildReviewItem(r)),
+              ],
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
@@ -96,9 +120,7 @@ class ProfileScreen extends StatelessWidget {
                   },
                   icon: const Icon(Icons.logout, color: AppColors.error),
                   label: const Text('Cerrar Sesión', style: TextStyle(color: AppColors.error)),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.error),
-                  ),
+                  style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.error)),
                 ),
               ),
             ],
@@ -108,17 +130,51 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoTile(IconData icon, String label, String value) {
-    return ListTile(
-      leading: Icon(icon, color: AppColors.secondary),
-      title: Text(label),
-      trailing: Text(value, style: const TextStyle(color: AppColors.textSecondary)),
+  Widget _buildStatRow(IconData icon, String value, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.secondary, size: 20),
+          const SizedBox(width: 12),
+          Text(label, style: const TextStyle(color: AppColors.textSecondary)),
+          const Spacer(),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        ],
+      ),
     );
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
+  Widget _buildReviewItem(Review review) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Row(
+            children: List.generate(5, (i) => Icon(
+              i < review.overallRating.round() ? Icons.star : Icons.star_border,
+              size: 16, color: AppColors.star,
+            )),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              review.comment.isNotEmpty ? review.comment : 'Sin comentario',
+              maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            ),
+          ),
+        ],
+      ),
+    );
   }
+
+  String _formatDate(DateTime date) => '${date.day}/${date.month}/${date.year}';
 
   Future<void> _changePhoto(BuildContext context) async {
     final picker = ImagePicker();

@@ -9,7 +9,7 @@ class CoffeeShop {
   final List<String> brewingMethods;
   final String priceRange;
   final bool hasWiFi;
-  final bool hasOutdoorSeating;
+  final String seatingMode;
   final Map<String, String> openingHours;
   final String phone;
   final String instagram;
@@ -34,7 +34,7 @@ class CoffeeShop {
     this.brewingMethods = const [],
     this.priceRange = r'$',
     this.hasWiFi = false,
-    this.hasOutdoorSeating = false,
+    this.seatingMode = '',
     this.openingHours = const {},
     this.phone = '',
     this.instagram = '',
@@ -61,7 +61,7 @@ class CoffeeShop {
       brewingMethods: List<String>.from(data['brewingMethods'] ?? []),
       priceRange: data['priceRange'] ?? r'$',
       hasWiFi: data['hasWiFi'] ?? false,
-      hasOutdoorSeating: data['hasOutdoorSeating'] ?? false,
+      seatingMode: data['seatingMode'] ?? '',
       openingHours: Map<String, String>.from(data['openingHours'] ?? {}),
       phone: data['phone'] ?? '',
       instagram: data['instagram'] ?? '',
@@ -88,7 +88,7 @@ class CoffeeShop {
       'brewingMethods': brewingMethods,
       'priceRange': priceRange,
       'hasWiFi': hasWiFi,
-      'hasOutdoorSeating': hasOutdoorSeating,
+      'seatingMode': seatingMode,
       'openingHours': openingHours,
       'phone': phone,
       'instagram': instagram,
@@ -115,7 +115,7 @@ class CoffeeShop {
     List<String>? brewingMethods,
     String? priceRange,
     bool? hasWiFi,
-    bool? hasOutdoorSeating,
+    String? seatingMode,
     Map<String, String>? openingHours,
     String? phone,
     String? instagram,
@@ -140,7 +140,7 @@ class CoffeeShop {
       brewingMethods: brewingMethods ?? this.brewingMethods,
       priceRange: priceRange ?? this.priceRange,
       hasWiFi: hasWiFi ?? this.hasWiFi,
-      hasOutdoorSeating: hasOutdoorSeating ?? this.hasOutdoorSeating,
+      seatingMode: seatingMode ?? this.seatingMode,
       openingHours: openingHours ?? this.openingHours,
       phone: phone ?? this.phone,
       instagram: instagram ?? this.instagram,

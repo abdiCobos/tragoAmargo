@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           appBar: _currentIndex == 0
               ? AppBar(
+                  automaticallyImplyLeading: false,
                   title: const Text('Trago Amargo'),
                   actions: [
                     if (auth.isAuthenticated) _notificationBell(context, auth),

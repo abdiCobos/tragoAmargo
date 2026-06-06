@@ -94,6 +94,7 @@ class CoffeeShop {
       'instagram': instagram,
       'location': location,
       'address': address,
+      'addressLower': address.trim().toLowerCase(),
       'photos': photos,
       'averageRating': averageRating,
       'averageQuality': averageQuality,

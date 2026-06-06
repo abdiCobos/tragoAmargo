@@ -84,6 +84,17 @@ class FirestoreService {
     });
   }
 
+  Future<CoffeeShop?> getCoffeeShopByAddress(String address) async {
+    final normalized = address.trim().toLowerCase();
+    final snapshot = await _firestore
+        .collection(FirestoreCollections.coffeeShops)
+        .where('addressLower', isEqualTo: normalized)
+        .limit(1)
+        .get();
+    if (snapshot.docs.isEmpty) return null;
+    return CoffeeShop.fromMap(snapshot.docs.first.id, snapshot.docs.first.data());
+  }
+
   Future<CoffeeShop?> getCoffeeShop(String shopId) async {
     final doc = await _firestore
         .collection(FirestoreCollections.coffeeShops)

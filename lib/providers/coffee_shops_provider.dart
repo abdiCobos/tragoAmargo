@@ -80,6 +80,13 @@ class CoffeeShopsProvider extends ChangeNotifier {
   }) async {
     _isLoading = true; _error = null; notifyListeners();
     try {
+      final existing = await _firestoreService.getCoffeeShopByAddress(address);
+      if (existing != null) {
+        _error = 'Ya existe una cafetería con esta dirección.';
+        _isLoading = false; notifyListeners();
+        return null;
+      }
+
       GeoPoint location;
       final latLng = await _geocodingService.searchAddress(address);
       if (latLng != null) {

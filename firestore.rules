@@ -9,8 +9,8 @@ service cloud.firestore {
       allow create: if request.auth != null
         && request.resource.data.verifiedOwnerUid == null;
       allow update: if request.auth != null
-        && (resource.data.verifiedOwnerUid == request.auth.uid
-            || get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.createdBy == request.auth.uid);
+        && (resource.data.verifiedOwnerUid == null
+            || resource.data.verifiedOwnerUid == request.auth.uid);
       allow delete: if false;
 
       match /products/{productId} {

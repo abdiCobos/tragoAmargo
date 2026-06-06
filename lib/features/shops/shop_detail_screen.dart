@@ -124,6 +124,16 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       },
                     ),
                   ],
+                  if (!isOwner && shop.verifiedOwnerUid == null && auth.isAuthenticated)
+                    IconButton(
+                      icon: const Icon(Icons.edit_note, color: Colors.white),
+                      tooltip: 'Completar información',
+                      onPressed: () async {
+                        final result = await Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => EditShopScreen(shop: shop)));
+                        if (result == true && mounted) context.read<CoffeeShopsProvider>().selectShop(shop.id);
+                      },
+                    ),
                   IconButton(
                     icon: const Icon(Icons.flag_outlined, color: Colors.white),
                     tooltip: 'Reportar',

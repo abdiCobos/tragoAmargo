@@ -10,6 +10,7 @@ import '../../services/firestore_service.dart';
 import '../../services/storage_service.dart';
 import '../../models/review.dart';
 import '../../models/coffee_shop.dart';
+import '../../models/app_user.dart';
 import '../../models/menu_item.dart';
 import '../../models/notification.dart';
 import '../../models/report.dart';
@@ -532,7 +533,14 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   void _viewProfile(Review review) async {
     final fs = context.read<FirestoreService>();
     final userReviews = await fs.getReviewsByUser(review.userId);
+    final appUser = await fs.getUser(review.userId);
     if (!mounted) return;
+
+    final ownedCount = appUser?.ownedShops.length ?? 0;
+    final favCount = appUser?.favoriteShops.length ?? 0;
+    final memberSince = appUser?.createdAt ?? DateTime.now();
+    final photoUrl = review.userPhoto.isNotEmpty ? review.userPhoto : (appUser?.photoUrl ?? '');
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -544,50 +552,77 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  CircleAvatar(radius: 24, backgroundColor: AppColors.primary,
-                    child: Text(review.userName.isNotEmpty ? review.userName[0].toUpperCase() : '?',
-                        style: const TextStyle(color: Colors.white, fontSize: 16)),
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: AppColors.primary,
+                    backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                    child: photoUrl.isEmpty
+                        ? Text(review.userName.isNotEmpty ? review.userName[0].toUpperCase() : '?',
+                            style: const TextStyle(color: Colors.white, fontSize: 18))
+                        : null,
                   ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(review.userName,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      Text('${userReviews.length} reseñas escritas',
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-                    ],
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(review.userName,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        if (appUser != null)
+                          Text('Miembro desde: ${memberSince.day}/${memberSince.month}/${memberSince.year}',
+                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                      ],
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16), const Divider(), const SizedBox(height: 8),
-              const Text('Reseñas', style: TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _profileStat(Icons.rate_review, '${userReviews.length}', 'Reseñas'),
+                  _profileStat(Icons.store, '$ownedCount', 'Cafeterías'),
+                  _profileStat(Icons.favorite, '$favCount', 'Favoritos'),
+                ],
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => UserProfileScreen(
+                        userId: review.userId,
+                        userName: review.userName,
+                        userPhoto: photoUrl,
+                        memberSince: memberSince,
+                      ),
+                    ));
+                  },
+                  icon: const Icon(Icons.person),
+                  label: const Text('Ver perfil'),
+                ),
+              ),
               const SizedBox(height: 8),
-              ...userReviews.take(5).map((r) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        Row(children: List.generate(5, (i) => Icon(
-                            i < r.overallRating.round() ? Icons.star : Icons.star_border,
-                            size: 14, color: AppColors.star))),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(r.comment.isNotEmpty ? r.comment : 'Sin comentario',
-                              maxLines: 1, overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-                        ),
-                      ],
-                    ),
-                  )),
-              const SizedBox(height: 16),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _profileStat(IconData icon, String value, String label) {
+    return Column(
+      children: [
+        Icon(icon, color: AppColors.secondary, size: 22),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+      ],
     );
   }
 
@@ -701,6 +736,204 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class UserProfileScreen extends StatefulWidget {
+  final String userId;
+  final String userName;
+  final String userPhoto;
+  final DateTime memberSince;
+  const UserProfileScreen({
+    super.key,
+    required this.userId,
+    required this.userName,
+    required this.userPhoto,
+    required this.memberSince,
+  });
+
+  @override
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+class _UserProfileScreenState extends State<UserProfileScreen> {
+  List<Review> _reviews = [];
+  List<CoffeeShop> _favoriteShops = [];
+  List<CoffeeShop> _ownedShops = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final fs = context.read<FirestoreService>();
+    final appUser = await fs.getUser(widget.userId);
+    final reviews = await fs.getReviewsByUser(widget.userId);
+
+    final favShops = <CoffeeShop>[];
+    for (final id in appUser?.favoriteShops ?? []) {
+      final shop = await fs.getCoffeeShop(id);
+      if (shop != null) favShops.add(shop);
+    }
+
+    final ownedShops = <CoffeeShop>[];
+    for (final id in appUser?.ownedShops ?? []) {
+      final shop = await fs.getCoffeeShop(id);
+      if (shop != null) ownedShops.add(shop);
+    }
+
+    if (mounted) {
+      setState(() {
+        _reviews = reviews;
+        _favoriteShops = favShops;
+        _ownedShops = ownedShops;
+        _loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Perfil')),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          : RefreshIndicator(
+              onRefresh: _loadData,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: AppColors.primary,
+                      backgroundImage: widget.userPhoto.isNotEmpty ? NetworkImage(widget.userPhoto) : null,
+                      child: widget.userPhoto.isEmpty
+                          ? Text(widget.userName.isNotEmpty ? widget.userName[0].toUpperCase() : '?',
+                              style: const TextStyle(color: Colors.white, fontSize: 28))
+                          : null,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(widget.userName,
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    Text('Miembro desde: ${widget.memberSince.day}/${widget.memberSince.month}/${widget.memberSince.year}',
+                        style: const TextStyle(color: AppColors.textSecondary)),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _stat(Icons.rate_review, '${_reviews.length}', 'Reseñas'),
+                        _stat(Icons.store, '${_ownedShops.length}', 'Cafeterías'),
+                        _stat(Icons.favorite, '${_favoriteShops.length}', 'Favoritos'),
+                      ],
+                    ),
+                    if (_ownedShops.isNotEmpty) ...[
+                      const SizedBox(height: 24), const Divider(),
+                      const SizedBox(height: 12),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Cafeterías', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                      const SizedBox(height: 8),
+                      ..._ownedShops.map((s) => _shopTile(s)),
+                    ],
+                    if (_favoriteShops.isNotEmpty) ...[
+                      const SizedBox(height: 24), const Divider(),
+                      const SizedBox(height: 12),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Favoritos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                      const SizedBox(height: 8),
+                      ..._favoriteShops.map((s) => _shopTile(s)),
+                    ],
+                    if (_reviews.isNotEmpty) ...[
+                      const SizedBox(height: 24), const Divider(),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Reseñas (${_reviews.length})',
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                      const SizedBox(height: 8),
+                      ..._reviews.map((r) => _reviewTile(r)),
+                    ],
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget _stat(IconData icon, String value, String label) {
+    return Column(children: [
+      Icon(icon, color: AppColors.secondary, size: 22),
+      const SizedBox(height: 4),
+      Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+      Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+    ]);
+  }
+
+  Widget _shopTile(CoffeeShop shop) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        tileColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        leading: const Icon(Icons.store, color: AppColors.primary),
+        title: Text(shop.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text(shop.address, maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (shop.averageRating > 0) ...[
+            const Icon(Icons.star, size: 14, color: AppColors.star),
+            const SizedBox(width: 2),
+            Text(shop.averageRating.toStringAsFixed(1),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          ],
+          const SizedBox(width: 8),
+          const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+        ]),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: shop.id))),
+      ),
+    );
+  }
+
+  Widget _reviewTile(Review r) {
+    return FutureBuilder<CoffeeShop?>(
+      future: context.read<FirestoreService>().getCoffeeShop(r.shopId),
+      builder: (_, snap) {
+        final shop = snap.data;
+        return Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          child: ListTile(
+            tileColor: AppColors.surface,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            leading: const Icon(Icons.rate_review, color: AppColors.primary),
+            title: Row(children: List.generate(5, (i) =>
+                Icon(i < r.overallRating.round() ? Icons.star : Icons.star_border,
+                    size: 16, color: AppColors.star))),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (shop != null)
+                  Text(shop.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                if (r.comment.isNotEmpty)
+                  Text(r.comment, maxLines: 2, overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+              ],
+            ),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: r.shopId))),
+          ),
+        );
+      },
     );
   }
 }

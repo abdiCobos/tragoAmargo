@@ -41,10 +41,17 @@ class AppUser {
       displayName: data['displayName'] ?? '',
       email: data['email'] ?? '',
       photoUrl: data['photoUrl'] ?? '',
-      favoriteShops: List<String>.from(data['favoriteShops'] ?? []),
-      ownedShops: List<String>.from(data['ownedShops'] ?? []),
+      favoriteShops: _toStringList(data['favoriteShops']),
+      ownedShops: _toStringList(data['ownedShops']),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
+  }
+
+  static List<String> _toStringList(dynamic value) {
+    if (value == null) return [];
+    if (value is List) return List<String>.from(value);
+    if (value is String) return [value];
+    return [];
   }
 
   Map<String, dynamic> toMap() {

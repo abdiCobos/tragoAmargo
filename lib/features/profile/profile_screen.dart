@@ -22,6 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List<CoffeeShop> _favoriteShops = [];
   List<CoffeeShop> _ownedShops = [];
   bool _loadingOwned = false;
+  bool _loadingReviews = true;
 
   @override
   void initState() {
@@ -49,6 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _userReviews = reviews;
         _favoriteShops = favShops;
         _loadingOwned = true;
+        _loadingReviews = false;
       });
     }
 
@@ -96,7 +98,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Text(user.email ?? '', style: const TextStyle(color: AppColors.textSecondary)),
                 const SizedBox(height: 24),
                 _stat(Icons.favorite, '${appUser?.favoriteShops.length ?? 0}', 'Favoritos'),
-                _stat(Icons.rate_review, '${_userReviews.length}', 'Reseñas'),
+                _stat(Icons.rate_review, _loadingReviews ? '...' : '${_userReviews.length}', 'Reseñas', onTap: () async {
+                  await Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => UserReviewsScreen(userId: user.uid, userName: user.displayName ?? 'Usuario')));
+                  _loadData();
+                }),
                 _stat(Icons.store, '${appUser?.ownedShops.length ?? 0}', 'Cafeterías'),
                 _stat(Icons.calendar_today, _fmt(appUser?.createdAt ?? DateTime.now()), 'Miembro desde'),
 
@@ -114,15 +120,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const Text('Mis Favoritos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   ..._favoriteShops.map((s) => ShopCard(shop: s, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: s.id))))),
-                ],
-
-                if (_userReviews.isNotEmpty && _ownedShops.isEmpty && _favoriteShops.isEmpty) ...[
-                  const SizedBox(height: 16),
-                  SizedBox(width: double.infinity, height: 44, child: OutlinedButton.icon(
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(
-                      builder: (_) => UserReviewsScreen(userId: user.uid, userName: user.displayName ?? 'Usuario'))),
-                    icon: const Icon(Icons.list_alt, size: 18), label: const Text('Ver todas mis reseñas'),
-                  )),
                 ],
 
                 const SizedBox(height: 32),
@@ -207,12 +204,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _stat(IconData icon, String value, String label) {
-    return Padding(padding: const EdgeInsets.symmetric(vertical: 6), child: Row(children: [
-      Icon(icon, color: AppColors.secondary, size: 20), const SizedBox(width: 12),
-      Text(label, style: const TextStyle(color: AppColors.textSecondary)),
-      const Spacer(), Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-    ]));
+  Widget _stat(IconData icon, String value, String label, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(padding: const EdgeInsets.symmetric(vertical: 6), child: Row(children: [
+        Icon(icon, color: AppColors.secondary, size: 20), const SizedBox(width: 12),
+        Text(label, style: TextStyle(color: onTap != null ? AppColors.primary : AppColors.textSecondary)),
+        const Spacer(), Row(children: [
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          if (onTap != null) ...[
+            const SizedBox(width: 4),
+            const Icon(Icons.chevron_right, size: 18, color: AppColors.textSecondary),
+          ],
+        ]),
+      ])),
+    );
   }
 
   String _fmt(DateTime date) => '${date.day}/${date.month}/${date.year}';
@@ -254,14 +261,60 @@ class UserReviewsScreen extends StatelessWidget {
           if (reviews.isEmpty) return const Center(child: Text('No ha escrito reseñas', style: TextStyle(color: AppColors.textSecondary)));
           return ListView.builder(padding: const EdgeInsets.all(16), itemCount: reviews.length, itemBuilder: (_, i) {
             final r = reviews[i];
-            return Card(margin: const EdgeInsets.only(bottom: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: List.generate(5, (j) => Icon(j < r.overallRating.round() ? Icons.star : Icons.star_border, size: 16, color: AppColors.star))),
-                if (r.comment.isNotEmpty) ...[const SizedBox(height: 8), Text(r.comment, style: const TextStyle(fontSize: 14))],
-              ])));
+            return _ReviewCardWithShop(review: r);
           });
         },
       ),
+    );
+  }
+}
+
+class _ReviewCardWithShop extends StatelessWidget {
+  final Review review;
+  const _ReviewCardWithShop({required this.review});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<CoffeeShop?>(
+      future: context.read<FirestoreService>().getCoffeeShop(review.shopId),
+      builder: (_, shopSnap) {
+        final shop = shopSnap.data;
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: review.shopId))),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if (shop != null) ...[
+                  Row(children: [
+                    const Icon(Icons.store, size: 16, color: AppColors.primary),
+                    const SizedBox(width: 6),
+                    Expanded(child: Text(shop.name,
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                        overflow: TextOverflow.ellipsis)),
+                    const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+                  ]),
+                  Text(shop.address,
+                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                      maxLines: 1, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 8),
+                ],
+                Row(children: List.generate(5, (j) =>
+                    Icon(j < review.overallRating.round() ? Icons.star : Icons.star_border,
+                        size: 16, color: AppColors.star))),
+                if (review.comment.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(review.comment, style: const TextStyle(fontSize: 14)),
+                ],
+              ]),
+            ),
+          ),
+        );
+      },
     );
   }
 }

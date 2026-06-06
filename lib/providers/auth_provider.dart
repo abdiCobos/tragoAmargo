@@ -130,9 +130,9 @@ class AuthProvider extends ChangeNotifier {
     if (_appUser == null) return;
 
     final isFav = _appUser!.favoriteShops.contains(shopId);
-    await _firestoreService.toggleFavorite(_appUser!.uid, shopId, !isFav);
+    final previousFavs = List<String>.from(_appUser!.favoriteShops);
+    final updatedFavs = List<String>.from(previousFavs);
 
-    final updatedFavs = List<String>.from(_appUser!.favoriteShops);
     if (isFav) {
       updatedFavs.remove(shopId);
     } else {
@@ -141,6 +141,14 @@ class AuthProvider extends ChangeNotifier {
 
     _appUser = _appUser!.copyWith(favoriteShops: updatedFavs);
     notifyListeners();
+
+    try {
+      await _firestoreService.toggleFavorite(_appUser!.uid, shopId, !isFav);
+    } catch (e) {
+      _appUser = _appUser!.copyWith(favoriteShops: previousFavs);
+      notifyListeners();
+      rethrow;
+    }
   }
 
   bool isFavorite(String shopId) {

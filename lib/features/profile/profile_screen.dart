@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/storage_service.dart';
@@ -184,7 +183,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final auth = context.read<AuthProvider>();
       final user = auth.user;
       if (user == null) return;
-      await storage.uploadUserPhoto(user.uid, File(photo.path));
+      final bytes = await photo.readAsBytes();
+      await storage.uploadUserPhoto(user.uid, bytes);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Foto actualizada')),

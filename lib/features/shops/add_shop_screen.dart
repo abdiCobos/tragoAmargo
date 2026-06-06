@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'dart:typed_data';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/validators.dart';
 import '../../providers/coffee_shops_provider.dart';
@@ -29,7 +29,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
   String _priceRange = r'$';
   bool _hasWiFi = false;
   String _seatingMode = '';
-  final _photos = <File>[];
+  final _photos = <Uint8List>[];
   final _openingHours = <String, TextEditingController>{};
   List<Map<String, dynamic>> _addressSuggestions = [];
   bool _showSuggestions = false;
@@ -85,13 +85,21 @@ class _AddShopScreenState extends State<AddShopScreen> {
   Future<void> _pickPhotos() async {
     final picker = ImagePicker();
     final images = await picker.pickMultiImage(imageQuality: 80);
-    if (images.isNotEmpty) setState(() => _photos.addAll(images.map((x) => File(x.path))));
+    if (images.isNotEmpty) {
+      for (final img in images) {
+        final bytes = await img.readAsBytes();
+        setState(() => _photos.add(bytes));
+      }
+    }
   }
 
   Future<void> _takePhoto() async {
     final picker = ImagePicker();
     final photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
-    if (photo != null) setState(() => _photos.add(File(photo.path)));
+    if (photo != null) {
+      final bytes = await photo.readAsBytes();
+      setState(() => _photos.add(bytes));
+    }
   }
 
   Future<void> _submit() async {
@@ -404,7 +412,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
                           padding: const EdgeInsets.only(right: 8),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.file(_photos[i], width: 80, height: 80, fit: BoxFit.cover),
+                            child: Image.memory(_photos[i], width: 80, height: 80, fit: BoxFit.cover),
                           ),
                         ),
                         Positioned(

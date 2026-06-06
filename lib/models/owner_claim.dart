@@ -8,7 +8,8 @@ class OwnerClaim {
   final String userId;
   final String userName;
   final String userEmail;
-  final String documentPhotoUrl;
+  final List<String> documentPhotos;
+  final List<String> selfiePhotos;
   final String status; // pending, approved, denied
   final DateTime createdAt;
 
@@ -20,7 +21,8 @@ class OwnerClaim {
     required this.userId,
     required this.userName,
     required this.userEmail,
-    required this.documentPhotoUrl,
+    required this.documentPhotos,
+    required this.selfiePhotos,
     this.status = 'pending',
     required this.createdAt,
   });
@@ -34,7 +36,8 @@ class OwnerClaim {
       userId: data['userId'] ?? '',
       userName: data['userName'] ?? '',
       userEmail: data['userEmail'] ?? '',
-      documentPhotoUrl: data['documentPhotoUrl'] ?? '',
+      documentPhotos: List<String>.from(data['documentPhotos'] ?? []),
+      selfiePhotos: List<String>.from(data['selfiePhotos'] ?? []),
       status: data['status'] ?? 'pending',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
@@ -48,7 +51,8 @@ class OwnerClaim {
       'userId': userId,
       'userName': userName,
       'userEmail': userEmail,
-      'documentPhotoUrl': documentPhotoUrl,
+      'documentPhotos': documentPhotos,
+      'selfiePhotos': selfiePhotos,
       'status': status,
       'createdAt': Timestamp.fromDate(createdAt),
     };

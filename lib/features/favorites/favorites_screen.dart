@@ -14,9 +14,12 @@ class FavoritesScreen extends StatelessWidget {
     return Consumer2<AuthProvider, CoffeeShopsProvider>(
       builder: (context, auth, shopProvider, _) {
         if (!auth.isAuthenticated) {
-          return const EmptyState(
+          return EmptyState(
             icon: Icons.favorite_border,
             title: 'Inicia sesión para ver tus favoritos',
+            subtitle: 'Guarda tus cafeterías favoritas y accede a ellas desde cualquier dispositivo',
+            buttonText: 'Iniciar Sesión',
+            onButtonPressed: () => Navigator.pushNamed(context, '/login'),
           );
         }
 

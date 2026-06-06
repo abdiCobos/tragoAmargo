@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../services/storage_service.dart';
 import '../../services/firestore_service.dart';
 import '../../models/review.dart';
+import '../../models/app_user.dart';
 import '../../models/coffee_shop.dart';
 import '../shops/shop_detail_screen.dart';
 import '../shops/widgets/shop_card.dart';
@@ -103,7 +104,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     builder: (_) => UserReviewsScreen(userId: user.uid, userName: user.displayName ?? 'Usuario')));
                   _loadData();
                 }),
-                _stat(Icons.store, '${appUser?.ownedShops.length ?? 0}', 'Cafeterías'),
+                _stat(Icons.store, '${appUser?.ownedShops.length ?? 0}', 'Cafeterías', onTap: () async {
+                  await Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => UserShopsScreen(userId: user.uid, userName: user.displayName ?? 'Usuario')));
+                  _loadData();
+                }),
                 _stat(Icons.calendar_today, _fmt(appUser?.createdAt ?? DateTime.now()), 'Miembro desde'),
 
                 if (_ownedShops.isNotEmpty) ...[
@@ -316,5 +321,65 @@ class _ReviewCardWithShop extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class UserShopsScreen extends StatelessWidget {
+  final String userId;
+  final String userName;
+  const UserShopsScreen({super.key, required this.userId, required this.userName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Cafeterías de $userName')),
+      body: FutureBuilder<AppUser?>(
+        future: context.read<FirestoreService>().getUser(userId),
+        builder: (_, userSnap) {
+          if (userSnap.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          }
+          final appUser = userSnap.data;
+          final ownedIds = appUser?.ownedShops ?? [];
+          if (ownedIds.isEmpty) {
+            return const Center(child: Text('No ha publicado cafeterías', style: TextStyle(color: AppColors.textSecondary)));
+          }
+          return FutureBuilder<List<CoffeeShop>>(
+            future: _loadShops(context, ownedIds),
+            builder: (_, shopsSnap) {
+              if (shopsSnap.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+              }
+              final shops = shopsSnap.data ?? [];
+              if (shops.isEmpty) {
+                return const Center(child: Text('No ha publicado cafeterías', style: TextStyle(color: AppColors.textSecondary)));
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: shops.length,
+                itemBuilder: (_, i) {
+                  final shop = shops[i];
+                  return ShopCard(
+                    shop: shop,
+                    onTap: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: shop.id))),
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  static Future<List<CoffeeShop>> _loadShops(BuildContext context, List<String> ids) async {
+    final fs = context.read<FirestoreService>();
+    final shops = <CoffeeShop>[];
+    for (final id in ids) {
+      final shop = await fs.getCoffeeShop(id);
+      if (shop != null) shops.add(shop);
+    }
+    return shops;
   }
 }

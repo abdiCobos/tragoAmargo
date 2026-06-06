@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/validators.dart';
 import '../../../providers/coffee_shops_provider.dart';
 import '../../../services/firestore_service.dart';
+import '../../../services/storage_service.dart';
 import '../../../models/coffee_shop.dart';
 
 class EditShopScreen extends StatefulWidget {
@@ -28,7 +30,9 @@ class _EditShopScreenState extends State<EditShopScreen> {
   late bool _hasWiFi;
   late String _seatingMode;
   late Map<String, TextEditingController> _hours;
+  late List<String> _photos;
   bool _saving = false;
+  bool _uploadingPhoto = false;
   bool _showExtras = false;
   bool _showHours = false;
 
@@ -56,6 +60,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
     for (final d in _days) {
       _hours[d] = TextEditingController(text: s.openingHours[d] ?? '');
     }
+    _photos = List.from(s.photos);
   }
 
   @override
@@ -64,6 +69,28 @@ class _EditShopScreenState extends State<EditShopScreen> {
     _addrCtrl.dispose(); _phoneCtrl.dispose(); _igCtrl.dispose();
     for (final c in _hours.values) c.dispose();
     super.dispose();
+  }
+
+  Future<void> _addPhoto() async {
+    final picker = ImagePicker();
+    final photo = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    if (photo == null || !mounted) return;
+
+    setState(() => _uploadingPhoto = true);
+    try {
+      final bytes = await photo.readAsBytes();
+      final storage = context.read<StorageService>();
+      final url = await storage.uploadImageBytes(bytes, name: 'shop_${widget.shop.id}');
+      setState(() => _photos.add(url));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al subir foto'), backgroundColor: AppColors.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _uploadingPhoto = false);
+    }
   }
 
   Future<void> _submit() async {
@@ -83,6 +110,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
       roastLevels: _roastLevels, brewingMethods: _brewingMethods, priceRange: _priceRange,
       hasWiFi: _hasWiFi, seatingMode: _seatingMode, openingHours: oh,
       phone: _phoneCtrl.text.trim(), instagram: _igCtrl.text.trim(),
+      photos: _photos,
     );
 
     final fs = context.read<FirestoreService>();
@@ -119,6 +147,56 @@ class _EditShopScreenState extends State<EditShopScreen> {
               return FilterChip(label: Text(r), selected: sel, selectedColor: AppColors.secondary.withValues(alpha: 0.3),
                 onSelected: (v) => setState(() { if (v) {_roastLevels.add(r);} else {_roastLevels.remove(r);} }));
             }).toList()),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                const Text('Fotos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                const Spacer(),
+                Text('${_photos.length} fotos', style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (_photos.isNotEmpty)
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _photos.length,
+                  itemBuilder: (_, i) => Stack(
+                    children: [
+                      Container(
+                        width: 100, height: 100, margin: const EdgeInsets.only(right: 8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          image: DecorationImage(image: NetworkImage(_photos[i]), fit: BoxFit.cover),
+                        ),
+                      ),
+                      Positioned(
+                        top: 4, right: 12,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _photos.removeAt(i)),
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(color: AppColors.error, shape: BoxShape.circle),
+                            child: const Icon(Icons.close, size: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _uploadingPhoto ? null : _addPhoto,
+                icon: _uploadingPhoto
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(Icons.add_a_photo),
+                label: Text(_uploadingPhoto ? 'Subiendo...' : 'Agregar foto'),
+              ),
+            ),
             const SizedBox(height: 14),
             SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('WiFi disponible'), value: _hasWiFi, activeTrackColor: AppColors.secondary, onChanged: (v) => setState(() => _hasWiFi = v)),
             const SizedBox(height: 14),

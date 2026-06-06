@@ -51,9 +51,6 @@ class MenuItemCard extends StatelessWidget {
                     if (item.showPrice)
                       Text('\$${item.price.toStringAsFixed(2)}',
                           style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.secondary)),
-                    if (!item.showPrice)
-                      const Text('—',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
                   ],
                 ),
                 const SizedBox(height: 2),

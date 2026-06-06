@@ -5,6 +5,7 @@ import '../services/geocoding_service.dart';
 import '../services/storage_service.dart';
 import '../models/coffee_shop.dart';
 import '../models/product.dart';
+import '../models/menu_item.dart';
 
 class CoffeeShopsProvider extends ChangeNotifier {
   final FirestoreService _firestoreService;
@@ -13,6 +14,7 @@ class CoffeeShopsProvider extends ChangeNotifier {
 
   List<CoffeeShop> _shops = [];
   List<Product> _currentProducts = [];
+  List<MenuItem> _menuItems = [];
   CoffeeShop? _selectedShop;
   bool _isLoading = false;
   String? _error;
@@ -22,16 +24,13 @@ class CoffeeShopsProvider extends ChangeNotifier {
   String? _priceFilter;
   bool? _wifiFilter;
 
-  CoffeeShopsProvider(
-    this._firestoreService,
-    this._geocodingService,
-    this._storageService,
-  ) {
+  CoffeeShopsProvider(this._firestoreService, this._geocodingService, this._storageService) {
     loadShops();
   }
 
   List<CoffeeShop> get shops => _shops;
   List<Product> get currentProducts => _currentProducts;
+  List<MenuItem> get menuItems => _menuItems;
   CoffeeShop? get selectedShop => _selectedShop;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -39,8 +38,7 @@ class CoffeeShopsProvider extends ChangeNotifier {
   String? get roastFilter => _roastFilter;
   String? get priceFilter => _priceFilter;
   bool? get wifiFilter => _wifiFilter;
-  bool get hasActiveFilters =>
-      _searchQuery != null || _roastFilter != null || _priceFilter != null || _wifiFilter != null;
+  bool get hasActiveFilters => _searchQuery != null || _roastFilter != null || _priceFilter != null || _wifiFilter != null;
 
   void setSearchQuery(String? query) { _searchQuery = query; loadShops(); }
   void setRoastFilter(String? roast) { _roastFilter = roast; loadShops(); }
@@ -67,6 +65,9 @@ class CoffeeShopsProvider extends ChangeNotifier {
     _firestoreService.getProducts(shopId).listen((products) {
       _currentProducts = products; notifyListeners();
     });
+    _firestoreService.getMenu(shopId).listen((menu) {
+      _menuItems = menu; notifyListeners();
+    });
   }
 
   Future<String?> addCoffeeShop({
@@ -83,17 +84,12 @@ class CoffeeShopsProvider extends ChangeNotifier {
       final existing = await _firestoreService.getCoffeeShopByAddress(address);
       if (existing != null) {
         _error = 'Ya existe una cafetería con esta dirección.';
-        _isLoading = false; notifyListeners();
-        return null;
+        _isLoading = false; notifyListeners(); return null;
       }
-
       GeoPoint location;
       final latLng = await _geocodingService.searchAddress(address);
-      if (latLng != null) {
-        location = GeoPoint(latLng.latitude, latLng.longitude);
-      } else {
-        location = const GeoPoint(0, 0);
-      }
+      if (latLng != null) { location = GeoPoint(latLng.latitude, latLng.longitude); }
+      else { location = const GeoPoint(0, 0); }
 
       final docRef = await _firestoreService.addCoffeeShop(CoffeeShop(
         id: '', name: name, description: description,
@@ -109,7 +105,6 @@ class CoffeeShopsProvider extends ChangeNotifier {
         final url = await _storageService.uploadImageBytes(bytes);
         photoUrls.add(url);
       }
-
       if (photoUrls.isNotEmpty) {
         await _firestoreService.updateCoffeeShop(CoffeeShop(
           id: docRef, name: name, description: description,
@@ -120,7 +115,6 @@ class CoffeeShopsProvider extends ChangeNotifier {
           photos: photoUrls, createdAt: DateTime.now(), createdBy: userId,
         ));
       }
-
       _isLoading = false; notifyListeners(); return docRef;
     } catch (e) {
       _error = e.toString(); _isLoading = false; notifyListeners(); return null;

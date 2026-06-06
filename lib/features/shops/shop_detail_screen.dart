@@ -10,6 +10,7 @@ import '../../services/firestore_service.dart';
 import '../../services/storage_service.dart';
 import '../../models/review.dart';
 import '../../models/coffee_shop.dart';
+import '../../models/menu_item.dart';
 import '../../widgets/loading_indicator.dart';
 import 'widgets/photo_gallery.dart';
 import 'widgets/product_card.dart';
@@ -18,6 +19,9 @@ import '../reviews/review_form_screen.dart';
 import 'claim_shop_screen.dart';
 import 'add_product_screen.dart';
 import 'rate_product_screen.dart';
+import 'manage_menu_screen.dart';
+import 'rate_menu_item_screen.dart';
+import 'widgets/menu_item_card.dart';
 
 class ShopDetailScreen extends StatefulWidget {
   final String shopId;
@@ -52,6 +56,28 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Foto agregada'), backgroundColor: AppColors.secondary),
     );
+  }
+
+  Future<void> _deleteMenuItem(MenuItem item) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar ítem'),
+        content: Text('¿Eliminar "${item.name}" del menú?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Eliminar', style: TextStyle(color: AppColors.error))),
+        ],
+      ),
+    );
+    if (confirm == true && mounted) {
+      final fs = context.read<FirestoreService>();
+      await fs.deleteMenuItem(item.shopId, item.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ítem eliminado')),
+      );
+    }
   }
 
   @override
@@ -171,11 +197,11 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         ),
                       if (isOwner) ...[
                         _actionButton(
-                          icon: Icons.local_drink,
-                          label: 'Agregar bebida insignia',
+                          icon: Icons.restaurant_menu,
+                          label: 'Administrar Menú',
                           color: AppColors.secondary,
                           onPressed: () => Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => AddProductScreen(shopId: shop.id))),
+                              MaterialPageRoute(builder: (_) => ManageMenuScreen(shopId: shop.id))),
                         ),
                         const SizedBox(height: 8),
                       ],
@@ -228,6 +254,24 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         _ratingRow('Sabrozura', shop.averageFlavor),
                         _ratingRow('Manejo del tostado', shop.averageRoast),
                         _ratingRow('Servicio', shop.averageService),
+                      ],
+                      if (shopProv.menuItems.isNotEmpty) ...[
+                        const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            const Text('Menú', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                            const Spacer(),
+                            Text('${shopProv.menuItems.length} items',
+                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        ...shopProv.menuItems.map((item) => MenuItemCard(
+                              item: item,
+                              onRate: isOwner ? null : () => Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) => RateMenuItemScreen(item: item))),
+                              onDelete: isOwner ? () => _deleteMenuItem(item) : null,
+                            )),
                       ],
                       if (shopProv.currentProducts.isNotEmpty) ...[
                         const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),

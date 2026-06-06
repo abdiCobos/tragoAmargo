@@ -4,6 +4,7 @@ import '../models/coffee_shop.dart';
 import '../models/review.dart';
 import '../models/app_user.dart';
 import '../models/product.dart';
+import '../models/menu_item.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -159,6 +160,65 @@ class FirestoreService {
         .doc(shopId)
         .collection(FirestoreCollections.products)
         .doc(productId)
+        .update({
+      'averageRating': averageRating,
+      'totalRatings': totalRatings,
+    });
+  }
+
+  // ─── Menu ───
+
+  Stream<List<MenuItem>> getMenu(String shopId) {
+    return _firestore
+        .collection(FirestoreCollections.coffeeShops)
+        .doc(shopId)
+        .collection('menu')
+        .orderBy('name', descending: false)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => MenuItem.fromMap(doc.id, doc.data(), shopId))
+          .toList();
+    });
+  }
+
+  Future<void> addMenuItem(MenuItem item) async {
+    await _firestore
+        .collection(FirestoreCollections.coffeeShops)
+        .doc(item.shopId)
+        .collection('menu')
+        .add(item.toMap());
+  }
+
+  Future<void> updateMenuItem(MenuItem item) async {
+    await _firestore
+        .collection(FirestoreCollections.coffeeShops)
+        .doc(item.shopId)
+        .collection('menu')
+        .doc(item.id)
+        .update(item.toMap());
+  }
+
+  Future<void> deleteMenuItem(String shopId, String itemId) async {
+    await _firestore
+        .collection(FirestoreCollections.coffeeShops)
+        .doc(shopId)
+        .collection('menu')
+        .doc(itemId)
+        .delete();
+  }
+
+  Future<void> rateMenuItem({
+    required String shopId,
+    required String itemId,
+    required double averageRating,
+    required int totalRatings,
+  }) async {
+    await _firestore
+        .collection(FirestoreCollections.coffeeShops)
+        .doc(shopId)
+        .collection('menu')
+        .doc(itemId)
         .update({
       'averageRating': averageRating,
       'totalRatings': totalRatings,

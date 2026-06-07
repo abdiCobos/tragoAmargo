@@ -3,33 +3,61 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ─ Helper: validar longitud de strings ──
+    function isStringValid(val, maxLen) {
+      return val is string && val.size() <= maxLen;
+    }
+
     // ─── Coffee Shops ──
     match /coffee_shops/{shopId} {
       allow read: if true;
       allow create: if request.auth != null
-        && request.resource.data.verifiedOwnerUid == null;
+        && request.resource.data.verifiedOwnerUid == null
+        && isStringValid(request.resource.data.name, 100)
+        && isStringValid(request.resource.data.description, 2000)
+        && isStringValid(request.resource.data.address, 200)
+        && isStringValid(request.resource.data.originAndAltitude, 200)
+        && isStringValid(request.resource.data.phone, 30)
+        && isStringValid(request.resource.data.instagram, 30)
+        && request.resource.data.photos.size() <= 10;
       allow update: if request.auth != null
         && (resource.data.verifiedOwnerUid == null
-            || resource.data.verifiedOwnerUid == request.auth.uid);
+            || resource.data.verifiedOwnerUid == request.auth.uid)
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['verifiedOwnerUid'])
+            || resource.data.verifiedOwnerUid == null
+            && request.resource.data.verifiedOwnerUid == request.auth.uid)
+        && isStringValid(request.resource.data.name, 100)
+        && isStringValid(request.resource.data.description, 2000)
+        && isStringValid(request.resource.data.address, 200)
+        && isStringValid(request.resource.data.originAndAltitude, 200)
+        && isStringValid(request.resource.data.phone, 30)
+        && isStringValid(request.resource.data.instagram, 30)
+        && request.resource.data.photos.size() <= 10;
       allow delete: if false;
 
       match /products/{productId} {
         allow read: if true;
         allow create, update: if request.auth != null
-          && get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.verifiedOwnerUid == request.auth.uid;
+          && get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.verifiedOwnerUid == request.auth.uid
+          && isStringValid(request.resource.data.name, 100)
+          && isStringValid(request.resource.data.description, 500);
         allow delete: if false;
       }
 
       match /menu/{itemId} {
         allow read: if true;
         allow create, update, delete: if request.auth != null
-          && get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.verifiedOwnerUid == request.auth.uid;
+          && get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.verifiedOwnerUid == request.auth.uid
+          && isStringValid(request.resource.data.name, 100)
+          && isStringValid(request.resource.data.category, 50);
       }
 
       match /menu_items/{itemId} {
         allow read: if true;
         allow create, update, delete: if request.auth != null
-          && get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.verifiedOwnerUid == request.auth.uid;
+          && get(/databases/$(database)/documents/coffee_shops/$(shopId)).data.verifiedOwnerUid == request.auth.uid
+          && isStringValid(request.resource.data.name, 100)
+          && isStringValid(request.resource.data.category, 50);
       }
     }
 
@@ -38,7 +66,8 @@ service cloud.firestore {
       allow read: if request.auth != null
         && request.auth.uid == resource.data.userId;
       allow create: if request.auth != null
-        && request.auth.uid == request.resource.data.userId;
+        && request.auth.uid == request.resource.data.userId
+        && request.resource.data.photos.size() <= 5;
       allow update: if false;
     }
 
@@ -46,17 +75,35 @@ service cloud.firestore {
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if request.auth != null
-        && request.auth.uid == request.resource.data.userId;
+        && request.auth.uid == request.resource.data.userId
+        && isStringValid(request.resource.data.comment, 2000)
+        && isStringValid(request.resource.data.userName, 50)
+        && request.resource.data.qualityRating >= 0 && request.resource.data.qualityRating <= 5
+        && request.resource.data.flavorRating >= 0 && request.resource.data.flavorRating <= 5
+        && request.resource.data.roastRating >= 0 && request.resource.data.roastRating <= 5
+        && request.resource.data.serviceRating >= 0 && request.resource.data.serviceRating <= 5
+        && request.resource.data.photos.size() <= 5;
       allow update: if request.auth != null
-        && request.auth.uid == resource.data.userId;
+        && request.auth.uid == resource.data.userId
+        && isStringValid(request.resource.data.comment, 2000)
+        && request.resource.data.qualityRating >= 0 && request.resource.data.qualityRating <= 5
+        && request.resource.data.flavorRating >= 0 && request.resource.data.flavorRating <= 5
+        && request.resource.data.roastRating >= 0 && request.resource.data.roastRating <= 5
+        && request.resource.data.serviceRating >= 0 && request.resource.data.serviceRating <= 5;
       allow delete: if false;
     }
 
     // ─── Users ──
     match /users/{uid} {
       allow read: if true;
-      allow create: if request.auth != null && request.auth.uid == uid;
-      allow update: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && isStringValid(request.resource.data.displayName, 50);
+      allow update: if request.auth != null
+        && request.auth.uid == uid
+        && isStringValid(request.resource.data.displayName, 50)
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['favoriteShops', 'ownedShops'])
+            || request.resource.data.diff(resource.data).affectedKeys().size() == 1);
     }
 
     // ─── Notifications ──
@@ -64,15 +111,20 @@ service cloud.firestore {
       allow read: if request.auth != null
         && request.auth.uid == resource.data.userId;
       allow create: if request.auth != null
-        && request.auth.uid == request.resource.data.userId;
+        && request.auth.uid == request.resource.data.userId
+        && isStringValid(request.resource.data.title, 100)
+        && isStringValid(request.resource.data.body, 500);
       allow update: if request.auth != null
-        && request.auth.uid == resource.data.userId;
+        && request.auth.uid == resource.data.userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
     }
 
     // ─── Reports ──
     match /reports/{reportId} {
       allow create: if request.auth != null
-        && request.auth.uid == request.resource.data.reporterId;
+        && request.auth.uid == request.resource.data.reporterId
+        && isStringValid(request.resource.data.reason, 100)
+        && isStringValid(request.resource.data.details, 1000);
       allow read, update, delete: if false;
     }
 

@@ -25,6 +25,10 @@ class CoffeeShopsProvider extends ChangeNotifier {
   bool? _wifiFilter;
   String? _cityFilter;
 
+  dynamic _shopsSubscription;
+  dynamic _productsSubscription;
+  dynamic _menuSubscription;
+
   CoffeeShopsProvider(this._firestoreService, this._geocodingService, this._storageService) {
     loadShops();
   }
@@ -55,7 +59,11 @@ class CoffeeShopsProvider extends ChangeNotifier {
 
   void loadShops() {
     _isLoading = true; notifyListeners();
-    _firestoreService.getCoffeeShops(
+    final sub = _shopsSubscription;
+    if (sub != null) {
+      try { sub.cancel(); } catch (_) {}
+    }
+    _shopsSubscription = _firestoreService.getCoffeeShops(
       searchQuery: _searchQuery, roastLevel: _roastFilter,
       priceRange: _priceFilter, hasWiFi: _wifiFilter,
       cityFilter: _cityFilter,
@@ -66,12 +74,26 @@ class CoffeeShopsProvider extends ChangeNotifier {
     _isLoading = true; notifyListeners();
     final shop = await _firestoreService.getCoffeeShop(shopId);
     _selectedShop = shop; _isLoading = false; notifyListeners();
-    _firestoreService.getProducts(shopId).listen((products) {
+
+    final p = _productsSubscription;
+    if (p != null) { try { p.cancel(); } catch (_) {} }
+    _productsSubscription = _firestoreService.getProducts(shopId).listen((products) {
       _currentProducts = products; notifyListeners();
     });
-    _firestoreService.getMenu(shopId).listen((menu) {
+
+    final m = _menuSubscription;
+    if (m != null) { try { m.cancel(); } catch (_) {} }
+    _menuSubscription = _firestoreService.getMenu(shopId).listen((menu) {
       _menuItems = menu; notifyListeners();
     });
+  }
+
+  @override
+  void dispose() {
+    for (final s in [_shopsSubscription, _productsSubscription, _menuSubscription]) {
+      if (s != null) { try { s.cancel(); } catch (_) {} }
+    }
+    super.dispose();
   }
 
   Future<String?> addCoffeeShop({

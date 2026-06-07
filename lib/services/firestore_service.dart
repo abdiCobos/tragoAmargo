@@ -183,7 +183,7 @@ class FirestoreService {
     return _firestore
         .collection(FirestoreCollections.coffeeShops)
         .doc(shopId)
-        .collection('menu')
+        .collection(FirestoreCollections.menu)
         .orderBy('name', descending: false)
         .snapshots()
         .map((snapshot) {
@@ -197,7 +197,7 @@ class FirestoreService {
     await _firestore
         .collection(FirestoreCollections.coffeeShops)
         .doc(item.shopId)
-        .collection('menu')
+        .collection(FirestoreCollections.menu)
         .add(item.toMap());
   }
 
@@ -205,7 +205,7 @@ class FirestoreService {
     await _firestore
         .collection(FirestoreCollections.coffeeShops)
         .doc(item.shopId)
-        .collection('menu')
+        .collection(FirestoreCollections.menu)
         .doc(item.id)
         .update(item.toMap());
   }
@@ -214,7 +214,7 @@ class FirestoreService {
     await _firestore
         .collection(FirestoreCollections.coffeeShops)
         .doc(shopId)
-        .collection('menu')
+        .collection(FirestoreCollections.menu)
         .doc(itemId)
         .delete();
   }
@@ -228,7 +228,7 @@ class FirestoreService {
     await _firestore
         .collection(FirestoreCollections.coffeeShops)
         .doc(shopId)
-        .collection('menu')
+        .collection(FirestoreCollections.menu)
         .doc(itemId)
         .update({
       'averageRating': averageRating,
@@ -274,86 +274,73 @@ class FirestoreService {
   }
 
   Future<void> addReview(Review review) async {
-    final batch = _firestore.batch();
-
-    final existing = await _firestore
+    // Query for existing review outside the transaction
+    final existingSnap = await _firestore
         .collection(FirestoreCollections.reviews)
         .where('shopId', isEqualTo: review.shopId)
         .where('userId', isEqualTo: review.userId)
         .limit(1)
         .get();
 
-    final isUpdate = existing.docs.isNotEmpty;
-    final previousTotal = isUpdate ? existing.docs.first['overallRating'] as double? ?? 0.0 : 0.0;
+    final isUpdate = existingSnap.docs.isNotEmpty;
+    final existingDoc = isUpdate ? existingSnap.docs.first : null;
+    final prevOverall = isUpdate
+        ? (existingDoc!['overallRating'] as double?) ?? 0.0
+        : 0.0;
+    final oldQuality = isUpdate ? (existingDoc!['qualityRating'] as double?) ?? 0.0 : 0.0;
+    final oldFlavor = isUpdate ? (existingDoc!['flavorRating'] as double?) ?? 0.0 : 0.0;
+    final oldRoast = isUpdate ? (existingDoc!['roastRating'] as double?) ?? 0.0 : 0.0;
+    final oldService = isUpdate ? (existingDoc!['serviceRating'] as double?) ?? 0.0 : 0.0;
 
-    var reviewRef = isUpdate
-        ? existing.docs.first.reference
+    final reviewRef = isUpdate
+        ? existingDoc!.reference
         : _firestore.collection(FirestoreCollections.reviews).doc();
 
-    batch.set(reviewRef, review.toMap());
+    await _firestore.runTransaction((tx) async {
+      final shopRef = _firestore
+          .collection(FirestoreCollections.coffeeShops)
+          .doc(review.shopId);
 
-    final shopRef = _firestore
-        .collection(FirestoreCollections.coffeeShops)
-        .doc(review.shopId);
+      final shopDoc = await tx.get(shopRef);
+      if (!shopDoc.exists) return;
 
-    final shopDoc = await shopRef.get();
-    final currentTotal = shopDoc.data()?['totalReviews'] as int? ?? 0;
+      tx.set(reviewRef, review.toMap());
 
-    final newTotal = isUpdate ? currentTotal : currentTotal + 1;
-    final currentAvgQuality =
-        shopDoc.data()?['averageQuality'] as double? ?? 0.0;
-    final currentAvgFlavor =
-        shopDoc.data()?['averageFlavor'] as double? ?? 0.0;
-    final currentAvgRoast = shopDoc.data()?['averageRoast'] as double? ?? 0.0;
-    final currentAvgService =
-        shopDoc.data()?['averageService'] as double? ?? 0.0;
-    final currentAvgRating =
-        shopDoc.data()?['averageRating'] as double? ?? 0.0;
+      final d = shopDoc.data()!;
+      final n = (d['totalReviews'] as int?) ?? 0;
+      final curQ = (d['averageQuality'] as double?) ?? 0.0;
+      final curF = (d['averageFlavor'] as double?) ?? 0.0;
+      final curR = (d['averageRoast'] as double?) ?? 0.0;
+      final curS = (d['averageService'] as double?) ?? 0.0;
+      final curOverall = (d['averageRating'] as double?) ?? 0.0;
 
-    if (isUpdate) {
-      final oldTotal = currentTotal > 0 ? currentTotal : 1;
-      batch.update(shopRef, {
-        'averageQuality':
-            ((currentAvgQuality * oldTotal) - (existing.docs.first['qualityRating'] as double? ?? 0.0) + review.qualityRating) /
-                oldTotal,
-        'averageFlavor':
-            ((currentAvgFlavor * oldTotal) - (existing.docs.first['flavorRating'] as double? ?? 0.0) + review.flavorRating) /
-                oldTotal,
-        'averageRoast':
-            ((currentAvgRoast * oldTotal) - (existing.docs.first['roastRating'] as double? ?? 0.0) + review.roastRating) /
-                oldTotal,
-        'averageService':
-            ((currentAvgService * oldTotal) - (existing.docs.first['serviceRating'] as double? ?? 0.0) + review.serviceRating) /
-                oldTotal,
-        'averageRating':
-            ((currentAvgRating * oldTotal) - previousTotal + review.overallRating) /
-                oldTotal,
-      });
-    } else {
-      batch.update(shopRef, {
-        'totalReviews': newTotal,
-        'averageQuality':
-            ((currentAvgQuality * currentTotal) + review.qualityRating) /
-                newTotal,
-        'averageFlavor':
-            ((currentAvgFlavor * currentTotal) + review.flavorRating) / newTotal,
-        'averageRoast':
-            ((currentAvgRoast * currentTotal) + review.roastRating) / newTotal,
-        'averageService':
-            ((currentAvgService * currentTotal) + review.serviceRating) / newTotal,
-        'averageRating':
-            ((currentAvgRating * currentTotal) + review.overallRating) /
-                newTotal,
-      });
-    }
-
-    await batch.commit();
+      if (isUpdate) {
+        final m = n > 0 ? n : 1;
+        tx.update(shopRef, {
+          'averageQuality': ((curQ * m) - oldQuality + review.qualityRating) / m,
+          'averageFlavor': ((curF * m) - oldFlavor + review.flavorRating) / m,
+          'averageRoast': ((curR * m) - oldRoast + review.roastRating) / m,
+          'averageService': ((curS * m) - oldService + review.serviceRating) / m,
+          'averageRating': ((curOverall * m) - prevOverall + review.overallRating) / m,
+        });
+      } else {
+        final newTotal = n + 1;
+        tx.update(shopRef, {
+          'totalReviews': newTotal,
+          'averageQuality': ((curQ * n) + review.qualityRating) / newTotal,
+          'averageFlavor': ((curF * n) + review.flavorRating) / newTotal,
+          'averageRoast': ((curR * n) + review.roastRating) / newTotal,
+          'averageService': ((curS * n) + review.serviceRating) / newTotal,
+          'averageRating': ((curOverall * n) + review.overallRating) / newTotal,
+        });
+      }
+    });
   }
 
   // ─── Owner Claims ───
 
   Future<void> submitOwnerClaim(OwnerClaim claim) async {
-    await _firestore.collection('owner_claims').add(claim.toMap());
+    await _firestore.collection(FirestoreCollections.ownerClaims).add(claim.toMap());
   }
 
   Future<void> addReviewReply(String reviewId, String userName, String text) async {
@@ -368,7 +355,7 @@ class FirestoreService {
 
   Future<bool> hasPendingClaim(String shopId, String userId) async {
     final snapshot = await _firestore
-        .collection('owner_claims')
+        .collection(FirestoreCollections.ownerClaims)
         .where('shopId', isEqualTo: shopId)
         .where('userId', isEqualTo: userId)
         .where('status', isEqualTo: 'pending')
@@ -380,12 +367,12 @@ class FirestoreService {
   // ─── Notifications ───
 
   Future<void> sendNotification(AppNotification notif) async {
-    await _firestore.collection('notifications').add(notif.toMap());
+    await _firestore.collection(FirestoreCollections.notifications).add(notif.toMap());
   }
 
   Stream<List<AppNotification>> getNotifications(String userId) {
     return _firestore
-        .collection('notifications')
+        .collection(FirestoreCollections.notifications)
         .where('userId', isEqualTo: userId)
         .orderBy('createdAt', descending: true)
         .snapshots()
@@ -394,7 +381,7 @@ class FirestoreService {
 
   Future<int> getUnreadCount(String userId) async {
     final snap = await _firestore
-        .collection('notifications')
+        .collection(FirestoreCollections.notifications)
         .where('userId', isEqualTo: userId)
         .where('read', isEqualTo: false)
         .count()
@@ -404,7 +391,7 @@ class FirestoreService {
 
   Stream<int> getUnreadCountStream(String userId) {
     return _firestore
-        .collection('notifications')
+        .collection(FirestoreCollections.notifications)
         .where('userId', isEqualTo: userId)
         .where('read', isEqualTo: false)
         .snapshots()
@@ -414,7 +401,7 @@ class FirestoreService {
   Future<void> markAllRead(String userId) async {
     final batch = _firestore.batch();
     final snap = await _firestore
-        .collection('notifications')
+        .collection(FirestoreCollections.notifications)
         .where('userId', isEqualTo: userId)
         .where('read', isEqualTo: false)
         .get();
@@ -424,9 +411,9 @@ class FirestoreService {
     await batch.commit();
   }
 
-  // ─── Reports ──
+  // ─── Reports ───
 
   Future<void> submitReport(Report report) async {
-    await _firestore.collection('reports').add(report.toMap());
+    await _firestore.collection(FirestoreCollections.reports).add(report.toMap());
   }
 }

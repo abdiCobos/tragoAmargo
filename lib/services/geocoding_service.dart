@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import '../core/constants/app_constants.dart';
@@ -15,17 +16,18 @@ class GeocodingService {
         'User-Agent': AppConstants.userAgent,
         'Accept-Language': 'es',
       });
-
       if (response.statusCode == 200) {
         final results = jsonDecode(response.body) as List;
         if (results.isNotEmpty) {
           return LatLng(
-            double.parse(results[0]['lat']),
-            double.parse(results[0]['lon']),
+            double.parse(results[0]['lat'].toString()),
+            double.parse(results[0]['lon'].toString()),
           );
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('GeocodingService.searchAddress error: $e');
+    }
     return null;
   }
 
@@ -38,12 +40,13 @@ class GeocodingService {
         'User-Agent': AppConstants.userAgent,
         'Accept-Language': 'es',
       });
-
       if (response.statusCode == 200) {
         final result = jsonDecode(response.body);
         return result['display_name'] as String?;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('GeocodingService.reverseGeocode error: $e');
+    }
     return null;
   }
 
@@ -65,33 +68,21 @@ class GeocodingService {
           'displayName': result['display_name'] ?? '',
         };
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('GeocodingService.getAddressDetails error: $e');
+    }
     return null;
   }
 
   Future<List<Map<String, dynamic>>> searchPlaces(String query) async {
-    try {
-      final uri = Uri.parse(
-        '$_baseUrl/search?format=jsonv2&q=${Uri.encodeComponent(query)}&limit=5&addressdetails=1&countrycodes=mx&accept-language=es',
-      );
-      final response = await http.get(uri, headers: {
-        'User-Agent': AppConstants.userAgent,
-        'Accept-Language': 'es',
-      });
-
-      if (response.statusCode == 200) {
-        final results = jsonDecode(response.body) as List;
-        return results.map((r) => {
-          'lat': double.parse(r['lat'] as String),
-          'lon': double.parse(r['lon'] as String),
-          'displayName': r['display_name'] as String? ?? '',
-        }).toList();
-      }
-    } catch (_) {}
-    return [];
+    return _search(query);
   }
 
   Future<List<Map<String, dynamic>>> searchStructured(String query) async {
+    return _search(query);
+  }
+
+  Future<List<Map<String, dynamic>>> _search(String query) async {
     try {
       final uri = Uri.parse(
         '$_baseUrl/search?format=jsonv2&q=${Uri.encodeComponent(query)}&limit=5&addressdetails=1&countrycodes=mx&accept-language=es',
@@ -103,12 +94,14 @@ class GeocodingService {
       if (response.statusCode == 200) {
         final results = jsonDecode(response.body) as List;
         return results.map((r) => {
-          'lat': double.parse(r['lat'] as String),
-          'lon': double.parse(r['lon'] as String),
+          'lat': double.parse((r['lat'] as dynamic).toString()),
+          'lon': double.parse((r['lon'] as dynamic).toString()),
           'displayName': r['display_name'] as String? ?? '',
         }).toList();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('GeocodingService._search error: $e');
+    }
     return [];
   }
 }

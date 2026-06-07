@@ -69,7 +69,7 @@ class CoffeeShop {
       openingHours: Map<String, String>.from(data['openingHours'] ?? {}),
       phone: data['phone'] ?? '',
       instagram: data['instagram'] ?? '',
-      location: data['location'],
+      location: (data['location'] as GeoPoint?) ?? const GeoPoint(0, 0),
       address: data['address'] ?? '',
       city: data['city'] ?? '',
       photos: List<String>.from(data['photos'] ?? []),

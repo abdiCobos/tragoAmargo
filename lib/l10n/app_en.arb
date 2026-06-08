@@ -143,5 +143,5 @@
   "brewingFrenchPress": "French Press",
   "brewingEspresso": "Espresso",
   "brewingColdBrew": "Cold Brew",
-  "brewingSifon": "Siphon"
+  "brewingSifon": "Siphon", "user": "User", "someone": "Someone", "itemDeleted": "Item deleted", "reviewLoading": "Loading reviews...", "photoAdded": "Photo added", "viewProfile": "View profile", "reviewOf": "review by"
 }

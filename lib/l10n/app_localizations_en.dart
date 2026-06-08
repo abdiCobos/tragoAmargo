@@ -449,4 +449,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get brewingSifon => 'Siphon';
+
+  @override
+  String get user => 'User';
+
+  @override
+  String get someone => 'Someone';
+
+  @override
+  String get itemDeleted => 'Item deleted';
+
+  @override
+  String get reviewLoading => 'Loading reviews...';
+
+  @override
+  String get photoAdded => 'Photo added';
+
+  @override
+  String get viewProfile => 'View profile';
+
+  @override
+  String get reviewOf => 'review by';
 }

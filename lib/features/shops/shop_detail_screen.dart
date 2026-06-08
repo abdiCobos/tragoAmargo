@@ -26,6 +26,7 @@ import 'manage_menu_screen.dart';
 import 'rate_menu_item_screen.dart';
 import 'widgets/menu_item_card.dart';
 import 'edit_shop_screen.dart';
+import '../../l10n/app_localizations.dart';
 
 class ShopDetailScreen extends StatefulWidget {
   final String shopId;
@@ -58,7 +59,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     if (!mounted) return;
     context.read<CoffeeShopsProvider>().selectShop(widget.shopId);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Foto agregada'), backgroundColor: AppColors.secondary),
+      const SnackBar(content: Text(l10n.photoAdded), backgroundColor: AppColors.secondary),
     );
   }
 
@@ -66,12 +67,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar ítem'),
+        title: const Text(l10n.deleteMenuItem),
         content: Text('¿Eliminar "${item.name}" del menú?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(l10n.cancel)),
           TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Eliminar', style: TextStyle(color: AppColors.error))),
+              child: const Text(l10n.delete, style: TextStyle(color: AppColors.error))),
         ],
       ),
     );
@@ -79,7 +80,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       final fs = context.read<FirestoreService>();
       await fs.deleteMenuItem(item.shopId, item.id);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ítem eliminado')),
+        const SnackBar(content: Text(l10n.itemDeleted)),
       );
     }
   }
@@ -90,7 +91,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       body: Consumer2<CoffeeShopsProvider, AuthProvider>(
         builder: (context, shopProv, auth, _) {
           if (shopProv.isLoading || shopProv.selectedShop == null) {
-            return const LoadingIndicator(message: 'Cargando cafetería...');
+            return const LoadingIndicator(message: l10n.loading);
           }
 
           final shop = shopProv.selectedShop!;
@@ -112,12 +113,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                   if (isOwner) ...[
                     IconButton(
                       icon: const Icon(Icons.add_a_photo, color: Colors.white),
-                      tooltip: 'Agregar fotos',
+                      tooltip: l10n.addPhoto,
                       onPressed: () => _addPhoto(shop),
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit, color: Colors.white),
-                      tooltip: 'Editar información',
+                      tooltip: l10n.editShop,
                       onPressed: () async {
                         final result = await Navigator.push(context,
                             MaterialPageRoute(builder: (_) => EditShopScreen(shop: shop)));
@@ -128,7 +129,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                   if (!isOwner && shop.verifiedOwnerUid == null && auth.isAuthenticated)
                     IconButton(
                       icon: const Icon(Icons.edit_note, color: Colors.white),
-                      tooltip: 'Completar información',
+                      tooltip: l10n.completeInfo,
                       onPressed: () async {
                         final result = await Navigator.push(context,
                             MaterialPageRoute(builder: (_) => EditShopScreen(shop: shop)));
@@ -137,7 +138,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                     ),
                   IconButton(
                     icon: const Icon(Icons.flag_outlined, color: Colors.white),
-                    tooltip: 'Reportar',
+                    tooltip: l10n.report,
                     onPressed: () => _reportShop(shop),
                   ),
                   IconButton(
@@ -169,7 +170,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                       color: AppColors.secondary.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
-                                    child: const Text('Dueño',
+                                    child: const Text(l10n.owner,
                                         style: TextStyle(fontSize: 11, color: AppColors.secondary, fontWeight: FontWeight.bold)),
                                   ),
                               ],
@@ -219,7 +220,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       if (isPendingClaim)
                         _actionButton(
                           icon: Icons.verified_outlined,
-                          label: '¿Eres el dueño? Acredítate',
+                          label: l10n.claimShop,
                           color: AppColors.star,
                           onPressed: () async {
                             if (!await auth.requireLogin(context)) return;
@@ -231,7 +232,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       if (isOwner) ...[
                         _actionButton(
                           icon: Icons.restaurant_menu,
-                          label: 'Administrar Menú',
+                          label: l10n.ownerMenu,
                           color: AppColors.secondary,
                           onPressed: () => Navigator.push(context,
                               MaterialPageRoute(builder: (_) => ManageMenuScreen(shopId: shop.id))),
@@ -242,21 +243,21 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       const Divider(),
                       if (shop.originAndAltitude.isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        _section(Icons.landscape, 'Origen y Altura', shop.originAndAltitude),
+                        _section(Icons.landscape, l10n.originAltitude, shop.originAndAltitude),
                       ],
                       if (shop.roastLevels.isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        _section(Icons.local_fire_department, 'Niveles de Tostado', null,
+                        _section(Icons.local_fire_department, l10n.roastLevel, null,
                           Wrap(spacing: 8, children: shop.roastLevels.map((r) => Chip(label: Text(r))).toList())),
                       ],
                       if (shop.brewingMethods.isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        _section(Icons.science, 'Métodos de Preparación', null,
+                        _section(Icons.science, l10n.brewingMethods, null,
                           Wrap(spacing: 8, children: shop.brewingMethods.map((m) => Chip(label: Text(m))).toList())),
                       ],
                       if (shop.description.isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        _section(Icons.description, 'Descripción', shop.description),
+                        _section(Icons.description, l10n.description, shop.description),
                       ],
                       if (shop.openingHours.isNotEmpty) ...[
                         const SizedBox(height: 16),
@@ -264,7 +265,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       ],
                       if (shop.phone.isNotEmpty || shop.instagram.isNotEmpty) ...[
                         const SizedBox(height: 16), const Divider(), const SizedBox(height: 16),
-                        const Text('Contacto', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const Text(l10n.contact, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 12),
                         if (shop.phone.isNotEmpty)
                           Row(children: [
@@ -281,18 +282,18 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       ],
                       if (shop.averageQuality > 0 || shop.averageFlavor > 0 || shop.averageRoast > 0 || shop.averageService > 0) ...[
                         const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),
-                        const Text('Calificaciones', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const Text(l10n.ratings, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 12),
-                        _ratingRow('Calidad del grano', shop.averageQuality),
-                        _ratingRow('Sabrozura', shop.averageFlavor),
-                        _ratingRow('Manejo del tostado', shop.averageRoast),
-                        _ratingRow('Servicio', shop.averageService),
+                        _ratingRow(l10n.quality, shop.averageQuality),
+                        _ratingRow(l10n.flavor, shop.averageFlavor),
+                        _ratingRow(l10n.roast, shop.averageRoast),
+                        _ratingRow(l10n.service, shop.averageService),
                       ],
                       if (shopProv.menuItems.isNotEmpty) ...[
                         const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),
                         Row(
                           children: [
-                            const Text('Menú', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                            const Text(l10n.menu, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                             const Spacer(),
                             Text('${shopProv.menuItems.length} items',
                                 style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
@@ -312,7 +313,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       ],
                       if (shopProv.currentProducts.isNotEmpty) ...[
                         const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),
-                        const Text('Bebidas insignia', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const Text(l10n.flagshipDrinks, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 12),
                         SizedBox(
                           height: 210,
@@ -340,7 +341,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                       MaterialPageRoute(builder: (_) => ReviewFormScreen(shopId: shop.id)));
                                 },
                                 icon: const Icon(Icons.rate_review),
-                                label: const Text('Reseña'),
+                                label: const Text(l10n.review),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -352,7 +353,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                 },
                                 icon: Icon(isFav ? Icons.favorite : Icons.favorite_border,
                                     color: isFav ? AppColors.error : AppColors.primary),
-                                label: Text(isFav ? 'Guardado' : 'Favorito'),
+                                label: Text(isFav ? l10n.saved : l10n.favorite),
                               ),
                             ),
                           ],
@@ -362,7 +363,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       Consumer<ReviewsProvider>(
                         builder: (context, reviews, _) {
                           if (reviews.isLoading && reviews.reviews.isEmpty) {
-                            return const LoadingIndicator(message: 'Cargando reseñas...');
+                            return const LoadingIndicator(message: l10n.reviewLoading);
                           }
                           if (reviews.reviews.isEmpty) return const SizedBox.shrink();
                           return Column(
@@ -370,7 +371,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                             children: [
                               const Divider(),
                               const SizedBox(height: 16),
-                              const Text('Reseñas', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              const Text(l10n.reviews, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 12),
                               ...reviews.reviews.map((r) => _reviewCard(r)),
                             ],
@@ -489,7 +490,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${r['userName'] ?? 'Usuario'}: ',
+                  Text('${r['userName'] ?? l10n.user}: ',
                       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: AppColors.primary)),
                   Expanded(
                     child: Text(r['text'] ?? '',
@@ -508,7 +509,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                   children: [
                     Icon(Icons.reply, size: 14, color: AppColors.textSecondary),
                     SizedBox(width: 4),
-                    Text('Responder', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Text(l10n.reply, style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                   ],
                 ),
               ),
@@ -519,7 +520,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                   children: [
                     Icon(Icons.flag_outlined, size: 14, color: AppColors.textSecondary),
                     SizedBox(width: 4),
-                    Text('Reportar', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Text(l10n.report, style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                   ],
                 ),
               ),
@@ -583,9 +584,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _profileStat(Icons.rate_review, '${userReviews.length}', 'Reseñas'),
-                  _profileStat(Icons.store, '$ownedCount', 'Cafeterías'),
-                  _profileStat(Icons.favorite, '$favCount', 'Favoritos'),
+                  _profileStat(Icons.rate_review, '${userReviews.length}', l10n.reviews),
+                  _profileStat(Icons.store, '$ownedCount', l10n.myCafesStat),
+                  _profileStat(Icons.favorite, '$favCount', l10n.favorites),
                 ],
               ),
               const SizedBox(height: 20),
@@ -604,7 +605,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                     ));
                   },
                   icon: const Icon(Icons.person),
-                  label: const Text('Ver perfil'),
+                  label: const Text(l10n.viewProfile),
                 ),
               ),
               const SizedBox(height: 8),
@@ -637,36 +638,36 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       builder: (ctx) => SizedBox(
         width: 400,
         child: AlertDialog(
-          title: const Text('Responder', style: TextStyle(fontSize: 18)),
+          title: const Text(l10n.reply, style: TextStyle(fontSize: 18)),
           content: SizedBox(
             width: double.maxFinite,
             child: TextField(
               controller: controller,
               maxLines: 5, minLines: 3,
               decoration: const InputDecoration(
-                hintText: 'Escribe tu respuesta...',
+                hintText: l10n.replyHint,
                 contentPadding: EdgeInsets.all(12),
               ),
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text(l10n.cancel)),
             TextButton(
               onPressed: () {
                 if (controller.text.trim().isEmpty) return;
                 final fs = context.read<FirestoreService>();
-                fs.addReviewReply(review.id, auth.user?.displayName ?? 'Usuario', controller.text.trim());
+                fs.addReviewReply(review.id, auth.user?.displayName ?? l10n.user, controller.text.trim());
                 fs.sendNotification(AppNotification(
-                  id: '', userId: review.userId, title: 'Respondieron tu reseña',
-                  body: '${auth.user?.displayName ?? 'Alguien'} respondió tu reseña en ${widget.shopId}',
+                  id: '', userId: review.userId, title: l10n.replyTitle,
+                  body: '${auth.user?.displayName ?? l10n.someone} respondió tu reseña en ${widget.shopId}',
                   type: 'review_reply', shopId: widget.shopId, createdAt: DateTime.now(),
                 ));
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Respuesta publicada'), backgroundColor: AppColors.secondary),
+                  const SnackBar(content: Text(l10n.replyPublished), backgroundColor: AppColors.secondary),
                 );
               },
-              child: const Text('Responder'),
+              child: const Text(l10n.reply),
             ),
           ],
         ),
@@ -693,7 +694,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   }
 
   void _showReportDialog(String targetType, String targetId, String targetName, AuthProvider auth) {
-    final reasons = ['Contenido ofensivo', 'Información falsa', 'Spam', 'Otro'];
+    final reasons = [l10n.offensive, l10n.falseInfo, l10n.spam, l10n.other];
     final selectedReason = ValueNotifier<String?>(null);
     final detailsCtrl = TextEditingController();
 
@@ -706,7 +707,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
           content: SizedBox(
             width: 400,
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('Motivo:', style: TextStyle(fontWeight: FontWeight.w600)),
+              const Text(l10n.reportReason + ":", style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               Wrap(spacing: 8, children: reasons.map((r) => ChoiceChip(
                 label: Text(r), selected: reason == r,
@@ -714,24 +715,24 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               )).toList()),
               const SizedBox(height: 16),
               TextField(controller: detailsCtrl, maxLines: 3,
-                decoration: const InputDecoration(hintText: 'Detalles adicionales...', isDense: true)),
+                decoration: const InputDecoration(hintText: l10n.reportDetails, isDense: true)),
             ]),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text(l10n.cancel)),
             ElevatedButton(
               onPressed: reason == null ? null : () {
                 final fs = context.read<FirestoreService>();
                 fs.submitReport(Report(
                   reporterId: auth.user!.uid,
-                  reporterName: auth.user?.displayName ?? 'Usuario',
+                  reporterName: auth.user?.displayName ?? l10n.user,
                   targetId: targetId, targetType: targetType,
                   reason: reason, details: detailsCtrl.text,
                 ));
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reporte enviado')));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(l10n.reportSent)));
               },
-              child: const Text('Enviar reporte'),
+              child: const Text(l10n.sendReport),
             ),
           ],
         ),
@@ -799,7 +800,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Perfil')),
+      appBar: AppBar(title: const Text(l10n.profile)),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
           : RefreshIndicator(
@@ -828,9 +829,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _stat(Icons.rate_review, '${_reviews.length}', 'Reseñas'),
-                        _stat(Icons.store, '${_ownedShops.length}', 'Cafeterías'),
-                        _stat(Icons.favorite, '${_favoriteShops.length}', 'Favoritos'),
+                        _stat(Icons.rate_review, '${_reviews.length}', l10n.reviews),
+                        _stat(Icons.store, '${_ownedShops.length}', l10n.myCafesStat),
+                        _stat(Icons.favorite, '${_favoriteShops.length}', l10n.favorites),
                       ],
                     ),
                     if (_ownedShops.isNotEmpty) ...[
@@ -838,7 +839,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       const SizedBox(height: 12),
                       const Align(
                         alignment: Alignment.centerLeft,
-                        child: Text('Cafeterías', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                        child: Text(l10n.myCafesStat, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
                       const SizedBox(height: 8),
                       ..._ownedShops.map((s) => _shopTile(s)),
                     ],
@@ -847,7 +848,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       const SizedBox(height: 12),
                       const Align(
                         alignment: Alignment.centerLeft,
-                        child: Text('Favoritos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                        child: Text(l10n.favorites, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
                       const SizedBox(height: 8),
                       ..._favoriteShops.map((s) => _shopTile(s)),
                     ],

@@ -961,6 +961,48 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Sifón'**
   String get brewingSifon;
+
+  /// No description provided for @user.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuario'**
+  String get user;
+
+  /// No description provided for @someone.
+  ///
+  /// In es, this message translates to:
+  /// **'Alguien'**
+  String get someone;
+
+  /// No description provided for @itemDeleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Ítem eliminado'**
+  String get itemDeleted;
+
+  /// No description provided for @reviewLoading.
+  ///
+  /// In es, this message translates to:
+  /// **'Cargando reseñas...'**
+  String get reviewLoading;
+
+  /// No description provided for @photoAdded.
+  ///
+  /// In es, this message translates to:
+  /// **'Foto agregada'**
+  String get photoAdded;
+
+  /// No description provided for @viewProfile.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver perfil'**
+  String get viewProfile;
+
+  /// No description provided for @reviewOf.
+  ///
+  /// In es, this message translates to:
+  /// **'la reseña de'**
+  String get reviewOf;
 }
 
 class _AppLocalizationsDelegate

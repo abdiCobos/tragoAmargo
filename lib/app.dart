@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/theme/app_theme.dart';
 import 'services/auth_service.dart';
 import 'services/firestore_service.dart';
@@ -12,6 +13,7 @@ import 'providers/favorites_provider.dart';
 import 'features/auth/login_screen.dart';
 import 'features/auth/register_screen.dart';
 import 'features/home/home_screen.dart';
+import 'l10n/app_localizations.dart';
 
 class AuthGate extends StatefulWidget {
   static const String homeRoute = '/home';
@@ -32,6 +34,7 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: Center(
         child: Column(
@@ -39,11 +42,11 @@ class _AuthGateState extends State<AuthGate> {
           children: [
             const Icon(Icons.coffee, size: 80, color: AppColors.primary),
             const SizedBox(height: 16),
-            const Text('Trago Amargo',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary)),
+            Text(l10n.appTitle,
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary)),
             const SizedBox(height: 8),
-            const Text('Muchas cafeterías, poca calidad y sabor',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+            Text(l10n.appTagline,
+                style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
             const SizedBox(height: 32),
             const CircularProgressIndicator(color: AppColors.primary),
           ],
@@ -86,6 +89,9 @@ class TragoAmargoApp extends StatelessWidget {
         title: 'Trago Amargo',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
+        locale: const Locale('es'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
         initialRoute: '/',
         routes: {
           '/': (context) => const AuthGate(),

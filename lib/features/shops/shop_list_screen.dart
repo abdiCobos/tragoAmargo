@@ -5,6 +5,7 @@ import '../../providers/coffee_shops_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/empty_state.dart';
+import '../../l10n/app_localizations.dart';
 import 'widgets/shop_card.dart';
 import 'shop_detail_screen.dart';
 import 'add_shop_screen.dart';
@@ -27,6 +28,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
 
   void _openFilters() {
     final provider = context.read<CoffeeShopsProvider>();
+    final l10n = AppLocalizations.of(context);
 
     showModalBottomSheet(
       context: context,
@@ -46,24 +48,29 @@ class _ShopListScreenState extends State<ShopListScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Filtros',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text(l10n.filters,
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       TextButton(
                         onPressed: () {
                           provider.clearFilters();
                           Navigator.pop(ctx);
                         },
-                        child: const Text('Limpiar'),
+                        child: Text(l10n.clear),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text('Nivel de Tostado',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text(l10n.roastLevel,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
-                    children: ['Claro', 'Medio', 'Oscuro', 'Espresso'].map((roast) {
+                    children: [
+                      l10n.roastClaro,
+                      l10n.roastMedio,
+                      l10n.roastOscuro,
+                      l10n.brewingEspresso
+                    ].map((roast) {
                       final selected = provider.roastFilter == roast;
                       return ChoiceChip(
                         label: Text(roast),
@@ -76,8 +83,8 @@ class _ShopListScreenState extends State<ShopListScreen> {
                     }).toList(),
                   ),
                   const SizedBox(height: 16),
-                  const Text('Rango de Precio',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text(l10n.priceRange,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -96,7 +103,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
                   const SizedBox(height: 16),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('WiFi'),
+                    title: Text(l10n.wifi),
                     value: provider.wifiFilter ?? false,
                     activeTrackColor: AppColors.secondary,
                     onChanged: (val) {
@@ -107,12 +114,12 @@ class _ShopListScreenState extends State<ShopListScreen> {
                   const SizedBox(height: 8),
                   const Divider(),
                   const SizedBox(height: 8),
-                  const Text('Proximidad (Ciudad)',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text(l10n.proximity,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   TextField(
                     decoration: InputDecoration(
-                      hintText: 'Ej: Guadalajara, Zapopan...',
+                      hintText: l10n.proximityHint,
                       prefixIcon: const Icon(Icons.location_city),
                       isDense: true,
                       suffixIcon: provider.cityFilter != null
@@ -139,6 +146,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: Column(
         children: [
@@ -150,7 +158,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: 'Buscar cafetería...',
+                      hintText: l10n.searchHint,
                       prefixIcon: const Icon(Icons.search),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
@@ -198,15 +206,15 @@ class _ShopListScreenState extends State<ShopListScreen> {
             child: Consumer<CoffeeShopsProvider>(
               builder: (context, provider, _) {
                 if (provider.isLoading && provider.shops.isEmpty) {
-                  return const LoadingIndicator(message: 'Cargando cafeterías...');
+                  return LoadingIndicator(message: l10n.loading);
                 }
 
                 if (provider.shops.isEmpty) {
                   return EmptyState(
                     icon: Icons.coffee_outlined,
-                    title: 'No hay cafeterías',
-                    subtitle: 'Sé el primero en agregar una cafetería',
-                    buttonText: 'Agregar Cafetería',
+                    title: l10n.noShops,
+                    subtitle: l10n.noShopsSubtitle,
+                    buttonText: l10n.addShop,
                     onButtonPressed: () {
                       Navigator.push(
                         context,

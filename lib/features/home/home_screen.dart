@@ -7,6 +7,7 @@ import '../profile/profile_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,13 +28,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
         return Scaffold(
           appBar: _currentIndex == 0
               ? AppBar(
                   automaticallyImplyLeading: false,
-                  title: const Text('Trago Amargo'),
+                  title: Text(l10n.appTitle),
                   actions: [
                     if (auth.isAuthenticated) _notificationBell(context, auth),
                     if (!auth.isAuthenticated)
@@ -43,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (result == true && mounted) setState(() {});
                         },
                         icon: const Icon(Icons.person, size: 18, color: Colors.white),
-                        label: const Text('Entrar', style: TextStyle(color: Colors.white, fontSize: 13)),
+                        label: Text(l10n.enter, style: const TextStyle(color: Colors.white, fontSize: 13)),
                       ),
                   ],
                 )
@@ -55,11 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: _currentIndex,
             onTap: (index) => setState(() => _currentIndex = index),
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.coffee), label: 'Cafeterías'),
-              BottomNavigationBarItem(icon: Icon(Icons.map_outlined), label: 'Mapa'),
-              BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Favoritos'),
-              BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Perfil'),
+            items: [
+              BottomNavigationBarItem(icon: const Icon(Icons.coffee), label: l10n.home),
+              BottomNavigationBarItem(icon: const Icon(Icons.map_outlined), label: l10n.map),
+              BottomNavigationBarItem(icon: const Icon(Icons.favorite_border), label: l10n.favorites),
+              BottomNavigationBarItem(icon: const Icon(Icons.person_outline), label: l10n.profile),
             ],
           ),
         );

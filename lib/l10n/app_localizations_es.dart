@@ -708,4 +708,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get sunday => 'domingo';
+
+  @override
+  String get language => 'Idioma';
 }

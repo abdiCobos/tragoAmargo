@@ -10,6 +10,7 @@ import 'providers/auth_provider.dart';
 import 'providers/coffee_shops_provider.dart';
 import 'providers/reviews_provider.dart';
 import 'providers/favorites_provider.dart';
+import 'providers/locale_provider.dart';
 import 'features/auth/login_screen.dart';
 import 'features/auth/register_screen.dart';
 import 'features/home/home_screen.dart';
@@ -84,21 +85,24 @@ class TragoAmargoApp extends StatelessWidget {
           create: (ctx) => ReviewsProvider(ctx.read<FirestoreService>()),
         ),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()..load()),
       ],
-      child: MaterialApp(
-        title: 'Trago Amargo',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        locale: const Locale('es'),
-        supportedLocales: AppLocalizations.supportedLocales,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const AuthGate(),
-          '/login': (context) => const LoginScreen(),
-          '/register': (context) => const RegisterScreen(),
-          '/home': (context) => const HomeScreen(),
-        },
+      child: Consumer<LocaleProvider>(
+        builder: (context, localeProvider, _) => MaterialApp(
+          title: 'Trago Amargo',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          locale: localeProvider.locale,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          initialRoute: '/',
+          routes: {
+            '/': (context) => const AuthGate(),
+            '/login': (context) => const LoginScreen(),
+            '/register': (context) => const RegisterScreen(),
+            '/home': (context) => const HomeScreen(),
+          },
+        ),
       ),
     );
   }

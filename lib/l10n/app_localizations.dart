@@ -1441,6 +1441,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'domingo'**
   String get sunday;
+
+  /// No description provided for @language.
+  ///
+  /// In es, this message translates to:
+  /// **'Idioma'**
+  String get language;
 }
 
 class _AppLocalizationsDelegate

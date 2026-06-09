@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../services/storage_service.dart';
 import '../../services/firestore_service.dart';
 import '../../l10n/app_localizations.dart';
@@ -129,6 +130,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ..._favoriteShops.map((s) => ShopCard(shop: s, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: s.id))))),
                 ],
 
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Icon(Icons.language, color: AppColors.secondary, size: 20),
+                    const SizedBox(width: 12),
+                    Text(l10n.language, style: const TextStyle(color: AppColors.textSecondary)),
+                    const Spacer(),
+                    Consumer<LocaleProvider>(
+                      builder: (_, localeProv, __) {
+                        final current = localeProv.locale.languageCode;
+                        return SegmentedButton<String>(
+                          segments: const [
+                            ButtonSegment(value: 'es', label: Text('ES')),
+                            ButtonSegment(value: 'en', label: Text('EN')),
+                          ],
+                          selected: {current},
+                          style: ButtonStyle(
+                            visualDensity: VisualDensity.compact,
+                            textStyle: WidgetStateProperty.all(
+                              const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                            minimumSize: WidgetStateProperty.all(const Size(44, 34)),
+                          ),
+                          onSelectionChanged: (val) {
+                            localeProv.setLocale(Locale(val.first));
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 32),
                 SizedBox(width: double.infinity, height: 52, child: OutlinedButton.icon(
                   onPressed: () async {

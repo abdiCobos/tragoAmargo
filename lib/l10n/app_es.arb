@@ -223,5 +223,6 @@
   "thursday": "jueves",
   "friday": "viernes",
   "saturday": "sábado",
-  "sunday": "domingo"
+  "sunday": "domingo",
+  "language": "Idioma"
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   static const Color brown900 = Color(0xFF3E2723);
@@ -34,10 +33,25 @@ class AppColors {
 }
 
 class AppTheme {
-  static ThemeData get lightTheme {
-    final textTheme = GoogleFonts.interTextTheme();
-    final displayTheme = GoogleFonts.playfairDisplayTextTheme();
+  static const _bodyFont = 'Inter';
+  static const _displayFont = 'PlayfairDisplay';
 
+  static const _textTheme = TextTheme(
+    bodyLarge: TextStyle(fontFamily: _bodyFont, fontSize: 16, fontWeight: FontWeight.w400),
+    bodyMedium: TextStyle(fontFamily: _bodyFont, fontSize: 14, fontWeight: FontWeight.w400),
+    bodySmall: TextStyle(fontFamily: _bodyFont, fontSize: 12, fontWeight: FontWeight.w400),
+    titleLarge: TextStyle(fontFamily: _displayFont, fontSize: 22, fontWeight: FontWeight.w700),
+    titleMedium: TextStyle(fontFamily: _bodyFont, fontSize: 16, fontWeight: FontWeight.w600),
+    titleSmall: TextStyle(fontFamily: _bodyFont, fontSize: 14, fontWeight: FontWeight.w600),
+    headlineLarge: TextStyle(fontFamily: _displayFont, fontSize: 32, fontWeight: FontWeight.w900),
+    headlineMedium: TextStyle(fontFamily: _displayFont, fontSize: 28, fontWeight: FontWeight.w700),
+    headlineSmall: TextStyle(fontFamily: _displayFont, fontSize: 24, fontWeight: FontWeight.w700),
+    labelLarge: TextStyle(fontFamily: _bodyFont, fontSize: 14, fontWeight: FontWeight.w600),
+    labelMedium: TextStyle(fontFamily: _bodyFont, fontSize: 12, fontWeight: FontWeight.w500),
+    labelSmall: TextStyle(fontFamily: _bodyFont, fontSize: 11, fontWeight: FontWeight.w500),
+  );
+
+  static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: const ColorScheme(
@@ -62,32 +76,9 @@ class AppTheme {
         onError: AppColors.white,
       ),
       scaffoldBackgroundColor: AppColors.brown50,
-      textTheme: textTheme.copyWith(
-        headlineLarge: displayTheme.headlineLarge?.copyWith(
-          color: AppColors.brown800,
-          fontWeight: FontWeight.w900,
-        ),
-        headlineMedium: displayTheme.headlineMedium?.copyWith(
-          color: AppColors.brown800,
-          fontWeight: FontWeight.w700,
-        ),
-        titleLarge: displayTheme.titleLarge?.copyWith(
-          color: AppColors.brown800,
-          fontWeight: FontWeight.w700,
-        ),
-        titleMedium: textTheme.titleMedium?.copyWith(
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.w600,
-        ),
-        bodyLarge: textTheme.bodyLarge?.copyWith(
-          color: AppColors.textPrimary,
-        ),
-        bodyMedium: textTheme.bodyMedium?.copyWith(
-          color: AppColors.textSecondary,
-        ),
-        labelLarge: textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
+      textTheme: _textTheme.apply(
+        bodyColor: AppColors.textPrimary,
+        displayColor: AppColors.brown800,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.white,
@@ -97,23 +88,26 @@ class AppTheme {
         scrolledUnderElevation: 1,
         shadowColor: AppColors.brown900.withValues(alpha: 0.08),
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.playfairDisplay(
+        titleTextStyle: const TextStyle(
+          fontFamily: _displayFont,
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.brown800,
         ),
       ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.white,
         selectedItemColor: AppColors.brown800,
         unselectedItemColor: AppColors.gray400,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
-        selectedLabelStyle: GoogleFonts.inter(
+        selectedLabelStyle: TextStyle(
+          fontFamily: _bodyFont,
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: GoogleFonts.inter(
+        unselectedLabelStyle: TextStyle(
+          fontFamily: _bodyFont,
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
@@ -166,7 +160,8 @@ class AppTheme {
           ),
           elevation: 4,
           shadowColor: AppColors.brown900.withValues(alpha: 0.25),
-          textStyle: GoogleFonts.inter(
+          textStyle: const TextStyle(
+            fontFamily: _bodyFont,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -180,7 +175,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(50),
           ),
           side: const BorderSide(color: AppColors.brown200, width: 2),
-          textStyle: GoogleFonts.inter(
+          textStyle: const TextStyle(
+            fontFamily: _bodyFont,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -189,7 +185,8 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.brown600,
-          textStyle: GoogleFonts.inter(
+          textStyle: const TextStyle(
+            fontFamily: _bodyFont,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -198,11 +195,13 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.brown50,
         selectedColor: AppColors.gold.withValues(alpha: 0.2),
-        labelStyle: GoogleFonts.inter(
+        labelStyle: const TextStyle(
+          fontFamily: _bodyFont,
           fontSize: 13,
           color: AppColors.brown700,
         ),
-        secondaryLabelStyle: GoogleFonts.inter(
+        secondaryLabelStyle: const TextStyle(
+          fontFamily: _bodyFont,
           fontSize: 13,
           color: AppColors.brown800,
         ),
@@ -216,12 +215,14 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        titleTextStyle: GoogleFonts.playfairDisplay(
+        titleTextStyle: const TextStyle(
+          fontFamily: _displayFont,
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: AppColors.brown800,
         ),
-        contentTextStyle: GoogleFonts.inter(
+        contentTextStyle: const TextStyle(
+          fontFamily: _bodyFont,
           fontSize: 15,
           color: AppColors.textSecondary,
         ),
@@ -231,7 +232,8 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        contentTextStyle: GoogleFonts.inter(
+        contentTextStyle: const TextStyle(
+          fontFamily: _bodyFont,
           fontSize: 14,
           color: AppColors.white,
         ),

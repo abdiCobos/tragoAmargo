@@ -218,7 +218,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
             SwitchListTile(contentPadding: EdgeInsets.zero, title: Text(l10n.wifiAvailable), value: _hasWiFi, activeTrackColor: AppColors.brown800, onChanged: (v) => setState(() => _hasWiFi = v)),
             const SizedBox(height: 14),
             DropdownButtonFormField<String>(
-              value: _seatingMode, decoration: InputDecoration(labelText: l10n.seatingMode, prefixIcon: const Icon(Icons.chair)),
+              initialValue: _seatingMode, decoration: InputDecoration(labelText: l10n.seatingMode, prefixIcon: const Icon(Icons.chair)),
               items: _seatingOptions.map((o) => DropdownMenuItem(value: o, child: Text(o.isEmpty ? l10n.seatingEmpty : o))).toList(),
               onChanged: (v) => setState(() => _seatingMode = v ?? ''),
             ),

@@ -95,7 +95,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
               ),
               const SizedBox(height: 14),
               DropdownButtonFormField<String>(
-                value: _category,
+                initialValue: _category,
                 decoration: const InputDecoration(labelText: 'Categoría', prefixIcon: Icon(Icons.category)),
                 items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                 onChanged: (v) => setState(() => _category = v ?? 'Bebida'),

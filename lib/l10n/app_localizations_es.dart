@@ -725,4 +725,41 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get resetLinkSent =>
       'Se ha enviado un enlace de restablecimiento a tu email.';
+
+  @override
+  String get howToGetThere => 'Cómo llegar';
+
+  @override
+  String approxTime(Object time) {
+    return '~$time min';
+  }
+
+  @override
+  String get chooseMapApp => '¿Con qué app quieres abrir la ruta?';
+
+  @override
+  String get googleMaps => 'Google Maps';
+
+  @override
+  String get waze => 'Waze';
+
+  @override
+  String get openStreetMap => 'OpenStreetMap';
+
+  @override
+  String get needLocation => 'Activa tu ubicación para calcular la distancia.';
+
+  @override
+  String get openInBrowser => 'Abrir en navegador';
+
+  @override
+  String distanceAway(Object distance) {
+    return 'a $distance';
+  }
+
+  @override
+  String get viewDetails => 'Ver detalles';
+
+  @override
+  String get tapForPreview => 'Toca un marcador para ver detalles';
 }

@@ -1471,6 +1471,72 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Se ha enviado un enlace de restablecimiento a tu email.'**
   String get resetLinkSent;
+
+  /// No description provided for @howToGetThere.
+  ///
+  /// In es, this message translates to:
+  /// **'Cómo llegar'**
+  String get howToGetThere;
+
+  /// No description provided for @approxTime.
+  ///
+  /// In es, this message translates to:
+  /// **'~{time} min'**
+  String approxTime(Object time);
+
+  /// No description provided for @chooseMapApp.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Con qué app quieres abrir la ruta?'**
+  String get chooseMapApp;
+
+  /// No description provided for @googleMaps.
+  ///
+  /// In es, this message translates to:
+  /// **'Google Maps'**
+  String get googleMaps;
+
+  /// No description provided for @waze.
+  ///
+  /// In es, this message translates to:
+  /// **'Waze'**
+  String get waze;
+
+  /// No description provided for @openStreetMap.
+  ///
+  /// In es, this message translates to:
+  /// **'OpenStreetMap'**
+  String get openStreetMap;
+
+  /// No description provided for @needLocation.
+  ///
+  /// In es, this message translates to:
+  /// **'Activa tu ubicación para calcular la distancia.'**
+  String get needLocation;
+
+  /// No description provided for @openInBrowser.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir en navegador'**
+  String get openInBrowser;
+
+  /// No description provided for @distanceAway.
+  ///
+  /// In es, this message translates to:
+  /// **'a {distance}'**
+  String distanceAway(Object distance);
+
+  /// No description provided for @viewDetails.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver detalles'**
+  String get viewDetails;
+
+  /// No description provided for @tapForPreview.
+  ///
+  /// In es, this message translates to:
+  /// **'Toca un marcador para ver detalles'**
+  String get tapForPreview;
 }
 
 class _AppLocalizationsDelegate

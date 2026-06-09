@@ -228,5 +228,16 @@
   "resetPasswordTitle": "Restablecer contraseña",
   "resetPasswordDesc": "Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.",
   "sendResetLink": "Enviar enlace",
-  "resetLinkSent": "Se ha enviado un enlace de restablecimiento a tu email."
+  "resetLinkSent": "Se ha enviado un enlace de restablecimiento a tu email.",
+  "howToGetThere": "Cómo llegar",
+  "approxTime": "~{time} min",
+  "chooseMapApp": "¿Con qué app quieres abrir la ruta?",
+  "googleMaps": "Google Maps",
+  "waze": "Waze",
+  "openStreetMap": "OpenStreetMap",
+  "needLocation": "Activa tu ubicación para calcular la distancia.",
+  "openInBrowser": "Abrir en navegador",
+  "distanceAway": "a {distance}",
+  "viewDetails": "Ver detalles",
+  "tapForPreview": "Toca un marcador para ver detalles"
 }

@@ -228,5 +228,16 @@
   "resetPasswordTitle": "Reset Password",
   "resetPasswordDesc": "Enter your email and we'll send you a link to reset your password.",
   "sendResetLink": "Send Link",
-  "resetLinkSent": "A reset link has been sent to your email."
+  "resetLinkSent": "A reset link has been sent to your email.",
+  "howToGetThere": "Get directions",
+  "approxTime": "~{time} min",
+  "chooseMapApp": "Which app do you want to use?",
+  "googleMaps": "Google Maps",
+  "waze": "Waze",
+  "openStreetMap": "OpenStreetMap",
+  "needLocation": "Enable location to calculate distance.",
+  "openInBrowser": "Open in browser",
+  "distanceAway": "{distance} away",
+  "viewDetails": "View details",
+  "tapForPreview": "Tap a marker to see details"
 }

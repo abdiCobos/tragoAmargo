@@ -189,8 +189,6 @@ class _MapScreenState extends State<MapScreen> {
         ? '${origin.latitude},${origin.longitude}'
         : '';
 
-    CrashReporting.log('_openDirections called for shop: ${shop.name}, origin: $originParam, dest: ${dest.latitude},${dest.longitude}');
-
     final gmUrl = origin != null
         ? 'https://www.google.com/maps/dir/?api=1&origin=$originParam&destination=${dest.latitude},${dest.longitude}&travelmode=walking'
         : 'https://www.google.com/maps/search/?api=1&query=${dest.latitude},${dest.longitude}';
@@ -198,6 +196,13 @@ class _MapScreenState extends State<MapScreen> {
     final osmUrl = origin != null
         ? 'https://www.openstreetmap.org/directions?from=$originParam&to=${dest.latitude},${dest.longitude}#map=16/${dest.latitude}/${dest.longitude}'
         : 'https://www.openstreetmap.org/?mlat=${dest.latitude}&mlon=${dest.longitude}#map=16/${dest.latitude}/${dest.longitude}';
+
+    // Launch URL directly — must happen inside the user gesture without async gap
+    void launchAndClose(BuildContext ctx, String url) {
+      debugPrint('[MapScreen] Opening: $url');
+      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      Navigator.of(ctx).pop();
+    }
 
     showDialog(
       context: context,
@@ -209,48 +214,22 @@ class _MapScreenState extends State<MapScreen> {
             ListTile(
               leading: const Icon(Icons.map),
               title: Text(l10n.googleMaps),
-              onTap: () {
-                Navigator.pop(ctx);
-                _tryLaunch(gmUrl, 'Google Maps');
-              },
+              onTap: () => launchAndClose(ctx, gmUrl),
             ),
             ListTile(
               leading: const Icon(Icons.travel_explore),
               title: Text(l10n.openStreetMap),
-              onTap: () {
-                Navigator.pop(ctx);
-                _tryLaunch(osmUrl, 'OpenStreetMap');
-              },
+              onTap: () => launchAndClose(ctx, osmUrl),
             ),
             ListTile(
               leading: const Icon(Icons.open_in_browser),
               title: Text(l10n.openInBrowser),
-              onTap: () {
-                Navigator.pop(ctx);
-                _tryLaunch(gmUrl, 'Browser fallback');
-              },
+              onTap: () => launchAndClose(ctx, gmUrl),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _tryLaunch(String urlString, String label) async {
-    try {
-      final uri = Uri.parse(urlString);
-      CrashReporting.log('Launching $label: $urlString');
-      final launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
-      if (!launched) {
-        CrashReporting.recordError(
-          'launchUrl returned false for $label',
-          StackTrace.current,
-          reason: 'MapScreen._tryLaunch failed',
-        );
-      }
-    } catch (e, stack) {
-      CrashReporting.recordError(e, stack, reason: 'MapScreen._tryLaunch $label');
-    }
   }
 
   @override

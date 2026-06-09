@@ -112,7 +112,7 @@ body {
 
 .nav__link {
   text-decoration: none;
-  color: var(--brown-600);
+  color: var(--white);
   font-size: 0.9rem;
   font-weight: 500;
   transition: color var(--transition);
@@ -185,14 +185,14 @@ body {
 
 .button--ghost {
   background: transparent;
-  color: var(--brown-600);
+  color: var(--white);
   padding: 14px 32px;
   border: 2px solid var(--brown-200);
 }
 
 .button--ghost:hover {
-  border-color: var(--brown-600);
-  color: var(--brown-800);
+  border-color: var(--gold-light);
+  color: var(--gold-light);
 }
 
 .button--small {

@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/crash_reporting.dart';
 import '../../providers/coffee_shops_provider.dart';
 import '../../models/coffee_shop.dart';
 import '../shops/shop_detail_screen.dart';
@@ -181,13 +182,22 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _openDirections(BuildContext context, CoffeeShop shop, AppLocalizations l10n) async {
+  void _openDirections(BuildContext context, CoffeeShop shop, AppLocalizations l10n) {
     final dest = LatLng(shop.location.latitude, shop.location.longitude);
+    final origin = _userLocation;
+    final originParam = origin != null
+        ? '${origin.latitude},${origin.longitude}'
+        : '';
 
-    final hasGoogleMaps = await canLaunchUrl(Uri.parse('comgooglemaps://'));
-    final hasWaze = await canLaunchUrl(Uri.parse('waze://'));
+    CrashReporting.log('_openDirections called for shop: ${shop.name}, origin: $originParam, dest: ${dest.latitude},${dest.longitude}');
 
-    if (!context.mounted) return;
+    final gmUrl = origin != null
+        ? 'https://www.google.com/maps/dir/?api=1&origin=$originParam&destination=${dest.latitude},${dest.longitude}&travelmode=walking'
+        : 'https://www.google.com/maps/search/?api=1&query=${dest.latitude},${dest.longitude}';
+
+    final osmUrl = origin != null
+        ? 'https://www.openstreetmap.org/directions?from=$originParam&to=${dest.latitude},${dest.longitude}#map=16/${dest.latitude}/${dest.longitude}'
+        : 'https://www.openstreetmap.org/?mlat=${dest.latitude}&mlon=${dest.longitude}#map=16/${dest.latitude}/${dest.longitude}';
 
     showDialog(
       context: context,
@@ -196,31 +206,20 @@ class _MapScreenState extends State<MapScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (hasGoogleMaps)
-              ListTile(
-                leading: const Icon(Icons.map),
-                title: Text(l10n.googleMaps),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  final url = 'https://www.google.com/maps/dir/?api=1&origin=${_userLocation?.latitude ?? ''},${_userLocation?.longitude ?? ''}&destination=${dest.latitude},${dest.longitude}&travelmode=walking';
-                  launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                },
-              ),
-            if (hasWaze)
-              ListTile(
-                leading: const Icon(Icons.navigation),
-                title: Text(l10n.waze),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  launchUrl(Uri.parse('waze://?ll=${dest.latitude},${dest.longitude}&navigate=yes'), mode: LaunchMode.externalApplication);
-                },
-              ),
+            ListTile(
+              leading: const Icon(Icons.map),
+              title: Text(l10n.googleMaps),
+              onTap: () {
+                Navigator.pop(ctx);
+                _tryLaunch(gmUrl, 'Google Maps');
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.travel_explore),
               title: Text(l10n.openStreetMap),
               onTap: () {
                 Navigator.pop(ctx);
-                launchUrl(Uri.parse('https://www.openstreetmap.org/directions?from=${_userLocation?.latitude ?? ''},${_userLocation?.longitude ?? ''}&to=${dest.latitude},${dest.longitude}#map=15/${dest.latitude}/${dest.longitude}'), mode: LaunchMode.externalApplication);
+                _tryLaunch(osmUrl, 'OpenStreetMap');
               },
             ),
             ListTile(
@@ -228,13 +227,30 @@ class _MapScreenState extends State<MapScreen> {
               title: Text(l10n.openInBrowser),
               onTap: () {
                 Navigator.pop(ctx);
-                launchUrl(Uri.parse('https://www.google.com/maps/dir/?api=1&destination=${dest.latitude},${dest.longitude}&travelmode=walking'), mode: LaunchMode.externalApplication);
+                _tryLaunch(gmUrl, 'Browser fallback');
               },
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _tryLaunch(String urlString, String label) async {
+    try {
+      final uri = Uri.parse(urlString);
+      CrashReporting.log('Launching $label: $urlString');
+      final launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+      if (!launched) {
+        CrashReporting.recordError(
+          'launchUrl returned false for $label',
+          StackTrace.current,
+          reason: 'MapScreen._tryLaunch failed',
+        );
+      }
+    } catch (e, stack) {
+      CrashReporting.recordError(e, stack, reason: 'MapScreen._tryLaunch $label');
+    }
   }
 
   @override

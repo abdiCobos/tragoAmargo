@@ -40,15 +40,26 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primary,
+      colorScheme: const ColorScheme(
+        brightness: Brightness.light,
         primary: AppColors.primary,
-        secondary: AppColors.secondary,
-        tertiary: AppColors.tertiary,
-        surface: AppColors.surface,
-        error: AppColors.error,
         onPrimary: AppColors.onPrimary,
+        primaryContainer: AppColors.brown600,
+        onPrimaryContainer: AppColors.white,
+        secondary: AppColors.gold,
         onSecondary: AppColors.onSecondary,
+        secondaryContainer: AppColors.goldLight,
+        onSecondaryContainer: AppColors.brown900,
+        tertiary: AppColors.brown200,
+        onTertiary: AppColors.brown900,
+        surface: AppColors.white,
+        onSurface: AppColors.black,
+        surfaceContainerHighest: AppColors.brown50,
+        onSurfaceVariant: AppColors.gray600,
+        outline: AppColors.brown100,
+        outlineVariant: AppColors.brown50,
+        error: AppColors.error,
+        onError: AppColors.white,
       ),
       scaffoldBackgroundColor: AppColors.brown50,
       textTheme: textTheme.copyWith(

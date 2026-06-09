@@ -36,20 +36,19 @@ class _AuthGateState extends State<AuthGate> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.coffee, size: 80, color: AppColors.primary),
+            Icon(Icons.coffee, size: 80, color: theme.colorScheme.primary),
             const SizedBox(height: 16),
-            Text(l10n.appTitle,
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary)),
+            Text(l10n.appTitle, style: theme.textTheme.headlineMedium),
             const SizedBox(height: 8),
-            Text(l10n.appTagline,
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+            Text(l10n.appTagline, style: theme.textTheme.bodyMedium),
             const SizedBox(height: 32),
-            const CircularProgressIndicator(color: AppColors.primary),
+            CircularProgressIndicator(color: theme.colorScheme.primary),
           ],
         ),
       ),

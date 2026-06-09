@@ -19,31 +19,22 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 80, color: AppColors.tertiary),
+            Icon(icon, size: 80, color: AppColors.brown200),
             const SizedBox(height: 16),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
+            Text(title, style: theme.textTheme.headlineSmall),
             if (subtitle != null) ...[
               const SizedBox(height: 8),
               Text(
                 subtitle!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 14,
-                ),
+                style: theme.textTheme.bodyMedium,
               ),
             ],
             if (buttonText != null && onButtonPressed != null) ...[

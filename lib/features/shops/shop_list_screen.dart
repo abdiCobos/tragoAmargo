@@ -29,10 +29,11 @@ class _ShopListScreenState extends State<ShopListScreen> {
   void _openFilters() {
     final provider = context.read<CoffeeShopsProvider>();
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -48,8 +49,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(l10n.filters,
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text(l10n.filters, style: theme.textTheme.headlineSmall),
                       TextButton(
                         onPressed: () {
                           provider.clearFilters();
@@ -60,8 +60,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(l10n.roastLevel,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(l10n.roastLevel, style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -83,8 +82,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
                     }).toList(),
                   ),
                   const SizedBox(height: 16),
-                  Text(l10n.priceRange,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(l10n.priceRange, style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -105,7 +103,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
                     contentPadding: EdgeInsets.zero,
                     title: Text(l10n.wifi),
                     value: provider.wifiFilter ?? false,
-                    activeTrackColor: AppColors.secondary,
+                    activeTrackColor: AppColors.brown800,
                     onChanged: (val) {
                       setModalState(() {});
                       provider.setWifiFilter(val ? true : null);
@@ -114,8 +112,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
                   const SizedBox(height: 8),
                   const Divider(),
                   const SizedBox(height: 8),
-                  Text(l10n.proximity,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(l10n.proximity, style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
                   TextField(
                     decoration: InputDecoration(
@@ -192,8 +189,8 @@ class _ShopListScreenState extends State<ShopListScreen> {
                         icon: const Icon(Icons.tune),
                         style: IconButton.styleFrom(
                           backgroundColor: provider.hasActiveFilters
-                              ? AppColors.secondary.withValues(alpha: 0.2)
-                              : Colors.grey.shade100,
+                              ? AppColors.gold.withValues(alpha: 0.2)
+                              : AppColors.brown50,
                         ),
                       ),
                     );

@@ -69,9 +69,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
-        if (!auth.isAuthenticated) return _guestView(context, l10n);
+        if (!auth.isAuthenticated) return _guestView(context, l10n, theme);
         final user = auth.user!;
         final appUser = auth.appUser;
 
@@ -86,46 +87,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Stack(
                   children: [
                     CircleAvatar(
-                      radius: 50, backgroundColor: AppColors.surface,
+                      radius: 50, backgroundColor: AppColors.brown50,
                       backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
-                      child: user.photoURL == null ? const Icon(Icons.person, size: 50, color: AppColors.tertiary) : null,
+                      child: user.photoURL == null ? const Icon(Icons.person, size: 50, color: AppColors.brown200) : null,
                     ),
                     Positioned(bottom: 0, right: 0, child: CircleAvatar(
-                      radius: 18, backgroundColor: AppColors.secondary,
-                      child: IconButton(icon: const Icon(Icons.camera_alt, size: 18, color: Colors.white), onPressed: () => _changePhoto(context)),
+                      radius: 18, backgroundColor: AppColors.brown800,
+                      child: IconButton(icon: const Icon(Icons.camera_alt, size: 18, color: AppColors.white), onPressed: () => _changePhoto(context)),
                     )),
                   ],
                 ),
                 const SizedBox(height: 16),
-                Text(user.displayName ?? l10n.user, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                Text(user.displayName ?? l10n.user, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text(user.email ?? '', style: const TextStyle(color: AppColors.textSecondary)),
+                Text(user.email ?? '', style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 24),
-                _stat(Icons.favorite, '${appUser?.favoriteShops.length ?? 0}', l10n.favorites),
-                _stat(Icons.rate_review, _loadingReviews ? '...' : '${_userReviews.length}', l10n.reviews, onTap: () async {
+                _stat(Icons.favorite, '${appUser?.favoriteShops.length ?? 0}', l10n.favorites, theme),
+                _stat(Icons.rate_review, _loadingReviews ? '...' : '${_userReviews.length}', l10n.reviews, theme, onTap: () async {
                   await Navigator.push(context, MaterialPageRoute(
                     builder: (_) => UserReviewsScreen(userId: user.uid, userName: user.displayName ?? l10n.user)));
                   _loadData();
                 }),
-                _stat(Icons.store, '${appUser?.ownedShops.length ?? 0}', l10n.myCafesStat, onTap: () async {
+                _stat(Icons.store, '${appUser?.ownedShops.length ?? 0}', l10n.myCafesStat, theme, onTap: () async {
                   await Navigator.push(context, MaterialPageRoute(
                     builder: (_) => UserShopsScreen(userId: user.uid, userName: user.displayName ?? l10n.user)));
                   _loadData();
                 }),
-                _stat(Icons.calendar_today, _fmt(appUser?.createdAt ?? DateTime.now()), l10n.memberSince),
+                _stat(Icons.calendar_today, _fmt(appUser?.createdAt ?? DateTime.now()), l10n.memberSince, theme),
 
                 if (_ownedShops.isNotEmpty) ...[
                   const SizedBox(height: 24), const Divider(),
                   const SizedBox(height: 12),
-                  Text(l10n.myCafes, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(l10n.myCafes, style: theme.textTheme.titleLarge),
                   const SizedBox(height: 8),
-                  ..._ownedShops.map((s) => _ownerCard(s, l10n)),
+                  ..._ownedShops.map((s) => _ownerCard(s, l10n, theme)),
                 ],
 
                 if (_favoriteShops.isNotEmpty) ...[
                   const SizedBox(height: 24), const Divider(),
                   const SizedBox(height: 12),
-                  Text(l10n.myFavorites, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(l10n.myFavorites, style: theme.textTheme.titleLarge),
                   const SizedBox(height: 8),
                   ..._favoriteShops.map((s) => ShopCard(shop: s, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: s.id))))),
                 ],
@@ -133,9 +134,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 24),
                 Row(
                   children: [
-                    Icon(Icons.language, color: AppColors.secondary, size: 20),
+                    Icon(Icons.language, color: theme.colorScheme.primary, size: 20),
                     const SizedBox(width: 12),
-                    Text(l10n.language, style: const TextStyle(color: AppColors.textSecondary)),
+                    Text(l10n.language, style: theme.textTheme.bodyMedium),
                     const Spacer(),
                     Consumer<LocaleProvider>(
                       builder: (_, localeProv, __) {
@@ -149,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: ButtonStyle(
                             visualDensity: VisualDensity.compact,
                             textStyle: WidgetStateProperty.all(
-                              const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                              theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
                             ),
                             minimumSize: WidgetStateProperty.all(const Size(44, 34)),
                           ),
@@ -179,20 +180,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _ownerCard(CoffeeShop shop, AppLocalizations l10n) {
+  Widget _ownerCard(CoffeeShop shop, AppLocalizations l10n, ThemeData theme) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(color: AppColors.brown50, borderRadius: BorderRadius.circular(16)),
       child: Row(children: [
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.verified, size: 16, color: AppColors.secondary),
+            const Icon(Icons.verified, size: 16, color: AppColors.brown800),
             const SizedBox(width: 6),
-            Expanded(child: Text(shop.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15), overflow: TextOverflow.ellipsis)),
+            Expanded(child: Text(shop.name, style: theme.textTheme.titleSmall, overflow: TextOverflow.ellipsis)),
           ]),
           const SizedBox(height: 4),
-          Text(shop.address, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(shop.address, style: theme.textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 6),
           Row(children: [
             _tag('${shop.totalReviews} ${l10n.reviews}'),
@@ -201,18 +202,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ]),
         ])),
         IconButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: shop.id))),
-            icon: const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.textSecondary)),
+            icon: const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.gray600)),
       ]),
     );
   }
 
   Widget _tag(String text) {
     return Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(color: AppColors.secondary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
-      child: Text(text, style: const TextStyle(fontSize: 11, color: AppColors.secondary, fontWeight: FontWeight.w600)));
+      decoration: BoxDecoration(color: AppColors.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
+      child: Text(text, style: const TextStyle(fontSize: 11, color: AppColors.brown700, fontWeight: FontWeight.w600)));
   }
 
-  Widget _guestView(BuildContext ctx, AppLocalizations l10n) {
+  Widget _guestView(BuildContext ctx, AppLocalizations l10n, ThemeData theme) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -223,18 +224,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.surface, shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 8))],
+                color: AppColors.brown50, shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: AppColors.brown800.withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 8))],
               ),
-              child: const Icon(Icons.coffee, size: 56, color: AppColors.primary),
+              child: const Icon(Icons.coffee, size: 56, color: AppColors.brown800),
             ),
           ),
           const SizedBox(height: 24),
           Text(l10n.guestMessage,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary), textAlign: TextAlign.center),
+              style: theme.textTheme.titleLarge?.copyWith(color: AppColors.textPrimary), textAlign: TextAlign.center),
           const SizedBox(height: 8),
           Text(l10n.guestSubtitle,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 14), textAlign: TextAlign.center),
+              style: theme.textTheme.bodyMedium, textAlign: TextAlign.center),
           const SizedBox(height: 28),
           ElevatedButton.icon(onPressed: () => Navigator.pushNamed(ctx, '/login'),
             icon: const Icon(Icons.person), label: Text(l10n.login)),
@@ -243,18 +244,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _stat(IconData icon, String value, String label, {VoidCallback? onTap}) {
+  Widget _stat(IconData icon, String value, String label, ThemeData theme, {VoidCallback? onTap}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Padding(padding: const EdgeInsets.symmetric(vertical: 6), child: Row(children: [
-        Icon(icon, color: AppColors.secondary, size: 20), const SizedBox(width: 12),
-        Text(label, style: TextStyle(color: onTap != null ? AppColors.primary : AppColors.textSecondary)),
+        Icon(icon, color: theme.colorScheme.primary, size: 20), const SizedBox(width: 12),
+        Text(label, style: TextStyle(color: onTap != null ? theme.colorScheme.primary : AppColors.gray600)),
         const Spacer(), Row(children: [
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(value, style: theme.textTheme.titleMedium),
           if (onTap != null) ...[
             const SizedBox(width: 4),
-            const Icon(Icons.chevron_right, size: 18, color: AppColors.textSecondary),
+            const Icon(Icons.chevron_right, size: 18, color: AppColors.gray600),
           ],
         ]),
       ])),
@@ -290,16 +291,17 @@ class UserReviewsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.reviewsOfUser(userName))),
       body: FutureBuilder<List<Review>>(
         future: context.read<FirestoreService>().getReviewsByUser(userId),
         builder: (_, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            return Center(child: CircularProgressIndicator(color: theme.colorScheme.primary));
           }
           final reviews = snap.data ?? [];
-          if (reviews.isEmpty) return Center(child: Text(l10n.noUserReviews, style: const TextStyle(color: AppColors.textSecondary)));
+          if (reviews.isEmpty) return Center(child: Text(l10n.noUserReviews, style: theme.textTheme.bodyMedium));
           return ListView.builder(padding: const EdgeInsets.all(16), itemCount: reviews.length, itemBuilder: (_, i) {
             final r = reviews[i];
             return _ReviewCardWithShop(review: r);
@@ -316,15 +318,15 @@ class _ReviewCardWithShop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return FutureBuilder<CoffeeShop?>(
       future: context.read<FirestoreService>().getCoffeeShop(review.shopId),
       builder: (_, shopSnap) {
         final shop = shopSnap.data;
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: InkWell(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: review.shopId))),
             child: Padding(
@@ -332,24 +334,24 @@ class _ReviewCardWithShop extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 if (shop != null) ...[
                   Row(children: [
-                    const Icon(Icons.store, size: 16, color: AppColors.primary),
+                    Icon(Icons.store, size: 16, color: theme.colorScheme.primary),
                     const SizedBox(width: 6),
                     Expanded(child: Text(shop.name,
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                        style: theme.textTheme.titleSmall,
                         overflow: TextOverflow.ellipsis)),
-                    const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+                    const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.gray600),
                   ]),
                   Text(shop.address,
-                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                      style: theme.textTheme.bodySmall,
                       maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 8),
                 ],
                 Row(children: List.generate(5, (j) =>
                     Icon(j < review.overallRating.round() ? Icons.star : Icons.star_border,
-                        size: 16, color: AppColors.star))),
+                        size: 16, color: AppColors.gold))),
                 if (review.comment.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(review.comment, style: const TextStyle(fontSize: 14)),
+                  Text(review.comment, style: theme.textTheme.bodyMedium),
                 ],
               ]),
             ),
@@ -368,28 +370,29 @@ class UserShopsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.shopsOfUser(userName))),
       body: FutureBuilder<AppUser?>(
         future: context.read<FirestoreService>().getUser(userId),
         builder: (_, userSnap) {
           if (userSnap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            return Center(child: CircularProgressIndicator(color: theme.colorScheme.primary));
           }
           final appUser = userSnap.data;
           final ownedIds = appUser?.ownedShops ?? [];
           if (ownedIds.isEmpty) {
-            return Center(child: Text(l10n.noPublishedShops, style: const TextStyle(color: AppColors.textSecondary)));
+            return Center(child: Text(l10n.noPublishedShops, style: theme.textTheme.bodyMedium));
           }
           return FutureBuilder<List<CoffeeShop>>(
             future: _loadShops(context, ownedIds),
             builder: (_, shopsSnap) {
               if (shopsSnap.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                return Center(child: CircularProgressIndicator(color: theme.colorScheme.primary));
               }
               final shops = shopsSnap.data ?? [];
               if (shops.isEmpty) {
-                return Center(child: Text(l10n.noPublishedShops, style: const TextStyle(color: AppColors.textSecondary)));
+                return Center(child: Text(l10n.noPublishedShops, style: theme.textTheme.bodyMedium));
               }
               return ListView.builder(
                 padding: const EdgeInsets.all(16),

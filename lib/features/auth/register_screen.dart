@@ -55,6 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.createAccount)),
       body: SafeArea(
@@ -63,10 +64,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Form(
             key: _formKey,
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Text(l10n.appTagline,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+              Text(l10n.appTagline, style: theme.textTheme.headlineSmall),
               const SizedBox(height: 8),
-              Text(l10n.guestSubtitle, style: const TextStyle(color: AppColors.textSecondary)),
+              Text(l10n.guestSubtitle, style: theme.textTheme.bodyMedium),
               const SizedBox(height: 32),
               TextFormField(
                 controller: _nameController,
@@ -141,7 +141,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 16),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(l10n.alreadyAccount, style: const TextStyle(color: AppColors.textSecondary)),
+                Text(l10n.alreadyAccount, style: theme.textTheme.bodyMedium),
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text(l10n.login),

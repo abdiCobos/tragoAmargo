@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
         return Scaffold(
@@ -37,15 +38,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   automaticallyImplyLeading: false,
                   title: Text(l10n.appTitle),
                   actions: [
-                    if (auth.isAuthenticated) _notificationBell(context, auth),
+                    if (auth.isAuthenticated) _notificationBell(context, auth, theme),
                     if (!auth.isAuthenticated)
                       TextButton.icon(
                         onPressed: () async {
                           final result = await Navigator.pushNamed(context, '/login');
                           if (result == true && mounted) setState(() {});
                         },
-                        icon: const Icon(Icons.person, size: 18, color: Colors.white),
-                        label: Text(l10n.enter, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                        icon: Icon(Icons.person, size: 18, color: theme.appBarTheme.foregroundColor),
+                        label: Text(l10n.enter, style: theme.textTheme.labelSmall?.copyWith(color: theme.appBarTheme.foregroundColor)),
                       ),
                   ],
                 )
@@ -69,16 +70,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _notificationBell(BuildContext context, AuthProvider auth) {
+  Widget _notificationBell(BuildContext context, AuthProvider auth, ThemeData theme) {
     return StreamBuilder<int>(
       stream: context.read<FirestoreService>().getUnreadCountStream(auth.user!.uid),
       initialData: 0,
       builder: (_, snap) {
         final count = snap.data ?? 0;
+        final fgColor = theme.appBarTheme.foregroundColor ?? theme.colorScheme.onSurface;
         return Stack(
           children: [
             IconButton(
-              icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+              icon: Icon(Icons.notifications_outlined, color: fgColor),
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
             ),
             if (count > 0)

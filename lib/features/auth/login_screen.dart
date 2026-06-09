@@ -101,6 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.login)),
       body: SafeArea(
@@ -113,15 +114,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.coffee, size: 80, color: AppColors.primary),
+                  Icon(Icons.coffee, size: 80, color: theme.colorScheme.primary),
                   const SizedBox(height: 16),
-                  Text(l10n.appTitle,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                  Text(
+                    l10n.appTitle,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium,
+                  ),
                   const SizedBox(height: 8),
-                  Text(l10n.appTagline,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppColors.textSecondary)),
+                  Text(
+                    l10n.appTagline,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium,
+                  ),
                   const SizedBox(height: 48),
                   TextFormField(
                     controller: _emailController,
@@ -202,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text(l10n.noAccount, style: const TextStyle(color: AppColors.textSecondary)),
+                    Text(l10n.noAccount, style: theme.textTheme.bodyMedium),
                     TextButton(
                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
                       child: Text(l10n.register),

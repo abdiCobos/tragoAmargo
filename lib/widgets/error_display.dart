@@ -9,6 +9,7 @@ class ErrorDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -20,10 +21,7 @@ class ErrorDisplay extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 16,
-              ),
+              style: theme.textTheme.bodyLarge,
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 24),

@@ -13,93 +13,112 @@ class MenuItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final theme = Theme.of(context);
+
+    return Card(
       margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.divider.withValues(alpha: 0.3)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: AppColors.brown100.withValues(alpha: 0.5)),
       ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: SizedBox(
-              width: 65, height: 65,
-              child: item.photo.isNotEmpty
-                  ? CachedNetworkImage(imageUrl: item.photo, fit: BoxFit.cover,
-                      placeholder: (_, a) => Container(color: AppColors.surface),
-                      errorWidget: (_, a, b) => Container(color: AppColors.surface,
-                          child: const Icon(Icons.local_drink, color: AppColors.tertiary, size: 24)),
-                    )
-                  : Container(color: AppColors.surface,
-                      child: const Icon(Icons.local_drink, color: AppColors.tertiary, size: 24)),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(item.name,
-                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                    ),
-                    if (item.showPrice)
-                      Text('\$${item.price.toStringAsFixed(2)}',
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.secondary)),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(item.category, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    if (item.averageRating > 0) ...[
-                      RatingBarIndicator(
-                        rating: item.averageRating,
-                        itemBuilder: (_, a) => const Icon(Icons.star, color: AppColors.star, size: 14),
-                        itemCount: 5, itemSize: 14,
-                      ),
-                      const SizedBox(width: 4),
-                      Text('(${item.totalRatings})',
-                          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                    ],
-                    if (item.isSignature) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.star.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: 65,
+                height: 65,
+                child: item.photo.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: item.photo,
+                        fit: BoxFit.cover,
+                        placeholder: (_, a) => Container(color: AppColors.brown50),
+                        errorWidget: (_, a, b) => Container(
+                          color: AppColors.brown50,
+                          child: const Icon(Icons.local_drink, color: AppColors.brown200, size: 24),
                         ),
-                        child: const Text('Insignia',
-                            style: TextStyle(fontSize: 10, color: AppColors.star, fontWeight: FontWeight.bold)),
+                      )
+                    : Container(
+                        color: AppColors.brown50,
+                        child: const Icon(Icons.local_drink, color: AppColors.brown200, size: 24),
                       ),
-                    ],
-                    const Spacer(),
-                    if (onRate != null)
-                      TextButton.icon(
-                        onPressed: onRate,
-                        icon: const Icon(Icons.star, size: 14, color: AppColors.star),
-                        label: const Text('Calificar', style: TextStyle(fontSize: 11)),
-                        style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 4)),
-                      ),
-                    if (onDelete != null)
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.textSecondary),
-                        onPressed: onDelete,
-                        tooltip: 'Eliminar',
-                      ),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(item.name, style: theme.textTheme.titleSmall),
+                      ),
+                      if (item.showPrice)
+                        Text(
+                          '\$${item.price.toStringAsFixed(2)}',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: AppColors.gold,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(item.category, style: theme.textTheme.labelSmall),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      if (item.averageRating > 0) ...[
+                        RatingBarIndicator(
+                          rating: item.averageRating,
+                          itemBuilder: (_, a) => const Icon(Icons.star, color: AppColors.gold, size: 14),
+                          itemCount: 5,
+                          itemSize: 14,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '(${item.totalRatings})',
+                          style: theme.textTheme.labelSmall,
+                        ),
+                      ],
+                      if (item.isSignature) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.gold.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'Insignia',
+                            style: TextStyle(fontSize: 10, color: AppColors.gold, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                      const Spacer(),
+                      if (onRate != null)
+                        TextButton.icon(
+                          onPressed: onRate,
+                          icon: const Icon(Icons.star, size: 14, color: AppColors.gold),
+                          label: Text('Calificar', style: theme.textTheme.labelSmall),
+                          style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 4)),
+                        ),
+                      if (onDelete != null)
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.gray600),
+                          onPressed: onDelete,
+                          tooltip: 'Eliminar',
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

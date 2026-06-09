@@ -12,108 +12,118 @@ class ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final createdDate = _formatDate(review.createdAt);
 
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.divider.withValues(alpha: 0.3)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: AppColors.brown100.withValues(alpha: 0.5)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: review.userPhoto.isNotEmpty
-                    ? CachedNetworkImageProvider(review.userPhoto)
-                    : null,
-                backgroundColor: AppColors.surface,
-                child: review.userPhoto.isEmpty
-                    ? const Icon(Icons.person, color: AppColors.tertiary)
-                    : null,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: review.userPhoto.isNotEmpty
+                      ? CachedNetworkImageProvider(review.userPhoto)
+                      : null,
+                  backgroundColor: AppColors.brown50,
+                  child: review.userPhoto.isEmpty
+                      ? const Icon(Icons.person, color: AppColors.brown200)
+                      : null,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        review.userName.isNotEmpty ? review.userName : 'Usuario',
+                        style: theme.textTheme.titleSmall,
+                      ),
+                      Text(
+                        createdDate,
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
                   children: [
-                    Text(
-                      review.userName.isNotEmpty ? review.userName : 'Usuario',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    RatingBarIndicator(
+                      rating: review.overallRating,
+                      itemBuilder: (_, __) => const Icon(Icons.star, color: AppColors.gold),
+                      itemCount: 5,
+                      itemSize: 16,
                     ),
-                    Text(createdDate,
-                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                    const SizedBox(width: 4),
+                    Text(
+                      review.overallRating.toStringAsFixed(1),
+                      style: theme.textTheme.titleSmall,
+                    ),
+                    if (onReport != null) ...[
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.flag_outlined, size: 16, color: AppColors.gray600),
+                        onPressed: onReport,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
                   ],
                 ),
-              ),
-              Row(
-                children: [
-                  RatingBarIndicator(
-                    rating: review.overallRating,
-                    itemBuilder: (_, __) => const Icon(Icons.star, color: AppColors.star),
-                    itemCount: 5,
-                    itemSize: 16,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(review.overallRating.toStringAsFixed(1),
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  if (onReport != null) ...[
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.flag_outlined, size: 16, color: AppColors.textSecondary),
-                      onPressed: onReport, padding: EdgeInsets.zero, constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _miniRating('Calidad', review.qualityRating),
-              const SizedBox(width: 12),
-              _miniRating('Sabrozura', review.flavorRating),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              _miniRating('Tostado', review.roastRating),
-              const SizedBox(width: 12),
-              _miniRating('Servicio', review.serviceRating),
-            ],
-          ),
-          if (review.comment.isNotEmpty) ...[
+              ],
+            ),
             const SizedBox(height: 12),
-            Text(review.comment, style: const TextStyle(fontSize: 14)),
+            Row(
+              children: [
+                _miniRating('Calidad', review.qualityRating, theme),
+                const SizedBox(width: 12),
+                _miniRating('Sabrozura', review.flavorRating, theme),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                _miniRating('Tostado', review.roastRating, theme),
+                const SizedBox(width: 12),
+                _miniRating('Servicio', review.serviceRating, theme),
+              ],
+            ),
+            if (review.comment.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(review.comment, style: theme.textTheme.bodyMedium),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
 
-  Widget _miniRating(String label, double rating) {
+  Widget _miniRating(String label, double rating, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+        Text(label, style: theme.textTheme.labelSmall),
         Row(
           children: [
             RatingBarIndicator(
               rating: rating,
-              itemBuilder: (_, __) => const Icon(Icons.circle, color: AppColors.star, size: 10),
+              itemBuilder: (_, __) => const Icon(Icons.circle, color: AppColors.gold, size: 10),
               itemCount: 5,
               itemSize: 10,
             ),
             const SizedBox(width: 4),
-            Text(rating.toStringAsFixed(1),
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+            Text(
+              rating.toStringAsFixed(1),
+              style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ],

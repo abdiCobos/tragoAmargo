@@ -65,13 +65,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
     if (mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bebida agregada'), backgroundColor: AppColors.secondary),
+        const SnackBar(content: Text('Bebida agregada'), backgroundColor: AppColors.brown800),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: const Text('Agregar Bebida')),
       body: SingleChildScrollView(
@@ -100,7 +101,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 decoration: const InputDecoration(labelText: 'Descripción'),
               ),
               const SizedBox(height: 14),
-              const Text('Foto (opcional)', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text('Foto (opcional)', style: theme.textTheme.titleSmall),
               const SizedBox(height: 8),
               if (_photoBytes != null)
                 Stack(

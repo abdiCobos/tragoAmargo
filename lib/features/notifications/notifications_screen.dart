@@ -28,27 +28,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.notifications)),
       body: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           if (!auth.isAuthenticated) {
-            return Center(child: Text(l10n.notificationsLogin, style: const TextStyle(color: AppColors.textSecondary)));
+            return Center(child: Text(l10n.notificationsLogin, style: theme.textTheme.bodyMedium));
           }
 
           return StreamBuilder<List<AppNotification>>(
             stream: context.read<FirestoreService>().getNotifications(auth.user!.uid),
             builder: (_, snap) {
               if (snap.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                return Center(child: CircularProgressIndicator(color: theme.colorScheme.primary));
               }
               final notifs = snap.data ?? [];
               if (notifs.isEmpty) {
                 return Center(
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    const Icon(Icons.notifications_none, size: 64, color: AppColors.tertiary),
+                    Icon(Icons.notifications_none, size: 64, color: AppColors.brown200),
                     const SizedBox(height: 12),
-                    Text(l10n.noNotificationsYet, style: const TextStyle(color: AppColors.textSecondary)),
+                    Text(l10n.noNotificationsYet, style: theme.textTheme.bodyMedium),
                   ]),
                 );
               }
@@ -61,20 +62,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: n.read ? AppColors.background : AppColors.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: n.read ? null : Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                      color: n.read ? AppColors.white : AppColors.brown50,
+                      borderRadius: BorderRadius.circular(16),
+                      border: n.read ? null : Border.all(color: AppColors.brown800.withValues(alpha: 0.2)),
                     ),
                     child: Row(children: [
-                      Icon(_iconFor(n.type), color: _colorFor(n.type), size: 24),
+                      Icon(_iconFor(n.type), color: _colorFor(n.type, theme), size: 24),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(n.title, style: TextStyle(fontWeight: n.read ? FontWeight.normal : FontWeight.bold, fontSize: 14)),
+                          Text(n.title, style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: n.read ? FontWeight.normal : FontWeight.bold,
+                          )),
                           const SizedBox(height: 2),
-                          Text(n.body, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                          Text(n.body, style: theme.textTheme.bodySmall),
                           const SizedBox(height: 4),
-                          Text(_formatDate(n.createdAt, l10n), style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                          Text(_formatDate(n.createdAt, l10n), style: theme.textTheme.labelSmall),
                         ]),
                       ),
                     ]),
@@ -106,13 +109,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Color _colorFor(String type) {
+  Color _colorFor(String type, ThemeData theme) {
     switch (type) {
-      case 'claim_approved': return AppColors.secondary;
-      case 'review_reply': return AppColors.primary;
-      case 'new_review': return AppColors.star;
-      case 'welcome': return AppColors.tertiary;
-      default: return AppColors.textSecondary;
+      case 'claim_approved': return theme.colorScheme.primary;
+      case 'review_reply': return theme.colorScheme.primary;
+      case 'new_review': return AppColors.gold;
+      case 'welcome': return AppColors.brown200;
+      default: return AppColors.gray600;
     }
   }
 }

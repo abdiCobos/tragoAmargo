@@ -168,13 +168,14 @@ class _AddShopScreenState extends State<AddShopScreen> {
     if (shopId != null && mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.shopAdded), backgroundColor: AppColors.secondary),
+        SnackBar(content: Text(l10n.shopAdded), backgroundColor: AppColors.brown800),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.addCoffeeShop)),
       body: SingleChildScrollView(
@@ -187,25 +188,21 @@ class _AddShopScreenState extends State<AddShopScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.surface, borderRadius: BorderRadius.circular(12),
+                  color: AppColors.brown50, borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: AppColors.secondary),
+                    Icon(Icons.info_outline, color: theme.colorScheme.primary),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        l10n.optionalNote,
-                        style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
-                      ),
+                      child: Text(l10n.optionalNote, style: theme.textTheme.bodyMedium),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
 
-              Text(l10n.requiredFields,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
+              Text(l10n.requiredFields, style: theme.textTheme.titleLarge?.copyWith(color: theme.colorScheme.primary)),
               const SizedBox(height: 12),
 
               TextFormField(
@@ -248,9 +245,9 @@ class _AddShopScreenState extends State<AddShopScreen> {
                 const SizedBox(height: 4),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.divider),
+                    border: Border.all(color: AppColors.brown100),
                   ),
                   constraints: const BoxConstraints(maxHeight: 160),
                   child: ListView.separated(
@@ -259,9 +256,9 @@ class _AddShopScreenState extends State<AddShopScreen> {
                     separatorBuilder: (_, __) => const Divider(height: 1),
                     itemBuilder: (_, i) => ListTile(
                       dense: true,
-                      leading: const Icon(Icons.location_on, size: 18, color: AppColors.secondary),
+                      leading: Icon(Icons.location_on, size: 18, color: theme.colorScheme.primary),
                       title: Text(_addressSuggestions[i]['displayName'] as String,
-                          style: const TextStyle(fontSize: 13)),
+                          style: theme.textTheme.bodyMedium),
                       onTap: () => _selectAddress(_addressSuggestions[i]),
                     ),
                   ),
@@ -269,8 +266,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
               ],
               const SizedBox(height: 14),
 
-              Text(l10n.roastLevelsRequired,
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              Text(l10n.roastLevelsRequired, style: theme.textTheme.titleSmall),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 8,
@@ -279,7 +275,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
                   return FilterChip(
                     label: Text(r),
                     selected: selected,
-                    selectedColor: AppColors.secondary.withValues(alpha: 0.3),
+                    selectedColor: AppColors.gold.withValues(alpha: 0.2),
                     onSelected: (val) {
                       setState(() {
                         if (val) {_roastLevels.add(r);} else {_roastLevels.remove(r);}
@@ -292,10 +288,9 @@ class _AddShopScreenState extends State<AddShopScreen> {
 
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text(l10n.wifiSwitch,
-                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                title: Text(l10n.wifiSwitch, style: theme.textTheme.titleSmall),
                 value: _hasWiFi,
-                activeTrackColor: AppColors.secondary,
+                activeTrackColor: AppColors.brown800,
                 onChanged: (v) => setState(() => _hasWiFi = v),
               ),
               const SizedBox(height: 14),
@@ -318,11 +313,9 @@ class _AddShopScreenState extends State<AddShopScreen> {
                 onTap: () => setState(() => _showExtras = !_showExtras),
                 child: Row(
                   children: [
-                    Icon(_showExtras ? Icons.expand_less : Icons.expand_more,
-                        color: AppColors.textSecondary),
+                    Icon(_showExtras ? Icons.expand_less : Icons.expand_more, color: AppColors.gray600),
                     const SizedBox(width: 8),
-                    Text(l10n.moreDetailsOpt,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text(l10n.moreDetailsOpt, style: theme.textTheme.titleMedium),
                   ],
                 ),
               ),
@@ -333,7 +326,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
                   decoration: InputDecoration(labelText: l10n.description, prefixIcon: const Icon(Icons.description)),
                 ),
                 const SizedBox(height: 14),
-                Text(l10n.brewingMethods, style: const TextStyle(fontWeight: FontWeight.w600)),
+                Text(l10n.brewingMethods, style: theme.textTheme.titleSmall),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 8,
@@ -350,7 +343,7 @@ class _AddShopScreenState extends State<AddShopScreen> {
                   }).toList(),
                 ),
                 const SizedBox(height: 14),
-                Text(l10n.priceRange, style: const TextStyle(fontWeight: FontWeight.w600)),
+                Text(l10n.priceRange, style: theme.textTheme.titleSmall),
                 const SizedBox(height: 6),
                 SegmentedButton<String>(
                   segments: const [
@@ -378,11 +371,9 @@ class _AddShopScreenState extends State<AddShopScreen> {
                 onTap: () => setState(() => _showHours = !_showHours),
                 child: Row(
                   children: [
-                    Icon(_showHours ? Icons.expand_less : Icons.expand_more,
-                        color: AppColors.textSecondary),
+                    Icon(_showHours ? Icons.expand_less : Icons.expand_more, color: AppColors.gray600),
                     const SizedBox(width: 8),
-                    Text(l10n.hoursOpt,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text(l10n.hoursOpt, style: theme.textTheme.titleMedium),
                   ],
                 ),
               ),
@@ -407,9 +398,9 @@ class _AddShopScreenState extends State<AddShopScreen> {
 
               const SizedBox(height: 20),
               Row(children: [
-                const Icon(Icons.photo_library_outlined, color: AppColors.secondary),
+                Icon(Icons.photo_library_outlined, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
-                Text(l10n.photosOpt, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(l10n.photosOpt, style: theme.textTheme.titleMedium),
               ]),
               const SizedBox(height: 8),
               Row(

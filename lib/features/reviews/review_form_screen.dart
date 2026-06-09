@@ -86,7 +86,7 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(reviews.isEditing ? l10n.reviewUpdated : l10n.reviewPublished),
-          backgroundColor: AppColors.secondary,
+          backgroundColor: AppColors.brown800,
         ),
       );
     }
@@ -94,6 +94,7 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Consumer<ReviewsProvider>(
       builder: (context, reviews, _) {
         final isEdit = reviews.existingReview != null;
@@ -110,50 +111,28 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
                     padding: const EdgeInsets.all(12),
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
+                      color: AppColors.brown50,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.edit, color: AppColors.secondary),
+                        Icon(Icons.edit, color: theme.colorScheme.primary),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text(l10n.alreadyReviewed,
-                              style: const TextStyle(fontSize: 13)),
+                          child: Text(l10n.alreadyReviewed, style: theme.textTheme.bodyMedium),
                         ),
                       ],
                     ),
                   ),
-                _buildRatingSection(
-                  l10n.quality,
-                  l10n.qualityDesc,
-                  _qualityRating,
-                  (v) => setState(() => _qualityRating = v),
-                ),
+                _buildRatingSection(l10n.quality, l10n.qualityDesc, _qualityRating, (v) => setState(() => _qualityRating = v), theme),
                 const SizedBox(height: 20),
-                _buildRatingSection(
-                  l10n.flavor,
-                  l10n.flavorDesc,
-                  _flavorRating,
-                  (v) => setState(() => _flavorRating = v),
-                ),
+                _buildRatingSection(l10n.flavor, l10n.flavorDesc, _flavorRating, (v) => setState(() => _flavorRating = v), theme),
                 const SizedBox(height: 20),
-                _buildRatingSection(
-                  l10n.roast,
-                  l10n.roastDesc,
-                  _roastRating,
-                  (v) => setState(() => _roastRating = v),
-                ),
+                _buildRatingSection(l10n.roast, l10n.roastDesc, _roastRating, (v) => setState(() => _roastRating = v), theme),
                 const SizedBox(height: 20),
-                _buildRatingSection(
-                  l10n.service,
-                  l10n.serviceDesc,
-                  _serviceRating,
-                  (v) => setState(() => _serviceRating = v),
-                ),
+                _buildRatingSection(l10n.service, l10n.serviceDesc, _serviceRating, (v) => setState(() => _serviceRating = v), theme),
                 const SizedBox(height: 24),
-                Text(l10n.comment,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                Text(l10n.comment, style: theme.textTheme.titleSmall),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _commentController,
@@ -167,10 +146,7 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
                   child: ElevatedButton(
                     onPressed: reviews.isLoading ? null : _submit,
                     child: reviews.isLoading
-                        ? const SizedBox(
-                            width: 24, height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
+                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                         : Text(isEdit ? l10n.updateReview : l10n.publishReview),
                   ),
                 ),
@@ -183,14 +159,12 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
     );
   }
 
-  Widget _buildRatingSection(
-    String title, String subtitle, double currentRating, ValueChanged<double> onChanged,
-  ) {
+  Widget _buildRatingSection(String title, String subtitle, double currentRating, ValueChanged<double> onChanged, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-        Text(subtitle, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+        Text(title, style: theme.textTheme.titleSmall),
+        Text(subtitle, style: theme.textTheme.bodySmall),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -202,9 +176,9 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
               itemCount: 5,
               itemSize: 36,
               ratingWidget: RatingWidget(
-                full: const Icon(Icons.star, color: AppColors.star),
-                half: const Icon(Icons.star_half, color: AppColors.star),
-                empty: const Icon(Icons.star_border, color: AppColors.star),
+                full: const Icon(Icons.star, color: AppColors.gold),
+                half: const Icon(Icons.star_half, color: AppColors.gold),
+                empty: const Icon(Icons.star_border, color: AppColors.gold),
               ),
               onRatingUpdate: onChanged,
             ),
@@ -212,13 +186,10 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: AppColors.brown50,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(
-                currentRating.toStringAsFixed(1),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
+              child: Text(currentRating.toStringAsFixed(1), style: theme.textTheme.headlineSmall),
             ),
           ],
         ),

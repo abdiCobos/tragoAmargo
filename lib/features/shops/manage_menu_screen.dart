@@ -71,13 +71,14 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
     if (mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ítem agregado al menú'), backgroundColor: AppColors.secondary),
+        const SnackBar(content: Text('Ítem agregado al menú'), backgroundColor: AppColors.brown800),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: const Text('Agregar al Menú')),
       body: SingleChildScrollView(
@@ -112,7 +113,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                 title: const Text('Mostrar precio'),
                 subtitle: const Text('El precio será visible para los clientes'),
                 value: _showPrice,
-                activeTrackColor: AppColors.secondary,
+                activeTrackColor: AppColors.brown800,
                 onChanged: (v) => setState(() => _showPrice = v),
               ),
               SwitchListTile(
@@ -120,7 +121,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                 title: const Text('Bebida insignia'),
                 subtitle: const Text('Aparece destacada en el perfil de la cafetería'),
                 value: _isSignature,
-                activeTrackColor: AppColors.star,
+                activeTrackColor: AppColors.gold,
                 onChanged: (v) => setState(() => _isSignature = v),
               ),
               const SizedBox(height: 14),
@@ -130,7 +131,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                 decoration: const InputDecoration(labelText: 'Descripción'),
               ),
               const SizedBox(height: 14),
-              const Text('Foto', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text('Foto', style: theme.textTheme.titleSmall),
               const SizedBox(height: 8),
               if (_photoBytes != null)
                 Stack(

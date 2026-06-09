@@ -12,9 +12,9 @@ class PhotoGallery extends StatelessWidget {
     if (photos.isEmpty) {
       return Container(
         height: 220,
-        color: AppColors.surface,
+        color: AppColors.brown50,
         child: const Center(
-          child: Icon(Icons.coffee, size: 64, color: AppColors.tertiary),
+          child: Icon(Icons.coffee, size: 64, color: AppColors.brown200),
         ),
       );
     }
@@ -28,10 +28,10 @@ class PhotoGallery extends StatelessWidget {
             imageUrl: photos[index],
             fit: BoxFit.cover,
             width: double.infinity,
-            placeholder: (_, __) => Container(color: AppColors.surface),
+            placeholder: (_, __) => Container(color: AppColors.brown50),
             errorWidget: (_, __, ___) => Container(
-              color: AppColors.surface,
-              child: const Icon(Icons.broken_image, color: AppColors.tertiary),
+              color: AppColors.brown50,
+              child: const Icon(Icons.broken_image, color: AppColors.brown200),
             ),
           );
         },

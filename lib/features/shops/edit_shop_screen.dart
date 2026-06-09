@@ -135,12 +135,13 @@ class _EditShopScreenState extends State<EditShopScreen> {
 
     if (mounted) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.shopUpdated), backgroundColor: AppColors.secondary));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.shopUpdated), backgroundColor: AppColors.brown800));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.editCoffeeShop)),
       body: SingleChildScrollView(
@@ -148,7 +149,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
         child: Form(
           key: _formKey,
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(l10n.basicInfo, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
+            Text(l10n.basicInfo, style: theme.textTheme.titleLarge?.copyWith(color: theme.colorScheme.primary)),
             const SizedBox(height: 12),
             TextFormField(controller: _nameCtrl, decoration: InputDecoration(labelText: l10n.name, prefixIcon: const Icon(Icons.store)), validator: (v) => Validators.required(v, l10n.name)),
             const SizedBox(height: 14),
@@ -156,19 +157,19 @@ class _EditShopScreenState extends State<EditShopScreen> {
             const SizedBox(height: 14),
             TextFormField(controller: _addrCtrl, decoration: InputDecoration(labelText: l10n.addressRequired, prefixIcon: const Icon(Icons.location_on_outlined)), validator: (v) => Validators.required(v, l10n.address)),
             const SizedBox(height: 14),
-            Text(l10n.roastingLevels, style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(l10n.roastingLevels, style: theme.textTheme.titleSmall),
             const SizedBox(height: 6),
             Wrap(spacing: 8, children: _roastOptions.map((r) {
               final sel = _roastLevels.contains(r);
-              return FilterChip(label: Text(r), selected: sel, selectedColor: AppColors.secondary.withValues(alpha: 0.3),
+              return FilterChip(label: Text(r), selected: sel, selectedColor: AppColors.gold.withValues(alpha: 0.2),
                 onSelected: (v) => setState(() { if (v) {_roastLevels.add(r);} else {_roastLevels.remove(r);} }));
             }).toList()),
             const SizedBox(height: 20),
             Row(
               children: [
-                Text(l10n.photos, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                Text(l10n.photos, style: theme.textTheme.titleLarge?.copyWith(color: theme.colorScheme.primary)),
                 const Spacer(),
-                Text('${_photos.length} ${l10n.photos.toLowerCase()}', style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                Text('${_photos.length} ${l10n.photos.toLowerCase()}', style: theme.textTheme.bodySmall),
               ],
             ),
             const SizedBox(height: 12),
@@ -214,7 +215,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
               ),
             ),
             const SizedBox(height: 14),
-            SwitchListTile(contentPadding: EdgeInsets.zero, title: Text(l10n.wifiAvailable), value: _hasWiFi, activeTrackColor: AppColors.secondary, onChanged: (v) => setState(() => _hasWiFi = v)),
+            SwitchListTile(contentPadding: EdgeInsets.zero, title: Text(l10n.wifiAvailable), value: _hasWiFi, activeTrackColor: AppColors.brown800, onChanged: (v) => setState(() => _hasWiFi = v)),
             const SizedBox(height: 14),
             DropdownButtonFormField<String>(
               value: _seatingMode, decoration: InputDecoration(labelText: l10n.seatingMode, prefixIcon: const Icon(Icons.chair)),
@@ -223,21 +224,21 @@ class _EditShopScreenState extends State<EditShopScreen> {
             ),
             const SizedBox(height: 28),
             InkWell(onTap: () => setState(() => _showExtras = !_showExtras), child: Row(children: [
-              Icon(_showExtras ? Icons.expand_less : Icons.expand_more, color: AppColors.textSecondary),
-              const SizedBox(width: 8), Text(l10n.moreDetails, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              Icon(_showExtras ? Icons.expand_less : Icons.expand_more, color: AppColors.gray600),
+              const SizedBox(width: 8), Text(l10n.moreDetails, style: theme.textTheme.titleMedium),
             ])),
             if (_showExtras) ...[
               const SizedBox(height: 12),
               TextFormField(controller: _descCtrl, maxLines: 3, decoration: InputDecoration(labelText: l10n.description)),
               const SizedBox(height: 14),
-              Text(l10n.brewingMethods, style: const TextStyle(fontWeight: FontWeight.w600)),
+              Text(l10n.brewingMethods, style: theme.textTheme.titleSmall),
               const SizedBox(height: 6),
               Wrap(spacing: 8, children: _brewingOptions.map((m) {
                 final sel = _brewingMethods.contains(m);
                 return FilterChip(label: Text(m), selected: sel, onSelected: (v) => setState(() { if (v) {_brewingMethods.add(m);} else {_brewingMethods.remove(m);} }));
               }).toList()),
               const SizedBox(height: 14),
-              Text(l10n.priceRange, style: const TextStyle(fontWeight: FontWeight.w600)),
+              Text(l10n.priceRange, style: theme.textTheme.titleSmall),
               SegmentedButton<String>(
                 segments: const [
                   ButtonSegment(value: r'$', label: Text(r'$')),
@@ -253,8 +254,8 @@ class _EditShopScreenState extends State<EditShopScreen> {
             ],
             const SizedBox(height: 20),
             InkWell(onTap: () => setState(() => _showHours = !_showHours), child: Row(children: [
-              Icon(_showHours ? Icons.expand_less : Icons.expand_more, color: AppColors.textSecondary),
-              const SizedBox(width: 8), Text(l10n.hours, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              Icon(_showHours ? Icons.expand_less : Icons.expand_more, color: AppColors.gray600),
+              const SizedBox(width: 8), Text(l10n.hours, style: theme.textTheme.titleMedium),
             ])),
             if (_showHours) ..._days.map((d) => Padding(
               padding: const EdgeInsets.only(top: 8), child: Row(children: [

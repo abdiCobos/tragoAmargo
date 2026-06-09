@@ -137,7 +137,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.claimSubmitted),
-          backgroundColor: AppColors.secondary, duration: const Duration(seconds: 5),
+          backgroundColor: AppColors.brown800, duration: const Duration(seconds: 5),
         ),
       );
     }
@@ -145,6 +145,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final shop = widget.shop;
     final hasOwner = shop.verifiedOwnerUid != null;
 
@@ -155,12 +156,11 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.verified, size: 64, color: AppColors.secondary),
+              Icon(Icons.verified, size: 64, color: theme.colorScheme.primary),
               const SizedBox(height: 16),
-              Text(shop.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              Text(shop.name, style: theme.textTheme.headlineSmall),
               const SizedBox(height: 8),
-              Text(l10n.hasOwnerMessage,
-                  style: const TextStyle(color: AppColors.textSecondary)),
+              Text(l10n.hasOwnerMessage, style: theme.textTheme.bodyMedium),
               const SizedBox(height: 24),
               OutlinedButton(
                 onPressed: () => Navigator.pop(context),
@@ -176,38 +176,35 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
       appBar: AppBar(title: Text(l10n.claimOwner)),
       body: Padding(
         padding: const EdgeInsets.all(24),
-        child: _step == 0 ? _gpsStep(shop) : _docsStep(shop),
+        child: _step == 0 ? _gpsStep(shop, theme) : _docsStep(shop, theme),
       ),
     );
   }
 
-  Widget _gpsStep(CoffeeShop shop) {
+  Widget _gpsStep(CoffeeShop shop, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.gpsStep1,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(l10n.gpsStep1, style: theme.textTheme.headlineSmall),
         const SizedBox(height: 8),
-        Text(l10n.gpsDesc,
-            style: const TextStyle(color: AppColors.textSecondary)),
+        Text(l10n.gpsDesc, style: theme.textTheme.bodyMedium),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surface, borderRadius: BorderRadius.circular(12),
+            color: AppColors.brown50, borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(children: [
-                const Icon(Icons.store, color: AppColors.primary),
+                Icon(Icons.store, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
-                Expanded(child: Text(shop.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+                Expanded(child: Text(shop.name, style: theme.textTheme.titleMedium)),
               ]),
               const SizedBox(height: 8),
               Row(children: [
-                const Icon(Icons.location_on, color: AppColors.secondary, size: 18),
+                Icon(Icons.location_on, color: theme.colorScheme.primary, size: 18),
                 const SizedBox(width: 8),
                 Expanded(child: Text(shop.address)),
               ]),
@@ -228,8 +225,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
           child: ElevatedButton.icon(
             onPressed: _loading ? null : _checkGps,
             icon: _loading
-                ? const SizedBox(width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : const Icon(Icons.gps_fixed),
             label: Text(l10n.verifyLocation),
           ),
@@ -239,47 +235,30 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
     );
   }
 
-  Widget _docsStep(CoffeeShop shop) {
+  Widget _docsStep(CoffeeShop shop, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.docsStep2,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(l10n.docsStep2, style: theme.textTheme.headlineSmall),
         const SizedBox(height: 8),
-        Text(l10n.docsSubtitle,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+        Text(l10n.docsSubtitle, style: theme.textTheme.bodyMedium),
         const SizedBox(height: 20),
 
-        _photoSection(
-          title: l10n.propertyDocs,
-          subtitle: l10n.docsDesc,
-          photos: _documents,
-          maxPhotos: 2,
-          isDocument: true,
-        ),
+        _photoSection(title: l10n.propertyDocs, subtitle: l10n.docsDesc, photos: _documents, maxPhotos: 2, isDocument: true, theme: theme),
         const SizedBox(height: 20),
-        _photoSection(
-          title: l10n.selfie,
-          subtitle: l10n.selfieDesc,
-          photos: _selfies,
-          maxPhotos: 2,
-          isDocument: false,
-        ),
+        _photoSection(title: l10n.selfie, subtitle: l10n.selfieDesc, photos: _selfies, maxPhotos: 2, isDocument: false, theme: theme),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColors.star.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8),
+            color: AppColors.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
-              const Icon(Icons.shield_outlined, color: AppColors.star, size: 18),
+              const Icon(Icons.shield_outlined, color: AppColors.brown800, size: 18),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  l10n.docsPolicy,
-                  style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
-                ),
+                child: Text(l10n.docsPolicy, style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textPrimary)),
               ),
             ],
           ),
@@ -297,10 +276,9 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
           width: double.infinity, height: 52,
           child: ElevatedButton.icon(
             onPressed: _loading ? null : _submitClaim,
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.secondary),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.brown800),
             icon: _loading
-                ? const SizedBox(width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : const Icon(Icons.verified),
             label: Text(l10n.submitClaim),
           ),
@@ -316,12 +294,13 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
     required List<Uint8List> photos,
     required int maxPhotos,
     required bool isDocument,
+    required ThemeData theme,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-        Text(subtitle, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+        Text(title, style: theme.textTheme.titleSmall),
+        Text(subtitle, style: theme.textTheme.bodySmall),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8, runSpacing: 8,
@@ -347,11 +326,11 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
                 child: Container(
                   width: 90, height: 90,
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.divider, width: 2),
+                    border: Border.all(color: AppColors.brown100, width: 2),
                     borderRadius: BorderRadius.circular(8),
-                    color: AppColors.background,
+                    color: AppColors.white,
                   ),
-                  child: const Icon(Icons.add, color: AppColors.textSecondary),
+                  child: const Icon(Icons.add, color: AppColors.gray600),
                 ),
               ),
           ],

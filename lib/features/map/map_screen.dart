@@ -11,6 +11,7 @@ class MapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Consumer<CoffeeShopsProvider>(
       builder: (context, provider, _) {
         final shops = provider.shops
@@ -62,26 +63,22 @@ class MapScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
+                                color: AppColors.black.withValues(alpha: 0.2),
                                 blurRadius: 8,
                               ),
                             ],
                           ),
                           child: Text(
                             shop.name,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
+                            style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.primary),
                           ),
                         ),
                         const SizedBox(height: 2),
-                        const Icon(Icons.location_on, color: AppColors.primary, size: 32),
+                        Icon(Icons.location_on, color: theme.colorScheme.primary, size: 32),
                       ],
                     ),
                   ),

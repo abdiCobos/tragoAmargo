@@ -42,6 +42,53 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _forgotPassword() async {
+    final l10n = AppLocalizations.of(context);
+    final emailController = TextEditingController(text: _emailController.text.trim());
+    final auth = context.read<AuthProvider>();
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.resetPasswordTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.resetPasswordDesc),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: l10n.email,
+                prefixIcon: const Icon(Icons.email_outlined),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.sendResetLink),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && mounted) {
+      await auth.sendPasswordReset(emailController.text.trim());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.resetLinkSent)),
+        );
+      }
+    }
+  }
+
   Future<void> _signInWithGoogle() async {
     final auth = context.read<AuthProvider>();
     final success = await auth.signInWithGoogle();
@@ -102,7 +149,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: Validators.password,
                     onFieldSubmitted: (_) => _signInWithEmail(),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 4),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _forgotPassword,
+                      child: const Text('Forgot Password?'),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   Consumer<AuthProvider>(
                     builder: (context, auth, _) {
                       if (auth.error != null) {

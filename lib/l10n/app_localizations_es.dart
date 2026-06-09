@@ -711,4 +711,18 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get language => 'Idioma';
+
+  @override
+  String get resetPasswordTitle => 'Restablecer contraseña';
+
+  @override
+  String get resetPasswordDesc =>
+      'Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.';
+
+  @override
+  String get sendResetLink => 'Enviar enlace';
+
+  @override
+  String get resetLinkSent =>
+      'Se ha enviado un enlace de restablecimiento a tu email.';
 }

@@ -126,6 +126,10 @@ class AuthProvider extends ChangeNotifier {
     await _authService.signOut();
   }
 
+  Future<void> sendPasswordReset(String email) async {
+    await _authService.resetPassword(email);
+  }
+
   Future<void> toggleFavorite(String shopId) async {
     if (_appUser == null) return;
 

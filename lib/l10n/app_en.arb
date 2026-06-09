@@ -224,5 +224,9 @@
   "friday": "Friday",
   "saturday": "Saturday",
   "sunday": "Sunday",
-  "language": "Language"
+  "language": "Language",
+  "resetPasswordTitle": "Reset Password",
+  "resetPasswordDesc": "Enter your email and we'll send you a link to reset your password.",
+  "sendResetLink": "Send Link",
+  "resetLinkSent": "A reset link has been sent to your email."
 }

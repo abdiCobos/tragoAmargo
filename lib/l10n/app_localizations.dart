@@ -1447,6 +1447,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Idioma'**
   String get language;
+
+  /// No description provided for @resetPasswordTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Restablecer contraseña'**
+  String get resetPasswordTitle;
+
+  /// No description provided for @resetPasswordDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.'**
+  String get resetPasswordDesc;
+
+  /// No description provided for @sendResetLink.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar enlace'**
+  String get sendResetLink;
+
+  /// No description provided for @resetLinkSent.
+  ///
+  /// In es, this message translates to:
+  /// **'Se ha enviado un enlace de restablecimiento a tu email.'**
+  String get resetLinkSent;
 }
 
 class _AppLocalizationsDelegate

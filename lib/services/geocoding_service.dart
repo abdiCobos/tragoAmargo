@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import '../core/constants/app_constants.dart';
+import '../core/utils/crash_reporting.dart';
 
 class GeocodingService {
   final String _baseUrl = AppConstants.nominatimUrl;
@@ -25,8 +25,8 @@ class GeocodingService {
           );
         }
       }
-    } catch (e) {
-      debugPrint('GeocodingService.searchAddress error: $e');
+    } catch (e, stack) {
+      CrashReporting.recordError(e, stack, reason: 'GeocodingService.searchAddress');
     }
     return null;
   }
@@ -44,8 +44,8 @@ class GeocodingService {
         final result = jsonDecode(response.body);
         return result['display_name'] as String?;
       }
-    } catch (e) {
-      debugPrint('GeocodingService.reverseGeocode error: $e');
+    } catch (e, stack) {
+      CrashReporting.recordError(e, stack, reason: 'GeocodingService.reverseGeocode');
     }
     return null;
   }
@@ -68,8 +68,8 @@ class GeocodingService {
           'displayName': result['display_name'] ?? '',
         };
       }
-    } catch (e) {
-      debugPrint('GeocodingService.getAddressDetails error: $e');
+    } catch (e, stack) {
+      CrashReporting.recordError(e, stack, reason: 'GeocodingService.getAddressDetails');
     }
     return null;
   }
@@ -99,8 +99,8 @@ class GeocodingService {
           'displayName': r['display_name'] as String? ?? '',
         }).toList();
       }
-    } catch (e) {
-      debugPrint('GeocodingService._search error: $e');
+    } catch (e, stack) {
+      CrashReporting.recordError(e, stack, reason: 'GeocodingService._search');
     }
     return [];
   }

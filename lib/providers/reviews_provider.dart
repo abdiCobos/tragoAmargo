@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import '../services/firestore_service.dart';
 import '../models/review.dart';
+import '../core/utils/crash_reporting.dart';
 
 class ReviewsProvider extends ChangeNotifier {
   final FirestoreService _firestoreService;
@@ -73,7 +74,8 @@ class ReviewsProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporting.recordError(e, stack, reason: 'ReviewsProvider.addReview');
       _error = e.toString();
       _isLoading = false;
       notifyListeners();

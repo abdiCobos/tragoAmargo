@@ -6,6 +6,7 @@ import '../services/storage_service.dart';
 import '../models/coffee_shop.dart';
 import '../models/product.dart';
 import '../models/menu_item.dart';
+import '../core/utils/crash_reporting.dart';
 
 class CoffeeShopsProvider extends ChangeNotifier {
   final FirestoreService _firestoreService;
@@ -146,7 +147,8 @@ class CoffeeShopsProvider extends ChangeNotifier {
         ));
       }
       _isLoading = false; notifyListeners(); return docRef;
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporting.recordError(e, stack, reason: 'CoffeeShopsProvider.addCoffeeShop');
       _error = e.toString(); _isLoading = false; notifyListeners(); return null;
     }
   }

@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
 import '../models/app_user.dart';
 import '../models/notification.dart';
+import '../core/utils/crash_reporting.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService;
@@ -32,21 +33,26 @@ class AuthProvider extends ChangeNotifier {
   Future<void> _onAuthStateChanged(User? firebaseUser) async {
     _user = firebaseUser;
     if (firebaseUser != null) {
-      _appUser = await _firestoreService.getUser(firebaseUser.uid);
-      if (_appUser == null) {
-        final newUser = AppUser.fromFirebaseUser(
-          firebaseUser.uid,
-          firebaseUser.displayName,
-          firebaseUser.email,
-          firebaseUser.photoURL,
-        );
-        await _firestoreService.createUser(newUser);
-        _appUser = newUser;
-        _firestoreService.sendNotification(AppNotification(
-          id: '', userId: firebaseUser.uid, title: '¡Bienvenido a Trago Amargo!',
-          body: 'Muchas cafeterías, poca calidad y sabor. Ayúdanos a encontrar las mejores.',
-          type: 'welcome', createdAt: DateTime.now(),
-        ));
+      try {
+        _appUser = await _firestoreService.getUser(firebaseUser.uid);
+        if (_appUser == null) {
+          final newUser = AppUser.fromFirebaseUser(
+            firebaseUser.uid,
+            firebaseUser.displayName,
+            firebaseUser.email,
+            firebaseUser.photoURL,
+          );
+          await _firestoreService.createUser(newUser);
+          _appUser = newUser;
+          _firestoreService.sendNotification(AppNotification(
+            id: '', userId: firebaseUser.uid, title: '¡Bienvenido a Trago Amargo!',
+            body: 'Muchas cafeterías, poca calidad y sabor. Ayúdanos a encontrar las mejores.',
+            type: 'welcome', createdAt: DateTime.now(),
+          ));
+        }
+        CrashReporting.setUserIdentifier(firebaseUser.uid);
+      } catch (e, stack) {
+        CrashReporting.recordError(e, stack, reason: 'AuthProvider._onAuthStateChanged');
       }
     } else {
       _appUser = null;
@@ -113,8 +119,9 @@ class AuthProvider extends ChangeNotifier {
     } on FirebaseAuthException catch (e) {
       _error = _getAuthErrorMessage(e.code);
       return false;
-    } catch (e) {
+    } catch (e, stack) {
       _error = 'Error al iniciar sesión con Google';
+      CrashReporting.recordError(e, stack, reason: 'AuthProvider.signInWithGoogle');
       return false;
     } finally {
       _isLoading = false;
@@ -148,10 +155,10 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await _firestoreService.toggleFavorite(_appUser!.uid, shopId, !isFav);
-    } catch (e) {
+    } catch (e, stack) {
       _appUser = _appUser!.copyWith(favoriteShops: previousFavs);
       notifyListeners();
-      rethrow;
+      CrashReporting.recordError(e, stack, reason: 'AuthProvider.toggleFavorite');
     }
   }
 

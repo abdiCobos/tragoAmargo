@@ -1,5 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'core/utils/crash_reporting.dart';
 import 'app.dart';
 
 void main() async {
@@ -16,6 +20,18 @@ void main() async {
       measurementId: 'G-45WQ891VX4',
     ),
   );
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    if (!kDebugMode) FirebaseCrashlytics.instance.recordFlutterError(details);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    if (!kDebugMode) FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+
+  CrashReporting.init();
 
   runApp(const TragoAmargoApp());
 }

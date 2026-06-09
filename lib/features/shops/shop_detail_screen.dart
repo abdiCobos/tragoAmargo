@@ -10,7 +10,6 @@ import '../../services/firestore_service.dart';
 import '../../services/storage_service.dart';
 import '../../models/review.dart';
 import '../../models/coffee_shop.dart';
-import '../../models/app_user.dart';
 import '../../models/menu_item.dart';
 import '../../models/notification.dart';
 import '../../models/report.dart';
@@ -20,7 +19,6 @@ import 'widgets/product_card.dart';
 import 'widgets/opening_hours_widget.dart';
 import '../reviews/review_form_screen.dart';
 import 'claim_shop_screen.dart';
-import 'add_product_screen.dart';
 import 'rate_product_screen.dart';
 import 'manage_menu_screen.dart';
 import 'rate_menu_item_screen.dart';
@@ -61,7 +59,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     if (!mounted) return;
     context.read<CoffeeShopsProvider>().selectShop(widget.shopId);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.photoAdded), backgroundColor: AppColors.secondary),
+      SnackBar(content: Text(l10n.photoAdded), backgroundColor: AppColors.brown800),
     );
   }
 
@@ -89,6 +87,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: Consumer2<CoffeeShopsProvider, AuthProvider>(
         builder: (context, shopProv, auth, _) {
@@ -106,20 +105,20 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               SliverAppBar(
                 expandedHeight: 220,
                 pinned: true,
-                backgroundColor: AppColors.primary,
-                iconTheme: const IconThemeData(color: Colors.white),
+                backgroundColor: theme.colorScheme.primary,
+                iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
                 flexibleSpace: FlexibleSpaceBar(
                   background: PhotoGallery(photos: shop.photos),
                 ),
                 actions: [
                   if (isOwner) ...[
                     IconButton(
-                      icon: const Icon(Icons.add_a_photo, color: Colors.white),
+                      icon: Icon(Icons.add_a_photo, color: theme.colorScheme.onPrimary),
                       tooltip: l10n.addPhoto,
                       onPressed: () => _addPhoto(shop),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.white),
+                      icon: Icon(Icons.edit, color: theme.colorScheme.onPrimary),
                       tooltip: l10n.editShop,
                       onPressed: () async {
                         final result = await Navigator.push(context,
@@ -130,7 +129,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                   ],
                   if (!isOwner && shop.verifiedOwnerUid == null && auth.isAuthenticated)
                     IconButton(
-                      icon: const Icon(Icons.edit_note, color: Colors.white),
+                      icon: Icon(Icons.edit_note, color: theme.colorScheme.onPrimary),
                       tooltip: l10n.completeInfo,
                       onPressed: () async {
                         final result = await Navigator.push(context,
@@ -139,13 +138,13 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       },
                     ),
                   IconButton(
-                    icon: const Icon(Icons.flag_outlined, color: Colors.white),
+                    icon: Icon(Icons.flag_outlined, color: theme.colorScheme.onPrimary),
                     tooltip: l10n.report,
                     onPressed: () => _reportShop(shop),
                   ),
                   IconButton(
                     icon: Icon(isFav ? Icons.favorite : Icons.favorite_border,
-                        color: isFav ? AppColors.error : Colors.white),
+                        color: isFav ? AppColors.error : theme.colorScheme.onPrimary),
                     onPressed: () => auth.toggleFavorite(shop.id),
                   ),
                 ],
@@ -162,18 +161,20 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(shop.name,
-                                    style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                                Text(shop.name, style: theme.textTheme.headlineMedium),
                                 if (isOwner)
                                   Container(
                                     margin: const EdgeInsets.only(top: 4),
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: AppColors.secondary.withValues(alpha: 0.15),
+                                      color: AppColors.gold.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(l10n.owner,
-                                        style: const TextStyle(fontSize: 11, color: AppColors.secondary, fontWeight: FontWeight.bold)),
+                                        style: theme.textTheme.labelSmall?.copyWith(
+                                          color: AppColors.brown700,
+                                          fontWeight: FontWeight.bold,
+                                        )),
                                   ),
                               ],
                             ),
@@ -186,35 +187,35 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                           children: [
                             RatingBarIndicator(
                               rating: shop.averageRating,
-                              itemBuilder: (_, _a) => const Icon(Icons.star, color: AppColors.star),
+                              itemBuilder: (_, _a) => const Icon(Icons.star, color: AppColors.gold),
                               itemCount: 5, itemSize: 22,
                             ),
                             const SizedBox(width: 8),
                             Text(shop.averageRating.toStringAsFixed(1),
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                style: theme.textTheme.titleMedium),
                             Text(' (${shop.totalReviews} ${l10n.reviews.toLowerCase()})',
-                                style: const TextStyle(color: AppColors.textSecondary)),
+                                style: theme.textTheme.bodyMedium),
                           ],
                         ),
                         const SizedBox(height: 16),
                       ],
                       Row(
                         children: [
-                          const Icon(Icons.location_on_outlined, color: AppColors.textSecondary, size: 18),
+                          Icon(Icons.location_on_outlined, color: theme.colorScheme.onSurfaceVariant, size: 18),
                           const SizedBox(width: 4),
                           Expanded(child: Text(shop.address,
-                              style: const TextStyle(color: AppColors.textSecondary))),
+                              style: theme.textTheme.bodyMedium)),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          _chip(Icons.attach_money, shop.priceRange),
+                          _chip(Icons.attach_money, shop.priceRange, theme),
                           const SizedBox(width: 8),
-                          if (shop.hasWiFi) _chip(Icons.wifi, 'WiFi'),
+                          if (shop.hasWiFi) _chip(Icons.wifi, 'WiFi', theme),
                           if (shop.seatingMode.isNotEmpty) ...[
                             const SizedBox(width: 8),
-                            _chip(Icons.chair, shop.seatingMode),
+                            _chip(Icons.chair, shop.seatingMode, theme),
                           ],
                         ],
                       ),
@@ -223,7 +224,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         _actionButton(
                           icon: Icons.verified_outlined,
                           label: l10n.claimShop,
-                          color: AppColors.star,
+                          color: AppColors.gold,
                           onPressed: () async {
                             if (!await auth.requireLogin(context)) return;
                             if (!context.mounted) return;
@@ -235,7 +236,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         _actionButton(
                           icon: Icons.restaurant_menu,
                           label: l10n.ownerMenu,
-                          color: AppColors.secondary,
+                          color: AppColors.brown800,
                           onPressed: () => Navigator.push(context,
                               MaterialPageRoute(builder: (_) => ManageMenuScreen(shopId: shop.id))),
                         ),
@@ -245,21 +246,21 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       const Divider(),
                       if (shop.originAndAltitude.isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        _section(Icons.landscape, l10n.originAltitude, shop.originAndAltitude),
+                        _section(Icons.landscape, l10n.originAltitude, shop.originAndAltitude, theme),
                       ],
                       if (shop.roastLevels.isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        _section(Icons.local_fire_department, l10n.roastLevel, null,
+                        _section(Icons.local_fire_department, l10n.roastLevel, null, theme,
                           Wrap(spacing: 8, children: shop.roastLevels.map((r) => Chip(label: Text(r))).toList())),
                       ],
                       if (shop.brewingMethods.isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        _section(Icons.science, l10n.brewingMethods, null,
+                        _section(Icons.science, l10n.brewingMethods, null, theme,
                           Wrap(spacing: 8, children: shop.brewingMethods.map((m) => Chip(label: Text(m))).toList())),
                       ],
                       if (shop.description.isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        _section(Icons.description, l10n.description, shop.description),
+                        _section(Icons.description, l10n.description, shop.description, theme),
                       ],
                       if (shop.openingHours.isNotEmpty) ...[
                         const SizedBox(height: 16),
@@ -267,38 +268,38 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       ],
                       if (shop.phone.isNotEmpty || shop.instagram.isNotEmpty) ...[
                         const SizedBox(height: 16), const Divider(), const SizedBox(height: 16),
-                        Text(l10n.contact, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(l10n.contact, style: theme.textTheme.titleLarge),
                         const SizedBox(height: 12),
                         if (shop.phone.isNotEmpty)
                           Row(children: [
-                            const Icon(Icons.phone, color: AppColors.secondary, size: 20),
+                            Icon(Icons.phone, color: theme.colorScheme.primary, size: 20),
                             const SizedBox(width: 8), Text(shop.phone),
                           ]),
                         if (shop.instagram.isNotEmpty) ...[
                           const SizedBox(height: 8),
                           Row(children: [
-                            const Icon(Icons.camera_alt, color: AppColors.secondary, size: 20),
+                            Icon(Icons.camera_alt, color: theme.colorScheme.primary, size: 20),
                             const SizedBox(width: 8), Text('@${shop.instagram}'),
                           ]),
                         ],
                       ],
                       if (shop.averageQuality > 0 || shop.averageFlavor > 0 || shop.averageRoast > 0 || shop.averageService > 0) ...[
                         const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),
-                        Text(l10n.ratings, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(l10n.ratings, style: theme.textTheme.titleLarge),
                         const SizedBox(height: 12),
-                        _ratingRow(l10n.quality, shop.averageQuality),
-                        _ratingRow(l10n.flavor, shop.averageFlavor),
-                        _ratingRow(l10n.roast, shop.averageRoast),
-                        _ratingRow(l10n.service, shop.averageService),
+                        _ratingRow(l10n.quality, shop.averageQuality, theme),
+                        _ratingRow(l10n.flavor, shop.averageFlavor, theme),
+                        _ratingRow(l10n.roast, shop.averageRoast, theme),
+                        _ratingRow(l10n.service, shop.averageService, theme),
                       ],
                       if (shopProv.menuItems.isNotEmpty) ...[
                         const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),
                         Row(
                           children: [
-                            Text(l10n.menu, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text(l10n.menu, style: theme.textTheme.titleLarge),
                             const Spacer(),
                             Text('${shopProv.menuItems.length} ${l10n.menuItems}',
-                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                                style: theme.textTheme.bodySmall),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -315,7 +316,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       ],
                       if (shopProv.currentProducts.isNotEmpty) ...[
                         const SizedBox(height: 24), const Divider(), const SizedBox(height: 16),
-                        Text(l10n.flagshipDrinks, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(l10n.flagshipDrinks, style: theme.textTheme.titleLarge),
                         const SizedBox(height: 12),
                         SizedBox(
                           height: 210,
@@ -354,7 +355,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                   auth.toggleFavorite(shop.id);
                                 },
                                 icon: Icon(isFav ? Icons.favorite : Icons.favorite_border,
-                                    color: isFav ? AppColors.error : AppColors.primary),
+                                    color: isFav ? AppColors.error : theme.colorScheme.primary),
                                 label: Text(isFav ? l10n.saved : l10n.favorite),
                               ),
                             ),
@@ -373,9 +374,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                             children: [
                               const Divider(),
                               const SizedBox(height: 16),
-                              Text(l10n.reviews, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              Text(l10n.reviews, style: theme.textTheme.titleLarge),
                               const SizedBox(height: 12),
-                              ...reviews.reviews.map((r) => _reviewCard(r)),
+                              ...reviews.reviews.map((r) => _reviewCard(r, theme)),
                             ],
                           );
                         },
@@ -408,54 +409,54 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     );
   }
 
-  Widget _chip(IconData icon, String text) {
+  Widget _chip(IconData icon, String text, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: AppColors.brown50, borderRadius: BorderRadius.circular(8)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 14, color: AppColors.primary),
+        Icon(icon, size: 14, color: theme.colorScheme.primary),
         const SizedBox(width: 4),
-        Text(text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+        Text(text, style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600)),
       ]),
     );
   }
 
-  Widget _section(IconData icon, String title, String? content, [Widget? child]) {
+  Widget _section(IconData icon, String title, String? content, ThemeData theme, [Widget? child]) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
-        Icon(icon, color: AppColors.secondary, size: 20),
+        Icon(icon, color: theme.colorScheme.primary, size: 20),
         const SizedBox(width: 8),
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(title, style: theme.textTheme.titleLarge),
       ]),
       const SizedBox(height: 8),
-      if (content != null) Text(content, style: const TextStyle(fontSize: 15)),
+      if (content != null) Text(content, style: theme.textTheme.bodyLarge),
       if (child != null) child,
     ]);
   }
 
-  Widget _ratingRow(String label, double rating) {
+  Widget _ratingRow(String label, double rating, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(children: [
-        SizedBox(width: 150, child: Text(label, style: const TextStyle(fontSize: 14))),
+        SizedBox(width: 150, child: Text(label, style: theme.textTheme.bodyMedium)),
         RatingBarIndicator(
           rating: rating,
-          itemBuilder: (_, _a) => const Icon(Icons.star, color: AppColors.star),
+          itemBuilder: (_, _a) => const Icon(Icons.star, color: AppColors.gold),
           itemCount: 5, itemSize: 16,
         ),
         const SizedBox(width: 8),
-        Text(rating.toStringAsFixed(1), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        Text(rating.toStringAsFixed(1), style: theme.textTheme.titleSmall),
       ]),
     );
   }
 
-  Widget _reviewCard(Review review) {
+  Widget _reviewCard(Review review, ThemeData theme) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.brown50,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -464,25 +465,24 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             onTap: () => _viewProfile(review),
             child: Row(
               children: [
-                CircleAvatar(radius: 16, backgroundColor: AppColors.primary,
+                CircleAvatar(radius: 16, backgroundColor: theme.colorScheme.primary,
                   child: Text(review.userName.isNotEmpty ? review.userName[0].toUpperCase() : '?',
-                      style: const TextStyle(color: Colors.white, fontSize: 12)),
+                      style: TextStyle(color: theme.colorScheme.onPrimary, fontSize: 12)),
                 ),
                 const SizedBox(width: 8),
-                Text(review.userName,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                Text(review.userName, style: theme.textTheme.titleSmall),
                 const SizedBox(width: 4),
-                const Icon(Icons.arrow_forward_ios, size: 10, color: AppColors.textSecondary),
+                const Icon(Icons.arrow_forward_ios, size: 10, color: AppColors.gray600),
                 const Spacer(),
                 Row(children: List.generate(5, (i) => Icon(
                     i < review.overallRating.round() ? Icons.star : Icons.star_border,
-                    size: 14, color: AppColors.star))),
+                    size: 14, color: AppColors.gold))),
               ],
             ),
           ),
           if (review.comment.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text(review.comment, style: const TextStyle(fontSize: 13)),
+            Text(review.comment, style: theme.textTheme.bodyMedium),
           ],
           if (review.replies.isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -493,10 +493,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('${r['userName'] ?? l10n.user}: ',
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: AppColors.primary)),
+                      style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.primary)),
                   Expanded(
-                    child: Text(r['text'] ?? '',
-                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                    child: Text(r['text'] ?? '', style: theme.textTheme.bodySmall),
                   ),
                 ],
               ),
@@ -509,9 +508,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                 onTap: () => _replyToReview(review),
                 child: Row(
                   children: [
-                    const Icon(Icons.reply, size: 14, color: AppColors.textSecondary),
+                    const Icon(Icons.reply, size: 14, color: AppColors.gray600),
                     const SizedBox(width: 4),
-                    Text(l10n.reply, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Text(l10n.reply, style: theme.textTheme.labelSmall),
                   ],
                 ),
               ),
@@ -520,9 +519,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                 onTap: () => _reportReview(review),
                 child: Row(
                   children: [
-                    const Icon(Icons.flag_outlined, size: 14, color: AppColors.textSecondary),
+                    const Icon(Icons.flag_outlined, size: 14, color: AppColors.gray600),
                     const SizedBox(width: 4),
-                    Text(l10n.report, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Text(l10n.report, style: theme.textTheme.labelSmall),
                   ],
                 ),
               ),
@@ -535,6 +534,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   void _viewProfile(Review review) async {
     final fs = context.read<FirestoreService>();
+    final theme = Theme.of(context);
     final userReviews = await fs.getReviewsByUser(review.userId);
     final appUser = await fs.getUser(review.userId);
     if (!mounted) return;
@@ -546,7 +546,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -560,11 +560,11 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: theme.colorScheme.primary,
                     backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
                     child: photoUrl.isEmpty
                         ? Text(review.userName.isNotEmpty ? review.userName[0].toUpperCase() : '?',
-                            style: const TextStyle(color: Colors.white, fontSize: 18))
+                            style: TextStyle(color: theme.colorScheme.onPrimary, fontSize: 18))
                         : null,
                   ),
                   const SizedBox(width: 14),
@@ -572,11 +572,10 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(review.userName,
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(review.userName, style: theme.textTheme.titleLarge),
                         if (appUser != null)
                           Text('${l10n.memberSince} ${memberSince.day}/${memberSince.month}/${memberSince.year}',
-                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                              style: theme.textTheme.bodyMedium),
                       ],
                     ),
                   ),
@@ -586,9 +585,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _profileStat(Icons.rate_review, '${userReviews.length}', l10n.reviews),
-                  _profileStat(Icons.store, '$ownedCount', l10n.myCafesStat),
-                  _profileStat(Icons.favorite, '$favCount', l10n.favorites),
+                  _profileStat(Icons.rate_review, '${userReviews.length}', l10n.reviews, theme),
+                  _profileStat(Icons.store, '$ownedCount', l10n.myCafesStat, theme),
+                  _profileStat(Icons.favorite, '$favCount', l10n.favorites, theme),
                 ],
               ),
               const SizedBox(height: 20),
@@ -618,13 +617,13 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     );
   }
 
-  Widget _profileStat(IconData icon, String value, String label) {
+  Widget _profileStat(IconData icon, String value, String label, ThemeData theme) {
     return Column(
       children: [
-        Icon(icon, color: AppColors.secondary, size: 22),
+        Icon(icon, color: theme.colorScheme.primary, size: 22),
         const SizedBox(height: 4),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+        Text(value, style: theme.textTheme.titleMedium),
+        Text(label, style: theme.textTheme.bodySmall),
       ],
     );
   }
@@ -640,7 +639,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       builder: (ctx) => SizedBox(
         width: 400,
         child: AlertDialog(
-          title: Text(l10n.reply, style: const TextStyle(fontSize: 18)),
+          title: Text(l10n.reply),
           content: SizedBox(
             width: double.maxFinite,
             child: TextField(
@@ -666,7 +665,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                 ));
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.replyPublished), backgroundColor: AppColors.secondary),
+                  SnackBar(content: Text(l10n.replyPublished), backgroundColor: AppColors.brown800),
                 );
               },
               child: Text(l10n.reply),
@@ -696,6 +695,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   }
 
   void _showReportDialog(String targetType, String targetId, String targetName, AuthProvider auth) {
+    final theme = Theme.of(context);
     final reasons = [l10n.offensive, l10n.falseInfo, l10n.spam, l10n.other];
     final selectedReason = ValueNotifier<String?>(null);
     final detailsCtrl = TextEditingController();
@@ -709,7 +709,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
           content: SizedBox(
             width: 400,
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('${l10n.reportReason}:', style: const TextStyle(fontWeight: FontWeight.w600)),
+              Text('${l10n.reportReason}:', style: theme.textTheme.titleSmall),
               const SizedBox(height: 8),
               Wrap(spacing: 8, children: reasons.map((r) => ChoiceChip(
                 label: Text(r), selected: reason == r,
@@ -803,10 +803,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.profile)),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? Center(child: CircularProgressIndicator(color: theme.colorScheme.primary))
           : RefreshIndicator(
               onRefresh: _loadData,
               child: SingleChildScrollView(
@@ -817,25 +818,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     const SizedBox(height: 12),
                     CircleAvatar(
                       radius: 40,
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: theme.colorScheme.primary,
                       backgroundImage: widget.userPhoto.isNotEmpty ? NetworkImage(widget.userPhoto) : null,
                       child: widget.userPhoto.isEmpty
                           ? Text(widget.userName.isNotEmpty ? widget.userName[0].toUpperCase() : '?',
-                              style: const TextStyle(color: Colors.white, fontSize: 28))
+                              style: TextStyle(color: theme.colorScheme.onPrimary, fontSize: 28))
                           : null,
                     ),
                     const SizedBox(height: 12),
-                    Text(widget.userName,
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    Text(widget.userName, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                     Text('${l10n.memberSince} ${widget.memberSince.day}/${widget.memberSince.month}/${widget.memberSince.year}',
-                        style: const TextStyle(color: AppColors.textSecondary)),
+                        style: theme.textTheme.bodyMedium),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _stat(Icons.rate_review, '${_reviews.length}', l10n.reviews),
-                        _stat(Icons.store, '${_ownedShops.length}', l10n.myCafesStat),
-                        _stat(Icons.favorite, '${_favoriteShops.length}', l10n.favorites),
+                        _stat(Icons.rate_review, '${_reviews.length}', l10n.reviews, theme),
+                        _stat(Icons.store, '${_ownedShops.length}', l10n.myCafesStat, theme),
+                        _stat(Icons.favorite, '${_favoriteShops.length}', l10n.favorites, theme),
                       ],
                     ),
                     if (_ownedShops.isNotEmpty) ...[
@@ -843,18 +843,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       const SizedBox(height: 12),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(l10n.myCafesStat, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                        child: Text(l10n.myCafesStat, style: theme.textTheme.titleLarge)),
                       const SizedBox(height: 8),
-                      ..._ownedShops.map((s) => _shopTile(s)),
+                      ..._ownedShops.map((s) => _shopTile(s, theme)),
                     ],
                     if (_favoriteShops.isNotEmpty) ...[
                       const SizedBox(height: 24), const Divider(),
                       const SizedBox(height: 12),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(l10n.favorites, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                        child: Text(l10n.favorites, style: theme.textTheme.titleLarge)),
                       const SizedBox(height: 8),
-                      ..._favoriteShops.map((s) => _shopTile(s)),
+                      ..._favoriteShops.map((s) => _shopTile(s, theme)),
                     ],
                     if (_reviews.isNotEmpty) ...[
                       const SizedBox(height: 24), const Divider(),
@@ -862,9 +862,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text('${l10n.reviews} (${_reviews.length})',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                            style: theme.textTheme.titleLarge)),
                       const SizedBox(height: 8),
-                      ..._reviews.map((r) => _reviewTile(r)),
+                      ..._reviews.map((r) => _reviewTile(r, theme)),
                     ],
                     const SizedBox(height: 40),
                   ],
@@ -874,34 +874,34 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _stat(IconData icon, String value, String label) {
+  Widget _stat(IconData icon, String value, String label, ThemeData theme) {
     return Column(children: [
-      Icon(icon, color: AppColors.secondary, size: 22),
+      Icon(icon, color: theme.colorScheme.primary, size: 22),
       const SizedBox(height: 4),
-      Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-      Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+      Text(value, style: theme.textTheme.titleMedium),
+      Text(label, style: theme.textTheme.bodySmall),
     ]);
   }
 
-  Widget _shopTile(CoffeeShop shop) {
+  Widget _shopTile(CoffeeShop shop, ThemeData theme) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
-        tileColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        leading: const Icon(Icons.store, color: AppColors.primary),
-        title: Text(shop.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+        tileColor: AppColors.brown50,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        leading: Icon(Icons.store, color: theme.colorScheme.primary),
+        title: Text(shop.name, style: theme.textTheme.titleSmall),
         subtitle: Text(shop.address, maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+            style: theme.textTheme.bodySmall),
         trailing: Row(mainAxisSize: MainAxisSize.min, children: [
           if (shop.averageRating > 0) ...[
-            const Icon(Icons.star, size: 14, color: AppColors.star),
+            const Icon(Icons.star, size: 14, color: AppColors.gold),
             const SizedBox(width: 2),
             Text(shop.averageRating.toStringAsFixed(1),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                style: theme.textTheme.titleSmall?.copyWith(fontSize: 13)),
           ],
           const SizedBox(width: 8),
-          const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+          const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.gray600),
         ]),
         onTap: () => Navigator.push(context,
             MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: shop.id))),
@@ -909,7 +909,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _reviewTile(Review r) {
+  Widget _reviewTile(Review r, ThemeData theme) {
     return FutureBuilder<CoffeeShop?>(
       future: context.read<FirestoreService>().getCoffeeShop(r.shopId),
       builder: (_, snap) {
@@ -917,23 +917,23 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         return Container(
           margin: const EdgeInsets.only(bottom: 10),
           child: ListTile(
-            tileColor: AppColors.surface,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            leading: const Icon(Icons.rate_review, color: AppColors.primary),
+            tileColor: AppColors.brown50,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            leading: Icon(Icons.rate_review, color: theme.colorScheme.primary),
             title: Row(children: List.generate(5, (i) =>
                 Icon(i < r.overallRating.round() ? Icons.star : Icons.star_border,
-                    size: 16, color: AppColors.star))),
+                    size: 16, color: AppColors.gold))),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (shop != null)
-                  Text(shop.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text(shop.name, style: theme.textTheme.titleSmall?.copyWith(fontSize: 13)),
                 if (r.comment.isNotEmpty)
                   Text(r.comment, maxLines: 2, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                      style: theme.textTheme.bodySmall),
               ],
             ),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.gray600),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: r.shopId))),
           ),

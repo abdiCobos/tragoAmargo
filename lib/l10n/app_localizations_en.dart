@@ -52,6 +52,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Save your favorite coffee shops and share your opinion';
 
   @override
+  String get guestFavoritesMessage => 'Sign in to see your favorites';
+
+  @override
+  String get guestFavoritesSubtitle =>
+      'Save your favorite coffee shops and access them from any device';
+
+  @override
   String get home => 'Coffee Shops';
 
   @override
@@ -83,6 +90,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wifi => 'WiFi';
+
+  @override
+  String get wifiAvailable => 'WiFi available';
 
   @override
   String get proximity => 'Proximity (City)';
@@ -281,6 +291,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get photoUpdated => 'Photo updated';
 
   @override
+  String get photoAdded => 'Photo added';
+
+  @override
   String get contact => 'Contact';
 
   @override
@@ -293,19 +306,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreDetails => 'More Details';
 
   @override
+  String get moreDetailsOpt => 'More Details (optional)';
+
+  @override
   String get hours => 'Hours';
+
+  @override
+  String get hoursOpt => 'Hours (optional)';
 
   @override
   String get name => 'Name';
 
   @override
+  String get nameRequired => 'Coffee Shop Name *';
+
+  @override
   String get originAltitude => 'Coffee Origin and Altitude';
+
+  @override
+  String get originAltitudeRequired => 'Coffee Origin and Altitude *';
 
   @override
   String get originHint => 'E.g.: Ethiopia Yirgacheffe, 1,900 masl';
 
   @override
   String get address => 'Address';
+
+  @override
+  String get addressRequired => 'Address *';
 
   @override
   String get addressHint => 'E.g.: 123 Main St, San Francisco';
@@ -340,6 +368,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectRoast => 'Select at least one roast level';
+
+  @override
+  String get roastLevelsRequired => 'Roast Levels *';
 
   @override
   String get duplicateAddress =>
@@ -403,6 +434,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noUserReviews => 'No reviews yet';
 
   @override
+  String get noPublishedShops => 'No coffee shops published yet';
+
+  @override
   String get pleaseSelectReason => 'Select a reason';
 
   @override
@@ -463,11 +497,216 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reviewLoading => 'Loading reviews...';
 
   @override
-  String get photoAdded => 'Photo added';
-
-  @override
   String get viewProfile => 'View profile';
 
   @override
   String get reviewOf => 'review by';
+
+  @override
+  String reviewsOfUser(Object userName) {
+    return 'Reviews by $userName';
+  }
+
+  @override
+  String shopsOfUser(Object userName) {
+    return 'Coffee Shops by $userName';
+  }
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get photosOpt => 'Photos (optional)';
+
+  @override
+  String get uploading => 'Uploading...';
+
+  @override
+  String get uploadError => 'Error uploading photo';
+
+  @override
+  String get shopName => 'Name';
+
+  @override
+  String get roastingLevels => 'Roast Levels';
+
+  @override
+  String get addReview => 'Write review';
+
+  @override
+  String get noShopFound => 'Coffee shop not found';
+
+  @override
+  String get errorLoading => 'Error loading';
+
+  @override
+  String dateFormat(Object day, Object month, Object year) {
+    return '$day/$month/$year';
+  }
+
+  @override
+  String get noFavorites => 'No favorites yet';
+
+  @override
+  String get noFavoritesSubtitle =>
+      'Save coffee shops by tapping the heart on their profile';
+
+  @override
+  String get passwordMismatch => 'Passwords don\'t match';
+
+  @override
+  String get confirmPassword => 'Confirm password';
+
+  @override
+  String get confirmPasswordRequired => 'Please confirm your password';
+
+  @override
+  String get selectRoastLevels => 'Select at least one roast level';
+
+  @override
+  String get wifiSwitch => 'WiFi available';
+
+  @override
+  String get spaceType => 'Space Type';
+
+  @override
+  String get addCoffeeShop => 'Add Coffee Shop';
+
+  @override
+  String get editCoffeeShop => 'Edit Coffee Shop';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get shopSaved => 'Coffee shop updated';
+
+  @override
+  String get gpsVerification => 'GPS Verification';
+
+  @override
+  String get gpsStep1 => 'Step 1 of 2: GPS Verification';
+
+  @override
+  String get gpsDesc => 'You must be within 20 meters of the location.';
+
+  @override
+  String get verifyLocation => 'Verify my location';
+
+  @override
+  String get gpsNotEnabled => 'Enable GPS on your device.';
+
+  @override
+  String get gpsPermissionDenied => 'Location permission denied.';
+
+  @override
+  String get gpsPermissionPermanent =>
+      'Enable location permissions in settings.';
+
+  @override
+  String tooFar(Object distance) {
+    return 'You are ${distance}m away. Maximum 20m allowed.';
+  }
+
+  @override
+  String get alreadyClaimPending =>
+      'You already have a pending claim for review.';
+
+  @override
+  String get shopHasOwner => 'This coffee shop already has a verified owner.';
+
+  @override
+  String get locationError => 'Error getting location. Try again.';
+
+  @override
+  String get docsStep2 => 'Step 2 of 2: Documents and Selfie';
+
+  @override
+  String get docsSubtitle =>
+      'Upload documents proving ownership and a selfie at the location.';
+
+  @override
+  String get propertyDocs => 'Ownership documents';
+
+  @override
+  String get docsDesc => 'Utility bills, rent receipts (min. 1, max. 2)';
+
+  @override
+  String get selfie => 'Selfie at the location';
+
+  @override
+  String get selfieDesc => 'In uniform if possible (min. 1, max. 2)';
+
+  @override
+  String get docsPolicy =>
+      'The document address must match the coffee shop. We\'ll review your case in 24-48h.';
+
+  @override
+  String get submitClaim => 'Submit claim';
+
+  @override
+  String get claimSubmitted =>
+      'Request submitted. We will review your documents soon.';
+
+  @override
+  String get claimOwner => 'Claim as Owner';
+
+  @override
+  String get ownerVerified => 'Verified Owner';
+
+  @override
+  String get hasOwnerMessage =>
+      'This coffee shop already has a verified owner.';
+
+  @override
+  String get goBack => 'Go back';
+
+  @override
+  String get notificationsLogin => 'Sign in to see notifications';
+
+  @override
+  String get noNotificationsYet => 'No notifications';
+
+  @override
+  String minutesAgo(Object minutes) {
+    return '$minutes min ago';
+  }
+
+  @override
+  String hoursAgo(Object hours) {
+    return '${hours}h ago';
+  }
+
+  @override
+  String get signInToReview => 'Sign in to write a review';
+
+  @override
+  String get publish => 'Publish';
+
+  @override
+  String get alreadyReviewed => 'You already have a review. You can edit it.';
+
+  @override
+  String get monday => 'Monday';
+
+  @override
+  String get tuesday => 'Tuesday';
+
+  @override
+  String get wednesday => 'Wednesday';
+
+  @override
+  String get thursday => 'Thursday';
+
+  @override
+  String get friday => 'Friday';
+
+  @override
+  String get saturday => 'Saturday';
+
+  @override
+  String get sunday => 'Sunday';
 }

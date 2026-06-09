@@ -35,7 +35,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final l10n = AppLocalizations.of(context);
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.reviewReview ?? 'Passwords don\'t match'), backgroundColor: AppColors.error),
+        SnackBar(content: Text(l10n.passwordMismatch), backgroundColor: AppColors.error),
       );
       return;
     }
@@ -103,8 +103,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _confirmPasswordController,
                 obscureText: _obscurePassword,
                 textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(labelText: 'Confirmar contraseña', prefixIcon: Icon(Icons.lock_outlined)),
-                validator: (v) => (v == null || v.isEmpty) ? 'Confirma tu contraseña' : v != _passwordController.text ? 'Las contraseñas no coinciden' : null,
+                decoration: InputDecoration(labelText: l10n.confirmPassword, prefixIcon: const Icon(Icons.lock_outlined)),
+                validator: (v) => (v == null || v.isEmpty) ? l10n.confirmPasswordRequired : v != _passwordController.text ? l10n.passwordMismatch : null,
                 onFieldSubmitted: (_) => _register(),
               ),
               const SizedBox(height: 16),

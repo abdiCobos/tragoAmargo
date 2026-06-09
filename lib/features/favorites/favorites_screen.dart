@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/coffee_shops_provider.dart';
 import '../../widgets/empty_state.dart';
@@ -11,14 +12,15 @@ class FavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer2<AuthProvider, CoffeeShopsProvider>(
       builder: (context, auth, shopProvider, _) {
         if (!auth.isAuthenticated) {
           return EmptyState(
             icon: Icons.favorite_border,
-            title: 'Inicia sesión para ver tus favoritos',
-            subtitle: 'Guarda tus cafeterías favoritas y accede a ellas desde cualquier dispositivo',
-            buttonText: 'Iniciar Sesión',
+            title: l10n.guestFavoritesMessage,
+            subtitle: l10n.guestFavoritesSubtitle,
+            buttonText: l10n.login,
             onButtonPressed: () => Navigator.pushNamed(context, '/login'),
           );
         }
@@ -31,8 +33,8 @@ class FavoritesScreen extends StatelessWidget {
         if (favoriteShops.isEmpty) {
           return EmptyState(
             icon: Icons.favorite_border,
-            title: 'No tienes favoritos',
-            subtitle: 'Guarda cafeterías tocando el corazón en su perfil',
+            title: l10n.noFavorites,
+            subtitle: l10n.noFavoritesSubtitle,
           );
         }
 

@@ -182,6 +182,18 @@ abstract class AppLocalizations {
   /// **'Guarda tus cafeterías favoritas y comparte tu opinión'**
   String get guestSubtitle;
 
+  /// No description provided for @guestFavoritesMessage.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicia sesión para ver tus favoritos'**
+  String get guestFavoritesMessage;
+
+  /// No description provided for @guestFavoritesSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Guarda tus cafeterías favoritas y accede a ellas desde cualquier dispositivo'**
+  String get guestFavoritesSubtitle;
+
   /// No description provided for @home.
   ///
   /// In es, this message translates to:
@@ -247,6 +259,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'WiFi'**
   String get wifi;
+
+  /// No description provided for @wifiAvailable.
+  ///
+  /// In es, this message translates to:
+  /// **'WiFi disponible'**
+  String get wifiAvailable;
 
   /// No description provided for @proximity.
   ///
@@ -626,6 +644,12 @@ abstract class AppLocalizations {
   /// **'Foto actualizada'**
   String get photoUpdated;
 
+  /// No description provided for @photoAdded.
+  ///
+  /// In es, this message translates to:
+  /// **'Foto agregada'**
+  String get photoAdded;
+
   /// No description provided for @contact.
   ///
   /// In es, this message translates to:
@@ -650,11 +674,23 @@ abstract class AppLocalizations {
   /// **'Más detalles'**
   String get moreDetails;
 
+  /// No description provided for @moreDetailsOpt.
+  ///
+  /// In es, this message translates to:
+  /// **'Más detalles (opcional)'**
+  String get moreDetailsOpt;
+
   /// No description provided for @hours.
   ///
   /// In es, this message translates to:
   /// **'Horarios'**
   String get hours;
+
+  /// No description provided for @hoursOpt.
+  ///
+  /// In es, this message translates to:
+  /// **'Horarios (opcional)'**
+  String get hoursOpt;
 
   /// No description provided for @name.
   ///
@@ -662,11 +698,23 @@ abstract class AppLocalizations {
   /// **'Nombre'**
   String get name;
 
+  /// No description provided for @nameRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la cafetería *'**
+  String get nameRequired;
+
   /// No description provided for @originAltitude.
   ///
   /// In es, this message translates to:
   /// **'Origen y Altura del Café'**
   String get originAltitude;
+
+  /// No description provided for @originAltitudeRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Origen y Altura del Café *'**
+  String get originAltitudeRequired;
 
   /// No description provided for @originHint.
   ///
@@ -679,6 +727,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Dirección'**
   String get address;
+
+  /// No description provided for @addressRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Dirección *'**
+  String get addressRequired;
 
   /// No description provided for @addressHint.
   ///
@@ -745,6 +799,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Selecciona al menos un nivel de tostado'**
   String get selectRoast;
+
+  /// No description provided for @roastLevelsRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Niveles de Tostado *'**
+  String get roastLevelsRequired;
 
   /// No description provided for @duplicateAddress.
   ///
@@ -866,6 +926,12 @@ abstract class AppLocalizations {
   /// **'No ha escrito reseñas aún'**
   String get noUserReviews;
 
+  /// No description provided for @noPublishedShops.
+  ///
+  /// In es, this message translates to:
+  /// **'No ha publicado cafeterías aún'**
+  String get noPublishedShops;
+
   /// No description provided for @pleaseSelectReason.
   ///
   /// In es, this message translates to:
@@ -986,12 +1052,6 @@ abstract class AppLocalizations {
   /// **'Cargando reseñas...'**
   String get reviewLoading;
 
-  /// No description provided for @photoAdded.
-  ///
-  /// In es, this message translates to:
-  /// **'Foto agregada'**
-  String get photoAdded;
-
   /// No description provided for @viewProfile.
   ///
   /// In es, this message translates to:
@@ -1003,6 +1063,384 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'la reseña de'**
   String get reviewOf;
+
+  /// No description provided for @reviewsOfUser.
+  ///
+  /// In es, this message translates to:
+  /// **'Reseñas de {userName}'**
+  String reviewsOfUser(Object userName);
+
+  /// No description provided for @shopsOfUser.
+  ///
+  /// In es, this message translates to:
+  /// **'Cafeterías de {userName}'**
+  String shopsOfUser(Object userName);
+
+  /// No description provided for @gallery.
+  ///
+  /// In es, this message translates to:
+  /// **'Galería'**
+  String get gallery;
+
+  /// No description provided for @camera.
+  ///
+  /// In es, this message translates to:
+  /// **'Cámara'**
+  String get camera;
+
+  /// No description provided for @photosOpt.
+  ///
+  /// In es, this message translates to:
+  /// **'Fotos (opcional)'**
+  String get photosOpt;
+
+  /// No description provided for @uploading.
+  ///
+  /// In es, this message translates to:
+  /// **'Subiendo...'**
+  String get uploading;
+
+  /// No description provided for @uploadError.
+  ///
+  /// In es, this message translates to:
+  /// **'Error al subir foto'**
+  String get uploadError;
+
+  /// No description provided for @shopName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre'**
+  String get shopName;
+
+  /// No description provided for @roastingLevels.
+  ///
+  /// In es, this message translates to:
+  /// **'Niveles de Tostado'**
+  String get roastingLevels;
+
+  /// No description provided for @addReview.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribir reseña'**
+  String get addReview;
+
+  /// No description provided for @noShopFound.
+  ///
+  /// In es, this message translates to:
+  /// **'Cafetería no encontrada'**
+  String get noShopFound;
+
+  /// No description provided for @errorLoading.
+  ///
+  /// In es, this message translates to:
+  /// **'Error al cargar'**
+  String get errorLoading;
+
+  /// No description provided for @dateFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'{day}/{month}/{year}'**
+  String dateFormat(Object day, Object month, Object year);
+
+  /// No description provided for @noFavorites.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes favoritos'**
+  String get noFavorites;
+
+  /// No description provided for @noFavoritesSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Guarda cafeterías tocando el corazón en su perfil'**
+  String get noFavoritesSubtitle;
+
+  /// No description provided for @passwordMismatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Las contraseñas no coinciden'**
+  String get passwordMismatch;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar contraseña'**
+  String get confirmPassword;
+
+  /// No description provided for @confirmPasswordRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirma tu contraseña'**
+  String get confirmPasswordRequired;
+
+  /// No description provided for @selectRoastLevels.
+  ///
+  /// In es, this message translates to:
+  /// **'Selecciona al menos un nivel de tostado'**
+  String get selectRoastLevels;
+
+  /// No description provided for @wifiSwitch.
+  ///
+  /// In es, this message translates to:
+  /// **'WiFi disponible'**
+  String get wifiSwitch;
+
+  /// No description provided for @spaceType.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipo de espacio'**
+  String get spaceType;
+
+  /// No description provided for @addCoffeeShop.
+  ///
+  /// In es, this message translates to:
+  /// **'Agregar Cafetería'**
+  String get addCoffeeShop;
+
+  /// No description provided for @editCoffeeShop.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar Cafetería'**
+  String get editCoffeeShop;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar Cambios'**
+  String get saveChanges;
+
+  /// No description provided for @shopSaved.
+  ///
+  /// In es, this message translates to:
+  /// **'Cafetería actualizada'**
+  String get shopSaved;
+
+  /// No description provided for @gpsVerification.
+  ///
+  /// In es, this message translates to:
+  /// **'Verificación GPS'**
+  String get gpsVerification;
+
+  /// No description provided for @gpsStep1.
+  ///
+  /// In es, this message translates to:
+  /// **'Paso 1 de 2: Verificación GPS'**
+  String get gpsStep1;
+
+  /// No description provided for @gpsDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Debes estar a 20 metros o menos del local.'**
+  String get gpsDesc;
+
+  /// No description provided for @verifyLocation.
+  ///
+  /// In es, this message translates to:
+  /// **'Verificar mi ubicación'**
+  String get verifyLocation;
+
+  /// No description provided for @gpsNotEnabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Activa el GPS de tu dispositivo.'**
+  String get gpsNotEnabled;
+
+  /// No description provided for @gpsPermissionDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Permiso de ubicación denegado.'**
+  String get gpsPermissionDenied;
+
+  /// No description provided for @gpsPermissionPermanent.
+  ///
+  /// In es, this message translates to:
+  /// **'Activa los permisos de ubicación en ajustes.'**
+  String get gpsPermissionPermanent;
+
+  /// No description provided for @tooFar.
+  ///
+  /// In es, this message translates to:
+  /// **'Estás a {distance}m del local. Máximo 20m permitido.'**
+  String tooFar(Object distance);
+
+  /// No description provided for @alreadyClaimPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya tienes una solicitud pendiente de revisión.'**
+  String get alreadyClaimPending;
+
+  /// No description provided for @shopHasOwner.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta cafetería ya tiene un dueño verificado.'**
+  String get shopHasOwner;
+
+  /// No description provided for @locationError.
+  ///
+  /// In es, this message translates to:
+  /// **'Error al obtener ubicación. Intenta de nuevo.'**
+  String get locationError;
+
+  /// No description provided for @docsStep2.
+  ///
+  /// In es, this message translates to:
+  /// **'Paso 2 de 2: Documentos y Selfie'**
+  String get docsStep2;
+
+  /// No description provided for @docsSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sube documentos que acrediten tu propiedad y una selfie en el local.'**
+  String get docsSubtitle;
+
+  /// No description provided for @propertyDocs.
+  ///
+  /// In es, this message translates to:
+  /// **'Documentos de propiedad'**
+  String get propertyDocs;
+
+  /// No description provided for @docsDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Recibos de luz, agua, renta (mín. 1, máx. 2)'**
+  String get docsDesc;
+
+  /// No description provided for @selfie.
+  ///
+  /// In es, this message translates to:
+  /// **'Selfie en el establecimiento'**
+  String get selfie;
+
+  /// No description provided for @selfieDesc.
+  ///
+  /// In es, this message translates to:
+  /// **'Con uniforme del local si es posible (mín. 1, máx. 2)'**
+  String get selfieDesc;
+
+  /// No description provided for @docsPolicy.
+  ///
+  /// In es, this message translates to:
+  /// **'La dirección del documento debe coincidir con la cafetería. Revisaremos tu caso en 24-48h.'**
+  String get docsPolicy;
+
+  /// No description provided for @submitClaim.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar solicitud'**
+  String get submitClaim;
+
+  /// No description provided for @claimSubmitted.
+  ///
+  /// In es, this message translates to:
+  /// **'Solicitud enviada. Revisaremos tus documentos pronto.'**
+  String get claimSubmitted;
+
+  /// No description provided for @claimOwner.
+  ///
+  /// In es, this message translates to:
+  /// **'Acreditar como Dueño'**
+  String get claimOwner;
+
+  /// No description provided for @ownerVerified.
+  ///
+  /// In es, this message translates to:
+  /// **'Dueño Verificado'**
+  String get ownerVerified;
+
+  /// No description provided for @hasOwnerMessage.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta cafetería ya tiene un dueño verificado.'**
+  String get hasOwnerMessage;
+
+  /// No description provided for @goBack.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver'**
+  String get goBack;
+
+  /// No description provided for @notificationsLogin.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicia sesión para ver notificaciones'**
+  String get notificationsLogin;
+
+  /// No description provided for @noNotificationsYet.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes notificaciones'**
+  String get noNotificationsYet;
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace {minutes} min'**
+  String minutesAgo(Object minutes);
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace {hours}h'**
+  String hoursAgo(Object hours);
+
+  /// No description provided for @signInToReview.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicia sesión para escribir una reseña'**
+  String get signInToReview;
+
+  /// No description provided for @publish.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicar'**
+  String get publish;
+
+  /// No description provided for @alreadyReviewed.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya tienes una reseña. Puedes editarla.'**
+  String get alreadyReviewed;
+
+  /// No description provided for @monday.
+  ///
+  /// In es, this message translates to:
+  /// **'lunes'**
+  String get monday;
+
+  /// No description provided for @tuesday.
+  ///
+  /// In es, this message translates to:
+  /// **'martes'**
+  String get tuesday;
+
+  /// No description provided for @wednesday.
+  ///
+  /// In es, this message translates to:
+  /// **'miércoles'**
+  String get wednesday;
+
+  /// No description provided for @thursday.
+  ///
+  /// In es, this message translates to:
+  /// **'jueves'**
+  String get thursday;
+
+  /// No description provided for @friday.
+  ///
+  /// In es, this message translates to:
+  /// **'viernes'**
+  String get friday;
+
+  /// No description provided for @saturday.
+  ///
+  /// In es, this message translates to:
+  /// **'sábado'**
+  String get saturday;
+
+  /// No description provided for @sunday.
+  ///
+  /// In es, this message translates to:
+  /// **'domingo'**
+  String get sunday;
 }
 
 class _AppLocalizationsDelegate

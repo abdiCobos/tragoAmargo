@@ -6,6 +6,7 @@ import '../../../providers/reviews_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/firestore_service.dart';
 import '../../../models/notification.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ReviewFormScreen extends StatefulWidget {
   final String shopId;
@@ -22,6 +23,8 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
   double _flavorRating = 3;
   double _roastRating = 3;
   double _serviceRating = 3;
+
+  AppLocalizations get l10n => AppLocalizations.of(context);
 
   @override
   void initState() {
@@ -60,7 +63,7 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
     final success = await reviews.addReview(
       shopId: widget.shopId,
       userId: auth.user!.uid,
-      userName: auth.user?.displayName ?? 'Usuario',
+      userName: auth.user?.displayName ?? l10n.user,
       userPhoto: auth.user?.photoURL ?? '',
       qualityRating: _qualityRating,
       flavorRating: _flavorRating,
@@ -74,15 +77,15 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
       final shop = await fs.getCoffeeShop(widget.shopId);
       if (shop != null && shop.verifiedOwnerUid != null && shop.verifiedOwnerUid != auth.user!.uid) {
         fs.sendNotification(AppNotification(
-          id: '', userId: shop.verifiedOwnerUid!, title: 'Nueva reseña en ${shop.name}',
-          body: '${auth.user?.displayName ?? 'Alguien'} calificó tu cafetería',
+          id: '', userId: shop.verifiedOwnerUid!, title: '${l10n.newReviewTitle} ${shop.name}',
+          body: '${auth.user?.displayName ?? l10n.someone} ${l10n.newReviewBody}',
           type: 'new_review', shopId: widget.shopId, createdAt: DateTime.now(),
         ));
       }
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(reviews.isEditing ? '¡Reseña actualizada!' : '¡Reseña publicada!'),
+          content: Text(reviews.isEditing ? l10n.reviewUpdated : l10n.reviewPublished),
           backgroundColor: AppColors.secondary,
         ),
       );
@@ -96,7 +99,7 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
         final isEdit = reviews.existingReview != null;
 
         return Scaffold(
-          appBar: AppBar(title: Text(isEdit ? 'Editar Reseña' : 'Escribir Reseña')),
+          appBar: AppBar(title: Text(isEdit ? l10n.editReview : l10n.writeReview)),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -110,52 +113,52 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.edit, color: AppColors.secondary),
-                        SizedBox(width: 12),
+                        const Icon(Icons.edit, color: AppColors.secondary),
+                        const SizedBox(width: 12),
                         Expanded(
-                          child: Text('Ya tienes una reseña. Puedes editarla.',
-                              style: TextStyle(fontSize: 13)),
+                          child: Text(l10n.alreadyReviewed,
+                              style: const TextStyle(fontSize: 13)),
                         ),
                       ],
                     ),
                   ),
                 _buildRatingSection(
-                  'Calidad del grano',
-                  'Evalúa la calidad y frescura del café',
+                  l10n.quality,
+                  l10n.qualityDesc,
                   _qualityRating,
                   (v) => setState(() => _qualityRating = v),
                 ),
                 const SizedBox(height: 20),
                 _buildRatingSection(
-                  'Sabrozura',
-                  'Qué tan sabroso está el café',
+                  l10n.flavor,
+                  l10n.flavorDesc,
                   _flavorRating,
                   (v) => setState(() => _flavorRating = v),
                 ),
                 const SizedBox(height: 20),
                 _buildRatingSection(
-                  'Manejo del tostado',
-                  'Qué tan bien manejan los niveles de tostado',
+                  l10n.roast,
+                  l10n.roastDesc,
                   _roastRating,
                   (v) => setState(() => _roastRating = v),
                 ),
                 const SizedBox(height: 20),
                 _buildRatingSection(
-                  'Servicio',
-                  'Atención del personal y ambiente del lugar',
+                  l10n.service,
+                  l10n.serviceDesc,
                   _serviceRating,
                   (v) => setState(() => _serviceRating = v),
                 ),
                 const SizedBox(height: 24),
-                const Text('Comentario',
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                Text(l10n.comment,
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _commentController,
                   maxLines: 4,
-                  decoration: const InputDecoration(hintText: 'Comparte tu experiencia...'),
+                  decoration: InputDecoration(hintText: l10n.commentHint),
                 ),
                 const SizedBox(height: 32),
                 SizedBox(
@@ -168,7 +171,7 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
                             width: 24, height: 24,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : Text(isEdit ? 'Actualizar Reseña' : 'Publicar Reseña'),
+                        : Text(isEdit ? l10n.updateReview : l10n.publishReview),
                   ),
                 ),
                 const SizedBox(height: 40),

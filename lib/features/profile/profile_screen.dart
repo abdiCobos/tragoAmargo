@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/storage_service.dart';
 import '../../services/firestore_service.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/review.dart';
 import '../../models/app_user.dart';
 import '../../models/coffee_shop.dart';
@@ -66,9 +67,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
-        if (!auth.isAuthenticated) return _guestView();
+        if (!auth.isAuthenticated) return _guestView(context, l10n);
         final user = auth.user!;
         final appUser = auth.appUser;
 
@@ -94,35 +96,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Text(user.displayName ?? 'Usuario', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                Text(user.displayName ?? l10n.user, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 Text(user.email ?? '', style: const TextStyle(color: AppColors.textSecondary)),
                 const SizedBox(height: 24),
-                _stat(Icons.favorite, '${appUser?.favoriteShops.length ?? 0}', 'Favoritos'),
-                _stat(Icons.rate_review, _loadingReviews ? '...' : '${_userReviews.length}', 'Reseñas', onTap: () async {
+                _stat(Icons.favorite, '${appUser?.favoriteShops.length ?? 0}', l10n.favorites),
+                _stat(Icons.rate_review, _loadingReviews ? '...' : '${_userReviews.length}', l10n.reviews, onTap: () async {
                   await Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => UserReviewsScreen(userId: user.uid, userName: user.displayName ?? 'Usuario')));
+                    builder: (_) => UserReviewsScreen(userId: user.uid, userName: user.displayName ?? l10n.user)));
                   _loadData();
                 }),
-                _stat(Icons.store, '${appUser?.ownedShops.length ?? 0}', 'Cafeterías', onTap: () async {
+                _stat(Icons.store, '${appUser?.ownedShops.length ?? 0}', l10n.myCafesStat, onTap: () async {
                   await Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => UserShopsScreen(userId: user.uid, userName: user.displayName ?? 'Usuario')));
+                    builder: (_) => UserShopsScreen(userId: user.uid, userName: user.displayName ?? l10n.user)));
                   _loadData();
                 }),
-                _stat(Icons.calendar_today, _fmt(appUser?.createdAt ?? DateTime.now()), 'Miembro desde'),
+                _stat(Icons.calendar_today, _fmt(appUser?.createdAt ?? DateTime.now()), l10n.memberSince),
 
                 if (_ownedShops.isNotEmpty) ...[
                   const SizedBox(height: 24), const Divider(),
                   const SizedBox(height: 12),
-                  const Text('Mis Cafeterías', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(l10n.myCafes, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  ..._ownedShops.map((s) => _ownerCard(s)),
+                  ..._ownedShops.map((s) => _ownerCard(s, l10n)),
                 ],
 
                 if (_favoriteShops.isNotEmpty) ...[
                   const SizedBox(height: 24), const Divider(),
                   const SizedBox(height: 12),
-                  const Text('Mis Favoritos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(l10n.myFavorites, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   ..._favoriteShops.map((s) => ShopCard(shop: s, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: s.id))))),
                 ],
@@ -134,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (context.mounted) Navigator.pushNamedAndRemoveUntil(context, '/home', (r) => false);
                   },
                   icon: const Icon(Icons.logout, color: AppColors.error),
-                  label: const Text('Cerrar Sesión', style: TextStyle(color: AppColors.error)),
+                  label: Text(l10n.logout, style: const TextStyle(color: AppColors.error)),
                   style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.error)),
                 )),
               ],
@@ -145,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _ownerCard(CoffeeShop shop) {
+  Widget _ownerCard(CoffeeShop shop, AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
@@ -161,9 +163,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(shop.address, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 6),
           Row(children: [
-            _tag('${shop.totalReviews} reseñas'),
+            _tag('${shop.totalReviews} ${l10n.reviews}'),
             const SizedBox(width: 8),
-            _tag(shop.averageRating > 0 ? shop.averageRating.toStringAsFixed(1) : 'Sin calif'),
+            _tag(shop.averageRating > 0 ? shop.averageRating.toStringAsFixed(1) : l10n.noRating),
           ]),
         ])),
         IconButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: shop.id))),
@@ -178,7 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Text(text, style: const TextStyle(fontSize: 11, color: AppColors.secondary, fontWeight: FontWeight.w600)));
   }
 
-  Widget _guestView() {
+  Widget _guestView(BuildContext ctx, AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -196,14 +198,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text('Inicia sesión para comenzar a reseñar',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary), textAlign: TextAlign.center),
+          Text(l10n.guestMessage,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary), textAlign: TextAlign.center),
           const SizedBox(height: 8),
-          const Text('Guarda tus cafeterías favoritas y comparte tu opinión',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 14), textAlign: TextAlign.center),
+          Text(l10n.guestSubtitle,
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 14), textAlign: TextAlign.center),
           const SizedBox(height: 28),
-          ElevatedButton.icon(onPressed: () => Navigator.pushNamed(context, '/login'),
-            icon: const Icon(Icons.person), label: const Text('Iniciar Sesión')),
+          ElevatedButton.icon(onPressed: () => Navigator.pushNamed(ctx, '/login'),
+            icon: const Icon(Icons.person), label: Text(l10n.login)),
         ],
       ),
     );
@@ -230,6 +232,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _fmt(DateTime date) => '${date.day}/${date.month}/${date.year}';
 
   Future<void> _changePhoto(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final picker = ImagePicker();
     final photo = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
     if (photo != null && context.mounted) {
@@ -242,7 +245,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await user.updatePhotoURL(url);
       if (!context.mounted) return;
       setState(() {});
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto actualizada')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.photoUpdated)));
     }
   }
 }
@@ -254,8 +257,9 @@ class UserReviewsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('Reseñas de $userName')),
+      appBar: AppBar(title: Text(l10n.reviewsOfUser(userName))),
       body: FutureBuilder<List<Review>>(
         future: context.read<FirestoreService>().getReviewsByUser(userId),
         builder: (_, snap) {
@@ -263,7 +267,7 @@ class UserReviewsScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
           final reviews = snap.data ?? [];
-          if (reviews.isEmpty) return const Center(child: Text('No ha escrito reseñas', style: TextStyle(color: AppColors.textSecondary)));
+          if (reviews.isEmpty) return Center(child: Text(l10n.noUserReviews, style: const TextStyle(color: AppColors.textSecondary)));
           return ListView.builder(padding: const EdgeInsets.all(16), itemCount: reviews.length, itemBuilder: (_, i) {
             final r = reviews[i];
             return _ReviewCardWithShop(review: r);
@@ -331,8 +335,9 @@ class UserShopsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('Cafeterías de $userName')),
+      appBar: AppBar(title: Text(l10n.shopsOfUser(userName))),
       body: FutureBuilder<AppUser?>(
         future: context.read<FirestoreService>().getUser(userId),
         builder: (_, userSnap) {
@@ -342,7 +347,7 @@ class UserShopsScreen extends StatelessWidget {
           final appUser = userSnap.data;
           final ownedIds = appUser?.ownedShops ?? [];
           if (ownedIds.isEmpty) {
-            return const Center(child: Text('No ha publicado cafeterías', style: TextStyle(color: AppColors.textSecondary)));
+            return Center(child: Text(l10n.noPublishedShops, style: const TextStyle(color: AppColors.textSecondary)));
           }
           return FutureBuilder<List<CoffeeShop>>(
             future: _loadShops(context, ownedIds),
@@ -352,7 +357,7 @@ class UserShopsScreen extends StatelessWidget {
               }
               final shops = shopsSnap.data ?? [];
               if (shops.isEmpty) {
-                return const Center(child: Text('No ha publicado cafeterías', style: TextStyle(color: AppColors.textSecondary)));
+                return Center(child: Text(l10n.noPublishedShops, style: const TextStyle(color: AppColors.textSecondary)));
               }
               return ListView.builder(
                 padding: const EdgeInsets.all(16),

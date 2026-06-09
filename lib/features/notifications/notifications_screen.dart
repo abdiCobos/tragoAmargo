@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
 import '../../models/notification.dart';
+import '../../l10n/app_localizations.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -26,12 +27,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Notificaciones')),
+      appBar: AppBar(title: Text(l10n.notifications)),
       body: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           if (!auth.isAuthenticated) {
-            return const Center(child: Text('Inicia sesión para ver notificaciones', style: TextStyle(color: AppColors.textSecondary)));
+            return Center(child: Text(l10n.notificationsLogin, style: const TextStyle(color: AppColors.textSecondary)));
           }
 
           return StreamBuilder<List<AppNotification>>(
@@ -42,11 +44,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               }
               final notifs = snap.data ?? [];
               if (notifs.isEmpty) {
-                return const Center(
+                return Center(
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.notifications_none, size: 64, color: AppColors.tertiary),
-                    SizedBox(height: 12),
-                    Text('No tienes notificaciones', style: TextStyle(color: AppColors.textSecondary)),
+                    const Icon(Icons.notifications_none, size: 64, color: AppColors.tertiary),
+                    const SizedBox(height: 12),
+                    Text(l10n.noNotificationsYet, style: const TextStyle(color: AppColors.textSecondary)),
                   ]),
                 );
               }
@@ -72,7 +74,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           const SizedBox(height: 2),
                           Text(n.body, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                           const SizedBox(height: 4),
-                          Text(_formatDate(n.createdAt), style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                          Text(_formatDate(n.createdAt, l10n), style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
                         ]),
                       ),
                     ]),
@@ -86,11 +88,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  String _formatDate(DateTime d) {
+  String _formatDate(DateTime d, AppLocalizations l10n) {
     final now = DateTime.now();
     final diff = now.difference(d);
-    if (diff.inMinutes < 60) return 'Hace ${diff.inMinutes} min';
-    if (diff.inHours < 24) return 'Hace ${diff.inHours}h';
+    if (diff.inMinutes < 60) return l10n.minutesAgo(diff.inMinutes.toString());
+    if (diff.inHours < 24) return l10n.hoursAgo(diff.inHours.toString());
     return '${d.day}/${d.month}/${d.year}';
   }
 

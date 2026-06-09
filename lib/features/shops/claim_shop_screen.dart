@@ -9,6 +9,7 @@ import '../../../services/firestore_service.dart';
 import '../../../services/storage_service.dart';
 import '../../../models/coffee_shop.dart';
 import '../../../models/owner_claim.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ClaimShopScreen extends StatefulWidget {
   final CoffeeShop shop;
@@ -25,23 +26,25 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
   final List<Uint8List> _documents = [];
   final List<Uint8List> _selfies = [];
 
+  AppLocalizations get l10n => AppLocalizations.of(context);
+
   Future<void> _checkGps() async {
     setState(() { _error = null; _loading = true; });
 
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      setState(() { _error = 'Activa el GPS de tu dispositivo.'; _loading = false; return; });
+      setState(() { _error = l10n.gpsNotEnabled; _loading = false; return; });
     }
 
     var permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        setState(() { _error = 'Permiso de ubicación denegado.'; _loading = false; return; });
+        setState(() { _error = l10n.gpsPermissionDenied; _loading = false; return; });
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      setState(() { _error = 'Activa los permisos de ubicación en ajustes.'; _loading = false; return; });
+      setState(() { _error = l10n.gpsPermissionPermanent; _loading = false; return; });
     }
 
     try {
@@ -53,7 +56,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
 
       if (distance > 20) {
         setState(() {
-          _error = 'Estás a ${distance.toInt()}m del local. Máximo 20m permitido.';
+          _error = l10n.tooFar(distance.toInt().toString());
           _loading = false;
         });
         return;
@@ -64,7 +67,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
       final alreadyPending = await fs.hasPendingClaim(widget.shop.id, auth.user!.uid);
       if (alreadyPending) {
         setState(() {
-          _error = 'Ya tienes una solicitud pendiente de revisión.';
+          _error = l10n.alreadyClaimPending;
           _loading = false;
         });
         return;
@@ -72,7 +75,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
 
       if (widget.shop.verifiedOwnerUid != null) {
         setState(() {
-          _error = 'Esta cafetería ya tiene un dueño verificado.';
+          _error = l10n.shopHasOwner;
           _loading = false;
         });
         return;
@@ -80,7 +83,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
 
       setState(() { _step = 1; _loading = false; });
     } catch (_) {
-      setState(() { _error = 'Error al obtener ubicación. Intenta de nuevo.'; _loading = false; });
+      setState(() { _error = l10n.locationError; _loading = false; });
     }
   }
 
@@ -97,11 +100,11 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
 
   Future<void> _submitClaim() async {
     if (_documents.isEmpty) {
-      setState(() => _error = 'Sube mínimo 1 documento que acredite tu propiedad.');
+      setState(() => _error = l10n.docsDesc);
       return;
     }
     if (_selfies.isEmpty) {
-      setState(() => _error = 'Sube mínimo 1 selfie dentro del establecimiento.');
+      setState(() => _error = l10n.selfieDesc);
       return;
     }
 
@@ -124,7 +127,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
 
     await fs.submitOwnerClaim(OwnerClaim(
       id: '', shopId: shop.id, shopName: shop.name, shopAddress: shop.address,
-      userId: auth.user!.uid, userName: auth.user?.displayName ?? 'Usuario',
+      userId: auth.user!.uid, userName: auth.user?.displayName ?? l10n.user,
       userEmail: auth.user?.email ?? '', documentPhotos: docUrls, selfiePhotos: selfieUrls,
       status: 'pending', createdAt: DateTime.now(),
     ));
@@ -132,9 +135,9 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
     if (mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Solicitud enviada. Revisaremos tus documentos pronto.'),
-          backgroundColor: AppColors.secondary, duration: Duration(seconds: 5),
+        SnackBar(
+          content: Text(l10n.claimSubmitted),
+          backgroundColor: AppColors.secondary, duration: const Duration(seconds: 5),
         ),
       );
     }
@@ -147,7 +150,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
 
     if (hasOwner) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Dueño')),
+        appBar: AppBar(title: Text(l10n.ownerVerified)),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -156,12 +159,12 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
               const SizedBox(height: 16),
               Text(shop.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              const Text('Esta cafetería ya tiene un dueño verificado.',
-                  style: TextStyle(color: AppColors.textSecondary)),
+              Text(l10n.hasOwnerMessage,
+                  style: const TextStyle(color: AppColors.textSecondary)),
               const SizedBox(height: 24),
               OutlinedButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Volver'),
+                child: Text(l10n.goBack),
               ),
             ],
           ),
@@ -170,7 +173,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Acreditar como Dueño')),
+      appBar: AppBar(title: Text(l10n.claimOwner)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: _step == 0 ? _gpsStep(shop) : _docsStep(shop),
@@ -182,11 +185,11 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Paso 1 de 2: Verificación GPS',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(l10n.gpsStep1,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        const Text('Debes estar a 20 metros o menos del local.',
-            style: TextStyle(color: AppColors.textSecondary)),
+        Text(l10n.gpsDesc,
+            style: const TextStyle(color: AppColors.textSecondary)),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(16),
@@ -228,7 +231,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
                 ? const SizedBox(width: 20, height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : const Icon(Icons.gps_fixed),
-            label: const Text('Verificar mi ubicación'),
+            label: Text(l10n.verifyLocation),
           ),
         ),
         const SizedBox(height: 24),
@@ -240,24 +243,24 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Paso 2 de 2: Documentos y Selfie',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(l10n.docsStep2,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        const Text('Sube documentos que acrediten tu propiedad y una selfie en el local.',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+        Text(l10n.docsSubtitle,
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
         const SizedBox(height: 20),
 
         _photoSection(
-          title: 'Documentos de propiedad',
-          subtitle: 'Recibos de luz, agua, renta (mín. 1, máx. 2)',
+          title: l10n.propertyDocs,
+          subtitle: l10n.docsDesc,
           photos: _documents,
           maxPhotos: 2,
           isDocument: true,
         ),
         const SizedBox(height: 20),
         _photoSection(
-          title: 'Selfie en el establecimiento',
-          subtitle: 'Con uniforme del local si es posible (mín. 1, máx. 2)',
+          title: l10n.selfie,
+          subtitle: l10n.selfieDesc,
           photos: _selfies,
           maxPhotos: 2,
           isDocument: false,
@@ -268,14 +271,14 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
           decoration: BoxDecoration(
             color: AppColors.star.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.shield_outlined, color: AppColors.star, size: 18),
-              SizedBox(width: 8),
+              const Icon(Icons.shield_outlined, color: AppColors.star, size: 18),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'La dirección del documento debe coincidir con la cafetería. Revisaremos tu caso en 24-48h.',
-                  style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
+                  l10n.docsPolicy,
+                  style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
                 ),
               ),
             ],
@@ -299,7 +302,7 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
                 ? const SizedBox(width: 20, height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : const Icon(Icons.verified),
-            label: const Text('Enviar solicitud'),
+            label: Text(l10n.submitClaim),
           ),
         ),
         const SizedBox(height: 24),

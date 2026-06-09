@@ -52,6 +52,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Guarda tus cafeterías favoritas y comparte tu opinión';
 
   @override
+  String get guestFavoritesMessage => 'Inicia sesión para ver tus favoritos';
+
+  @override
+  String get guestFavoritesSubtitle =>
+      'Guarda tus cafeterías favoritas y accede a ellas desde cualquier dispositivo';
+
+  @override
   String get home => 'Cafeterías';
 
   @override
@@ -83,6 +90,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get wifi => 'WiFi';
+
+  @override
+  String get wifiAvailable => 'WiFi disponible';
 
   @override
   String get proximity => 'Proximidad (Ciudad)';
@@ -281,6 +291,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get photoUpdated => 'Foto actualizada';
 
   @override
+  String get photoAdded => 'Foto agregada';
+
+  @override
   String get contact => 'Contacto';
 
   @override
@@ -293,19 +306,34 @@ class AppLocalizationsEs extends AppLocalizations {
   String get moreDetails => 'Más detalles';
 
   @override
+  String get moreDetailsOpt => 'Más detalles (opcional)';
+
+  @override
   String get hours => 'Horarios';
+
+  @override
+  String get hoursOpt => 'Horarios (opcional)';
 
   @override
   String get name => 'Nombre';
 
   @override
+  String get nameRequired => 'Nombre de la cafetería *';
+
+  @override
   String get originAltitude => 'Origen y Altura del Café';
+
+  @override
+  String get originAltitudeRequired => 'Origen y Altura del Café *';
 
   @override
   String get originHint => 'Ej: Etiopía Yirgacheffe, 1,900 msnm';
 
   @override
   String get address => 'Dirección';
+
+  @override
+  String get addressRequired => 'Dirección *';
 
   @override
   String get addressHint => 'Ej: Av. Juárez 123, Guadalajara';
@@ -340,6 +368,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get selectRoast => 'Selecciona al menos un nivel de tostado';
+
+  @override
+  String get roastLevelsRequired => 'Niveles de Tostado *';
 
   @override
   String get duplicateAddress => 'Ya existe una cafetería con esta dirección.';
@@ -402,6 +433,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noUserReviews => 'No ha escrito reseñas aún';
 
   @override
+  String get noPublishedShops => 'No ha publicado cafeterías aún';
+
+  @override
   String get pleaseSelectReason => 'Selecciona un motivo';
 
   @override
@@ -462,11 +496,216 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reviewLoading => 'Cargando reseñas...';
 
   @override
-  String get photoAdded => 'Foto agregada';
-
-  @override
   String get viewProfile => 'Ver perfil';
 
   @override
   String get reviewOf => 'la reseña de';
+
+  @override
+  String reviewsOfUser(Object userName) {
+    return 'Reseñas de $userName';
+  }
+
+  @override
+  String shopsOfUser(Object userName) {
+    return 'Cafeterías de $userName';
+  }
+
+  @override
+  String get gallery => 'Galería';
+
+  @override
+  String get camera => 'Cámara';
+
+  @override
+  String get photosOpt => 'Fotos (opcional)';
+
+  @override
+  String get uploading => 'Subiendo...';
+
+  @override
+  String get uploadError => 'Error al subir foto';
+
+  @override
+  String get shopName => 'Nombre';
+
+  @override
+  String get roastingLevels => 'Niveles de Tostado';
+
+  @override
+  String get addReview => 'Escribir reseña';
+
+  @override
+  String get noShopFound => 'Cafetería no encontrada';
+
+  @override
+  String get errorLoading => 'Error al cargar';
+
+  @override
+  String dateFormat(Object day, Object month, Object year) {
+    return '$day/$month/$year';
+  }
+
+  @override
+  String get noFavorites => 'No tienes favoritos';
+
+  @override
+  String get noFavoritesSubtitle =>
+      'Guarda cafeterías tocando el corazón en su perfil';
+
+  @override
+  String get passwordMismatch => 'Las contraseñas no coinciden';
+
+  @override
+  String get confirmPassword => 'Confirmar contraseña';
+
+  @override
+  String get confirmPasswordRequired => 'Confirma tu contraseña';
+
+  @override
+  String get selectRoastLevels => 'Selecciona al menos un nivel de tostado';
+
+  @override
+  String get wifiSwitch => 'WiFi disponible';
+
+  @override
+  String get spaceType => 'Tipo de espacio';
+
+  @override
+  String get addCoffeeShop => 'Agregar Cafetería';
+
+  @override
+  String get editCoffeeShop => 'Editar Cafetería';
+
+  @override
+  String get saveChanges => 'Guardar Cambios';
+
+  @override
+  String get shopSaved => 'Cafetería actualizada';
+
+  @override
+  String get gpsVerification => 'Verificación GPS';
+
+  @override
+  String get gpsStep1 => 'Paso 1 de 2: Verificación GPS';
+
+  @override
+  String get gpsDesc => 'Debes estar a 20 metros o menos del local.';
+
+  @override
+  String get verifyLocation => 'Verificar mi ubicación';
+
+  @override
+  String get gpsNotEnabled => 'Activa el GPS de tu dispositivo.';
+
+  @override
+  String get gpsPermissionDenied => 'Permiso de ubicación denegado.';
+
+  @override
+  String get gpsPermissionPermanent =>
+      'Activa los permisos de ubicación en ajustes.';
+
+  @override
+  String tooFar(Object distance) {
+    return 'Estás a ${distance}m del local. Máximo 20m permitido.';
+  }
+
+  @override
+  String get alreadyClaimPending =>
+      'Ya tienes una solicitud pendiente de revisión.';
+
+  @override
+  String get shopHasOwner => 'Esta cafetería ya tiene un dueño verificado.';
+
+  @override
+  String get locationError => 'Error al obtener ubicación. Intenta de nuevo.';
+
+  @override
+  String get docsStep2 => 'Paso 2 de 2: Documentos y Selfie';
+
+  @override
+  String get docsSubtitle =>
+      'Sube documentos que acrediten tu propiedad y una selfie en el local.';
+
+  @override
+  String get propertyDocs => 'Documentos de propiedad';
+
+  @override
+  String get docsDesc => 'Recibos de luz, agua, renta (mín. 1, máx. 2)';
+
+  @override
+  String get selfie => 'Selfie en el establecimiento';
+
+  @override
+  String get selfieDesc =>
+      'Con uniforme del local si es posible (mín. 1, máx. 2)';
+
+  @override
+  String get docsPolicy =>
+      'La dirección del documento debe coincidir con la cafetería. Revisaremos tu caso en 24-48h.';
+
+  @override
+  String get submitClaim => 'Enviar solicitud';
+
+  @override
+  String get claimSubmitted =>
+      'Solicitud enviada. Revisaremos tus documentos pronto.';
+
+  @override
+  String get claimOwner => 'Acreditar como Dueño';
+
+  @override
+  String get ownerVerified => 'Dueño Verificado';
+
+  @override
+  String get hasOwnerMessage => 'Esta cafetería ya tiene un dueño verificado.';
+
+  @override
+  String get goBack => 'Volver';
+
+  @override
+  String get notificationsLogin => 'Inicia sesión para ver notificaciones';
+
+  @override
+  String get noNotificationsYet => 'No tienes notificaciones';
+
+  @override
+  String minutesAgo(Object minutes) {
+    return 'Hace $minutes min';
+  }
+
+  @override
+  String hoursAgo(Object hours) {
+    return 'Hace ${hours}h';
+  }
+
+  @override
+  String get signInToReview => 'Inicia sesión para escribir una reseña';
+
+  @override
+  String get publish => 'Publicar';
+
+  @override
+  String get alreadyReviewed => 'Ya tienes una reseña. Puedes editarla.';
+
+  @override
+  String get monday => 'lunes';
+
+  @override
+  String get tuesday => 'martes';
+
+  @override
+  String get wednesday => 'miércoles';
+
+  @override
+  String get thursday => 'jueves';
+
+  @override
+  String get friday => 'viernes';
+
+  @override
+  String get saturday => 'sábado';
+
+  @override
+  String get sunday => 'domingo';
 }

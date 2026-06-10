@@ -7,7 +7,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/utils/crash_reporting.dart';
 import '../../providers/coffee_shops_provider.dart';
 import '../../models/coffee_shop.dart';
 import '../shops/shop_detail_screen.dart';
@@ -23,6 +22,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   LatLng? _userLocation;
   bool _locating = false;
+  final MapController _mapController = MapController();
 
   @override
   void initState() {
@@ -72,6 +72,48 @@ class _MapScreenState extends State<MapScreen> {
     return '${km.toStringAsFixed(1)} km';
   }
 
+  void _openDirectionsInSheet(BuildContext ctx, CoffeeShop shop) {
+    final dest = LatLng(shop.location.latitude, shop.location.longitude);
+    final origin = _userLocation;
+    final originParam = origin != null ? '${origin.latitude},${origin.longitude}' : '';
+    final gmUrl = origin != null
+        ? 'https://www.google.com/maps/dir/?api=1&origin=$originParam&destination=${dest.latitude},${dest.longitude}&travelmode=walking'
+        : 'https://www.google.com/maps/search/?api=1&query=${dest.latitude},${dest.longitude}';
+    final osmUrl = origin != null
+        ? 'https://www.openstreetmap.org/directions?from=$originParam&to=${dest.latitude},${dest.longitude}#map=16/${dest.latitude}/${dest.longitude}'
+        : 'https://www.openstreetmap.org/?mlat=${dest.latitude}&mlon=${dest.longitude}#map=16/${dest.latitude}/${dest.longitude}';
+
+    showDialog(
+      context: ctx,
+      builder: (dialogCtx) => AlertDialog(
+        title: Text(AppLocalizations.of(ctx).chooseMapApp),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.map),
+              title: Text(AppLocalizations.of(ctx).googleMaps),
+              onTap: () {
+                launchUrl(Uri.parse(gmUrl), mode: LaunchMode.platformDefault, webOnlyWindowName: '_blank');
+                Navigator.of(dialogCtx).pop();
+                Navigator.of(ctx).pop();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.travel_explore),
+              title: Text(AppLocalizations.of(ctx).openStreetMap),
+              onTap: () {
+                launchUrl(Uri.parse(osmUrl), mode: LaunchMode.platformDefault, webOnlyWindowName: '_blank');
+                Navigator.of(dialogCtx).pop();
+                Navigator.of(ctx).pop();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showPreviewSheet(BuildContext context, CoffeeShop shop) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
@@ -87,6 +129,16 @@ class _MapScreenState extends State<MapScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (sheetContext) {
+        final dest = LatLng(shop.location.latitude, shop.location.longitude);
+        final origin = _userLocation;
+        final originParam = origin != null ? '${origin.latitude},${origin.longitude}' : '';
+        final gmUrl = origin != null
+            ? 'https://www.google.com/maps/dir/?api=1&origin=$originParam&destination=${dest.latitude},${dest.longitude}&travelmode=walking'
+            : 'https://www.google.com/maps/search/?api=1&query=${dest.latitude},${dest.longitude}';
+        final osmUrl = origin != null
+            ? 'https://www.openstreetmap.org/directions?from=$originParam&to=${dest.latitude},${dest.longitude}#map=16/${dest.latitude}/${dest.longitude}'
+            : 'https://www.openstreetmap.org/?mlat=${dest.latitude}&mlon=${dest.longitude}#map=16/${dest.latitude}/${dest.longitude}';
+
         return Padding(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
           child: Column(
@@ -147,88 +199,67 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ],
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(sheetContext);
-                        _openDirections(context, shop, l10n);
-                      },
-                      icon: const Icon(Icons.directions, size: 18),
-                      label: Text(l10n.howToGetThere),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          launchUrl(Uri.parse(gmUrl), mode: LaunchMode.platformDefault, webOnlyWindowName: '_blank');
+                          Navigator.pop(sheetContext);
+                        },
+                        icon: const Icon(Icons.map, size: 16),
+                        label: Text(l10n.googleMaps),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.brown700,
+                          side: const BorderSide(color: AppColors.brown200),
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(sheetContext);
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (_) => ShopDetailScreen(shopId: shop.id),
-                        ));
-                      },
-                      icon: const Icon(Icons.info_outline, size: 18),
-                      label: Text(l10n.viewDetails),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          launchUrl(Uri.parse(osmUrl), mode: LaunchMode.platformDefault, webOnlyWindowName: '_blank');
+                          Navigator.pop(sheetContext);
+                        },
+                        icon: const Icon(Icons.travel_explore, size: 16),
+                        label: Text(l10n.openStreetMap),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.brown700,
+                          side: const BorderSide(color: AppColors.brown200),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(sheetContext);
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (_) => ShopDetailScreen(shopId: shop.id),
+                          ));
+                        },
+                        icon: const Icon(Icons.info_outline, size: 16),
+                        label: Text(l10n.viewDetails),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.brown800,
+                          foregroundColor: AppColors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: MediaQuery.of(sheetContext).viewInsets.bottom),
             ],
           ),
         );
       },
-    );
-  }
-
-  void _openDirections(BuildContext context, CoffeeShop shop, AppLocalizations l10n) {
-    final dest = LatLng(shop.location.latitude, shop.location.longitude);
-    final origin = _userLocation;
-    final originParam = origin != null
-        ? '${origin.latitude},${origin.longitude}'
-        : '';
-
-    final gmUrl = origin != null
-        ? 'https://www.google.com/maps/dir/?api=1&origin=$originParam&destination=${dest.latitude},${dest.longitude}&travelmode=walking'
-        : 'https://www.google.com/maps/search/?api=1&query=${dest.latitude},${dest.longitude}';
-
-    final osmUrl = origin != null
-        ? 'https://www.openstreetmap.org/directions?from=$originParam&to=${dest.latitude},${dest.longitude}#map=16/${dest.latitude}/${dest.longitude}'
-        : 'https://www.openstreetmap.org/?mlat=${dest.latitude}&mlon=${dest.longitude}#map=16/${dest.latitude}/${dest.longitude}';
-
-    // Launch URL directly — must happen inside the user gesture without async gap
-    void launchAndClose(BuildContext ctx, String url) {
-      debugPrint('[MapScreen] Opening: $url');
-      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      Navigator.of(ctx).pop();
-    }
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.chooseMapApp),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.map),
-              title: Text(l10n.googleMaps),
-              onTap: () => launchAndClose(ctx, gmUrl),
-            ),
-            ListTile(
-              leading: const Icon(Icons.travel_explore),
-              title: Text(l10n.openStreetMap),
-              onTap: () => launchAndClose(ctx, osmUrl),
-            ),
-            ListTile(
-              leading: const Icon(Icons.open_in_browser),
-              title: Text(l10n.openInBrowser),
-              onTap: () => launchAndClose(ctx, gmUrl),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -250,6 +281,7 @@ class _MapScreenState extends State<MapScreen> {
         return Stack(
           children: [
             FlutterMap(
+              mapController: _mapController,
               options: MapOptions(
                 initialCenter: center,
                 initialZoom: 13.0,
@@ -313,6 +345,17 @@ class _MapScreenState extends State<MapScreen> {
                   ],
                 ),
               ],
+            ),
+            Positioned(
+              top: 16, right: 16,
+              child: FloatingActionButton.small(
+                heroTag: 'compass',
+                onPressed: () {
+                  _mapController.move(center, 13.0);
+                },
+                backgroundColor: AppColors.white,
+                child: const Icon(Icons.explore, color: AppColors.brown800),
+              ),
             ),
             if (_locating)
               const Positioned(top: 16, left: 16, child: Card(

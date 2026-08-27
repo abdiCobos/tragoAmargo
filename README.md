@@ -26,6 +26,9 @@ A diferencia de otras plataformas donde todo se califica con "estrellitas" gené
 - 📱 **Multiplataforma:** Experiencia web rápida y aplicación fluida construida en Flutter.
 - 🌍 **Bilingüe:** Soporte integrado para Español e Inglés con detección automática.
 
+## 💼 Para Dueños de Cafeterías
+**¿Tu establecimiento está en Trago Amargo?** Reclama tu cafetería, toma el control de tu perfil y comienza a escuchar el *feedback* real de tus clientes para llevar la calidad de tu café al siguiente nivel.
+
 ## 🛠️ Stack Tecnológico
 - **Frontend App:** Flutter (Dart)
 - **Backend / Base de Datos:** Firebase (Firestore, Auth, Storage, Hosting)

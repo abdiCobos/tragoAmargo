@@ -24,12 +24,13 @@
         Trago Amargo
       </a>
       <ul class="nav__menu" id="nav-menu">
-        <li><a href="#hero" class="nav__link">Inicio</a></li>
-        <li><a href="#features" class="nav__link">¿Qué hacemos?</a></li>
-        <li><a href="#about" class="nav__link">Nosotros</a></li>
-        <li><a href="#legal" class="nav__link">Aviso Legal</a></li>
+        <li><a href="#hero" class="nav__link" data-i18n="nav_home">Inicio</a></li>
+        <li><a href="#features" class="nav__link" data-i18n="nav_features">¿Qué hacemos?</a></li>
+        <li><a href="#about" class="nav__link" data-i18n="nav_about">Nosotros</a></li>
+        <li><a href="#legal" class="nav__link" data-i18n="nav_legal">Aviso Legal</a></li>
       </ul>
-      <a href="/app" class="nav__cta button button--small">Entrar</a>
+      <a href="/app" class="nav__cta button button--small" data-i18n="nav_enter">Entrar</a>
+      <button class="lang-toggle" id="lang-toggle">EN</button>
       <button class="nav__toggle" id="nav-toggle" aria-label="Menú">
         <span></span><span></span><span></span>
       </button>
@@ -40,37 +41,36 @@
     <section class="hero" id="hero">
       <div class="hero__bg">
         <div class="hero__overlay"></div>
-        <div class="hero__particles" id="hero-particles"></div>
       </div>
       <div class="hero__content container">
-        <span class="hero__badge fade-in">☕ Comunidad cafetera</span>
-        <h1 class="hero__title fade-in delay-1">
+        <span class="hero__badge fade-in" data-i18n="hero_badge">☕ Comunidad cafetera</span>
+        <h1 class="hero__title fade-in delay-1" data-i18n="hero_title">
           Muchas cafeterías,<br>
           <span class="hero__title--highlight">poca calidad y sabor</span>
         </h1>
-        <p class="hero__subtitle fade-in delay-2">
+        <p class="hero__subtitle fade-in delay-2" data-i18n="hero_subtitle">
           Descubre, califica y comparte las cafeterías que realmente valen la pena.
           Porque el buen café merece ser encontrado.
         </p>
         <div class="hero__actions fade-in delay-3">
           <a href="/app" class="button button--primary">
-            <span>Explorar cafeterías</span>
+            <span data-i18n="hero_btn_explore">Explorar cafeterías</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
-          <a href="#features" class="button button--ghost">Conocer más</a>
+          <a href="#features" class="button button--ghost" data-i18n="hero_btn_more">Conocer más</a>
         </div>
         <div class="hero__stats fade-in delay-4">
           <div class="hero__stat">
             <span class="hero__stat-number" data-count="4">0</span>
-            <span class="hero__stat-label">Calificaciones</span>
+            <span class="hero__stat-label" data-i18n="stat_1">Calificaciones</span>
           </div>
           <div class="hero__stat">
             <span class="hero__stat-number" data-count="3">0</span>
-            <span class="hero__stat-label">Dimensiones</span>
+            <span class="hero__stat-label" data-i18n="stat_2">Dimensiones</span>
           </div>
           <div class="hero__stat">
             <span class="hero__stat-number" data-count="100">0</span>
-            <span class="hero__stat-label">% Honestidad</span>
+            <span class="hero__stat-label" data-i18n="stat_3">% Honestidad</span>
           </div>
         </div>
       </div>
@@ -78,36 +78,36 @@
 
     <section class="features section" id="features">
       <div class="container">
-        <h2 class="section__title fade-in">¿Qué es Trago Amargo?</h2>
-        <p class="section__subtitle fade-in">Una plataforma donde la comunidad califica cafeterías con criterios reales, no solo estrellitas.</p>
+        <h2 class="section__title fade-in" data-i18n="feat_title">¿Qué es Trago Amargo?</h2>
+        <p class="section__subtitle fade-in" data-i18n="feat_subtitle">Una plataforma donde la comunidad califica cafeterías con criterios reales, no solo estrellitas.</p>
         <div class="features__grid">
           <article class="feature-card fade-in delay-1">
             <div class="feature-card__icon">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8ZM6 1v3M10 1v3M14 1v3"/></svg>
             </div>
-            <h3>Calidad del grano</h3>
-            <p>Evalúa la frescura, origen y calidad del café que sirven. No todo café sabe igual y el grano lo dice todo.</p>
+            <h3 data-i18n="feat_1_title">Calidad del grano</h3>
+            <p data-i18n="feat_1_desc">Evalúa la frescura, origen y calidad del café que sirven. No todo café sabe igual y el grano lo dice todo.</p>
           </article>
           <article class="feature-card fade-in delay-2">
             <div class="feature-card__icon">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7Z"/><path d="M9 21h6"/></svg>
             </div>
-            <h3>Sabrozura</h3>
-            <p>¿Qué tan sabroso está el café? Califica el sabor real, no la decoración del lugar ni la marca.</p>
+            <h3 data-i18n="feat_2_title">Sabrozura</h3>
+            <p data-i18n="feat_2_desc">¿Qué tan sabroso está el café? Califica el sabor real, no la decoración del lugar ni la marca.</p>
           </article>
           <article class="feature-card fade-in delay-3">
             <div class="feature-card__icon">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.5 12.5h-11M15.5 8h-7M13 15.5H9M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9Z"/></svg>
             </div>
-            <h3>Manejo del tostado</h3>
-            <p>El tostado lo cambia todo. Evalúa qué tan bien manejan los niveles: claro, medio y oscuro.</p>
+            <h3 data-i18n="feat_3_title">Manejo del tostado</h3>
+            <p data-i18n="feat_3_desc">El tostado lo cambia todo. Evalúa qué tan bien manejan los niveles: claro, medio y oscuro.</p>
           </article>
           <article class="feature-card fade-in delay-4">
             <div class="feature-card__icon">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </div>
-            <h3>Servicio y ambiente</h3>
-            <p>Porque el mejor café en un mal ambiente no sabe igual. Califica atención, espacio y experiencia.</p>
+            <h3 data-i18n="feat_4_title">Servicio y ambiente</h3>
+            <p data-i18n="feat_4_desc">Porque el mejor café en un mal ambiente no sabe igual. Califica atención, espacio y experiencia.</p>
           </article>
         </div>
       </div>
@@ -141,14 +141,14 @@
             </div>
           </div>
           <div class="showcase__text fade-in delay-2">
-            <h2 class="section__title section__title--left">Califica con criterio,<br>no con estrellitas</h2>
-            <p class="showcase__desc">A diferencia de otras apps donde todo es "4.5 estrellas", en Trago Amargo evaluamos cuatro dimensiones reales. Así sabes exactamente qué esperar antes de ir.</p>
+            <h2 class="section__title section__title--left" data-i18n="showcase_title">Califica con criterio,<br>no con estrellitas</h2>
+            <p class="showcase__desc" data-i18n="showcase_desc">A diferencia de otras apps donde todo es "4.5 estrellas", en Trago Amargo evaluamos cuatro dimensiones reales. Así sabes exactamente qué esperar antes de ir.</p>
             <ul class="showcase__list">
-              <li><span>✓</span> Reseñas con puntuación por categoría</li>
-              <li><span>✓</span> Fotos reales de la comunidad</li>
-              <li><span>✓</span> Mapa con cafeterías verificadas</li>
-              <li><span>✓</span> Dueños pueden reclamar su local</li>
-              <li><span>✓</span> Reportes de calidad y spam</li>
+              <li><span>✓</span> <span data-i18n="showcase_li1">Reseñas con puntuación por categoría</span></li>
+              <li><span>✓</span> <span data-i18n="showcase_li2">Fotos reales de la comunidad</span></li>
+              <li><span>✓</span> <span data-i18n="showcase_li3">Mapa con cafeterías verificadas</span></li>
+              <li><span>✓</span> <span data-i18n="showcase_li4">Dueños pueden reclamar su local</span></li>
+              <li><span>✓</span> <span data-i18n="showcase_li5">Reportes de calidad y spam</span></li>
             </ul>
           </div>
         </div>
@@ -157,15 +157,15 @@
 
     <section class="about section" id="about">
       <div class="container">
-        <h2 class="section__title fade-in">Acerca de nosotros</h2>
+        <h2 class="section__title fade-in" data-i18n="about_title">Acerca de nosotros</h2>
         <div class="about__content fade-in delay-1">
-          <p>
+          <p data-i18n="about_p1">
             <strong>Trago Amargo</strong> nace de una frustración compartida: apps donde cada cafetería tiene 4.8 estrellas y al llegar el café sabe a quemado.
           </p>
-          <p>
+          <p data-i18n="about_p2">
             Somos un equipo pequeño de entusiastas del café que creen que la calidad debe medirse con honestidad. No aceptamos reseñas patrocinadas, no inflamos puntuaciones. Solo datos reales de personas reales.
           </p>
-          <p>
+          <p data-i18n="about_p3">
             Nuestra misión es simple: <strong>que encuentres la mejor taza de café de tu ciudad</strong>, respaldada por una comunidad que sabe distinguir un buen grano de uno mal tostado.
           </p>
         </div>
@@ -175,10 +175,10 @@
     <section class="cta section">
       <div class="container">
         <div class="cta__card fade-in">
-          <h2>¿Listo para encontrar tu próxima cafetería favorita?</h2>
-          <p>Únete gratis. Sin reseñas falsas. Solo café de verdad.</p>
+          <h2 data-i18n="cta_title">¿Listo para encontrar tu próxima cafetería favorita?</h2>
+          <p data-i18n="cta_subtitle">Únete gratis. Sin reseñas falsas. Solo café de verdad.</p>
           <a href="/app" class="button button--primary button--large">
-            Entrar a Trago Amargo
+            <span data-i18n="cta_btn">Entrar a Trago Amargo</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
         </div>
@@ -187,41 +187,41 @@
 
     <section class="legal section" id="legal">
       <div class="container">
-        <h2 class="section__title fade-in">Aviso legal y privacidad</h2>
+        <h2 class="section__title fade-in" data-i18n="legal_title">Aviso legal y privacidad</h2>
         <div class="legal__content fade-in delay-1">
-          <h3>1. Información que recopilamos</h3>
-          <p>Para el funcionamiento de la plataforma, recopilamos únicamente:</p>
+          <h3 data-i18n="legal_1_title">1. Información que recopilamos</h3>
+          <p data-i18n="legal_1_p">Para el funcionamiento de la plataforma, recopilamos únicamente:</p>
           <ul>
-            <li><strong>Correo electrónico:</strong> utilizado exclusivamente para autenticar tu cuenta y permitir el inicio de sesión.</li>
-            <li><strong>Nombre de usuario:</strong> el nombre que elijas para mostrar en tus reseñas y perfil público.</li>
-            <li><strong>Foto de perfil (opcional):</strong> puedes subir una imagen para personalizar tu cuenta.</li>
-            <li><strong>Reseñas y calificaciones:</strong> el contenido que publiques sobre cafeterías es público por naturaleza.</li>
+            <li><strong data-i18n="legal_1_li1_str">Correo electrónico:</strong> <span data-i18n="legal_1_li1">utilizado exclusivamente para autenticar tu cuenta y permitir el inicio de sesión.</span></li>
+            <li><strong data-i18n="legal_1_li2_str">Nombre de usuario:</strong> <span data-i18n="legal_1_li2">el nombre que elijas para mostrar en tus reseñas y perfil público.</span></li>
+            <li><strong data-i18n="legal_1_li3_str">Foto de perfil (opcional):</strong> <span data-i18n="legal_1_li3">puedes subir una imagen para personalizar tu cuenta.</span></li>
+            <li><strong data-i18n="legal_1_li4_str">Reseñas y calificaciones:</strong> <span data-i18n="legal_1_li4">el contenido que publiques sobre cafeterías es público por naturaleza.</span></li>
           </ul>
 
-          <h3>2. Uso de la información</h3>
-          <p>Tu información personal <strong>nunca</strong> será vendida, compartida con terceros ni utilizada para fines publicitarios. El correo electrónico se usa exclusivamente para:</p>
+          <h3 data-i18n="legal_2_title">2. Uso de la información</h3>
+          <p data-i18n="legal_2_p">Tu información personal <strong>nunca</strong> será vendida, compartida con terceros ni utilizada para fines publicitarios. El correo electrónico se usa exclusivamente para:</p>
           <ul>
-            <li>Autenticación de cuenta (inicio de sesión)</li>
-            <li>Recuperación de contraseña</li>
-            <li>Notificaciones relacionadas con tu actividad (respuestas a reseñas, reclamaciones de cafeterías)</li>
+            <li data-i18n="legal_2_li1">Autenticación de cuenta (inicio de sesión)</li>
+            <li data-i18n="legal_2_li2">Recuperación de contraseña</li>
+            <li data-i18n="legal_2_li3">Notificaciones relacionadas con tu actividad (respuestas a reseñas, reclamaciones de cafeterías)</li>
           </ul>
 
-          <h3>3. Contenido generado por usuarios</h3>
-          <p>Las reseñas, fotos y calificaciones que publiques son visibles para otros usuarios de la plataforma. Eres responsable del contenido que compartes. Nos reservamos el derecho de eliminar contenido que infrinja nuestras normas comunitarias (spam, contenido ofensivo, información falsa).</p>
+          <h3 data-i18n="legal_3_title">3. Contenido generado por usuarios</h3>
+          <p data-i18n="legal_3_p">Las reseñas, fotos y calificaciones que publiques son visibles para otros usuarios de la plataforma. Eres responsable del contenido que compartes. Nos reservamos el derecho de eliminar contenido que infrinja nuestras normas comunitarias (spam, contenido ofensivo, información falsa).</p>
 
-          <h3>4. Protección de datos</h3>
-          <p>Utilizamos Firebase (Google Cloud Platform) para almacenar datos. Tus credenciales de acceso están protegidas mediante los estándares de seguridad de Firebase Authentication. No almacenamos contraseñas en texto plano.</p>
+          <h3 data-i18n="legal_4_title">4. Protección de datos</h3>
+          <p data-i18n="legal_4_p">Utilizamos Firebase (Google Cloud Platform) para almacenar datos. Tus credenciales de acceso están protegidas mediante los estándares de seguridad de Firebase Authentication. No almacenamos contraseñas en texto plano.</p>
 
-          <h3>5. Cookies y seguimiento</h3>
-          <p><strong>No utilizamos cookies de terceros ni sistemas de tracking.</strong> La plataforma solo utiliza las cookies técnicas necesarias para mantener tu sesión iniciada (Firebase Auth). No recolectamos datos de navegación ni perfilamos usuarios.</p>
+          <h3 data-i18n="legal_5_title">5. Cookies y seguimiento</h3>
+          <p data-i18n="legal_5_p"><strong>No utilizamos cookies de terceros ni sistemas de tracking.</strong> La plataforma solo utiliza las cookies técnicas necesarias para mantener tu sesión iniciada (Firebase Auth). No recolectamos datos de navegación ni perfilamos usuarios.</p>
 
-          <h3>6. Eliminación de cuenta</h3>
-          <p>Puedes solicitar la eliminación de tu cuenta y todos tus datos asociados en cualquier momento contactándonos. Una vez eliminada, tus reseñas se anonimizarán y tus datos personales serán borrados permanentemente.</p>
+          <h3 data-i18n="legal_6_title">6. Eliminación de cuenta</h3>
+          <p data-i18n="legal_6_p">Puedes solicitar la eliminación de tu cuenta y todos tus datos asociados en cualquier momento contactándonos. Una vez eliminada, tus reseñas se anonimizarán y tus datos personales serán borrados permanentemente.</p>
 
-          <h3>7. Contacto</h3>
-          <p>Para cualquier duda sobre este aviso legal o para ejercer tus derechos de acceso, rectificación o eliminación de datos, contáctanos a través de los canales disponibles en la plataforma.</p>
+          <h3 data-i18n="legal_7_title">7. Contacto</h3>
+          <p data-i18n="legal_7_p">Para cualquier duda sobre este aviso legal o para ejercer tus derechos de acceso, rectificación o eliminación de datos, contáctanos a través de los canales disponibles en la plataforma.</p>
 
-          <p class="legal__updated">Última actualización: Junio 2026</p>
+          <p class="legal__updated" data-i18n="legal_updated">Última actualización: Junio 2026</p>
         </div>
       </div>
     </section>
@@ -231,17 +231,17 @@
     <div class="container footer__grid">
       <div class="footer__brand">
         <span class="footer__logo">☕ Trago Amargo</span>
-        <p>Muchas cafeterías, poca calidad y sabor.</p>
+        <p data-i18n="footer_slogan">Muchas cafeterías, poca calidad y sabor.</p>
       </div>
       <div class="footer__links">
-        <a href="#hero">Inicio</a>
-        <a href="#features">¿Qué hacemos?</a>
-        <a href="#about">Nosotros</a>
-        <a href="#legal">Aviso Legal</a>
-        <a href="/app">App</a>
+        <a href="#hero" data-i18n="nav_home">Inicio</a>
+        <a href="#features" data-i18n="nav_features">¿Qué hacemos?</a>
+        <a href="#about" data-i18n="nav_about">Nosotros</a>
+        <a href="#legal" data-i18n="nav_legal">Aviso Legal</a>
+        <a href="/app" data-i18n="footer_app">App</a>
       </div>
       <div class="footer__copy">
-        <p>&copy; 2026 Trago Amargo. Todos los derechos reservados.</p>
+        <p data-i18n="footer_copy">&copy; 2026 Trago Amargo. Todos los derechos reservados.</p>
       </div>
     </div>
   </footer>

@@ -33,8 +33,67 @@
     };
     firebase.initializeApp(firebaseConfig);
   </script>
+  <style>
+    body {
+      background-color: #3E2723; /* Dark brown theme */
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+    .splash-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .splash-icon {
+      font-size: 64px;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+    .splash-text {
+      color: #FFF8E1; /* Cream white */
+      margin-top: 16px;
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    .loading-bar {
+      margin-top: 24px;
+      width: 150px;
+      height: 4px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .loading-bar-fill {
+      height: 100%;
+      background-color: #FFD54F; /* Gold color */
+      width: 0%;
+      animation: loading 2s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes loading {
+      0% { width: 0%; transform: translateX(-100%); }
+      50% { width: 100%; transform: translateX(0%); }
+      100% { width: 100%; transform: translateX(100%); }
+    }
+  </style>
 </head>
 <body>
+  <div class="splash-container">
+    <div class="splash-icon">☕</div>
+    <div class="splash-text">Trago Amargo</div>
+    <div class="loading-bar">
+      <div class="loading-bar-fill"></div>
+    </div>
+  </div>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

@@ -53,7 +53,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     final bytes = await photo.readAsBytes();
     final storage = context.read<StorageService>();
     final fs = context.read<FirestoreService>();
-    final url = await storage.uploadImageBytes(bytes, name: 'shop_${shop.id}');
+    final url = await storage.uploadShopPhoto(shop.id, bytes);
     final updated = shop.copyWith(photos: [...shop.photos, url]);
     await fs.updateCoffeeShop(updated);
     if (!mounted) return;

@@ -56,7 +56,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
     final price = double.tryParse(_priceController.text.trim()) ?? 0.0;
     String photoUrl = '';
     if (_photoBytes != null) {
-      photoUrl = await storage.uploadImageBytes(_photoBytes!, name: 'menu_${widget.shopId}');
+      photoUrl = await storage.uploadProductPhoto(widget.shopId, _photoBytes!);
     }
 
     await fs.addMenuItem(MenuItem(

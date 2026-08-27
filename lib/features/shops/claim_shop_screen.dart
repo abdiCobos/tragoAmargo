@@ -117,12 +117,11 @@ class _ClaimShopScreenState extends State<ClaimShopScreen> {
 
     final docUrls = <String>[];
     for (final bytes in _documents) {
-      docUrls.add(await storage.uploadImageBytes(bytes, name: 'doc_${shop.id}'));
+      docUrls.add(await storage.uploadShopPhoto(shop.id, bytes));
     }
-
     final selfieUrls = <String>[];
     for (final bytes in _selfies) {
-      selfieUrls.add(await storage.uploadImageBytes(bytes, name: 'selfie_${shop.id}'));
+      selfieUrls.add(await storage.uploadShopPhoto(shop.id, bytes));
     }
 
     await fs.submitOwnerClaim(OwnerClaim(

@@ -133,7 +133,7 @@ class CoffeeShopsProvider extends ChangeNotifier {
 
       final photoUrls = <String>[];
       for (final bytes in photos) {
-        final url = await _storageService.uploadImageBytes(bytes);
+        final url = await _storageService.uploadShopPhoto(docRef, bytes);
         photoUrls.add(url);
       }
       if (photoUrls.isNotEmpty) {

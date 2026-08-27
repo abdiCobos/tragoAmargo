@@ -83,7 +83,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
     try {
       final bytes = await photo.readAsBytes();
       final storage = context.read<StorageService>();
-      final url = await storage.uploadImageBytes(bytes, name: 'shop_${widget.shop.id}');
+      final url = await storage.uploadShopPhoto(widget.shop.id, bytes);
       setState(() => _photos.add(url));
     } catch (e) {
       if (mounted) {

@@ -9,6 +9,8 @@ class CrashReporting {
     if (_initialized) return;
     _initialized = true;
 
+    if (kIsWeb) return;
+
     FlutterError.onError = (FlutterErrorDetails details) {
       FlutterError.presentError(details);
       FirebaseCrashlytics.instance.recordFlutterError(details);
@@ -21,6 +23,10 @@ class CrashReporting {
   }
 
   static Future<void> log(dynamic message) async {
+    if (kIsWeb) {
+      if (kDebugMode) debugPrint('[Crashlytics-WebLog] $message');
+      return;
+    }
     if (kDebugMode) {
       debugPrint('[Crashlytics] $message');
       return;
@@ -34,6 +40,13 @@ class CrashReporting {
     bool fatal = false,
     String? reason,
   }) async {
+    if (kIsWeb) {
+      if (kDebugMode) {
+        debugPrint('[Crashlytics-WebERROR] ${reason ?? exception}');
+        if (stack != null) debugPrint(stack.toString());
+      }
+      return;
+    }
     if (kDebugMode) {
       debugPrint('[Crashlytics ERROR] ${reason ?? exception}');
       if (stack != null) debugPrint(stack.toString());
@@ -51,15 +64,17 @@ class CrashReporting {
   }
 
   static Future<void> recordFlutterError(FlutterErrorDetails details) async {
-    if (kDebugMode) return;
+    if (kIsWeb || kDebugMode) return;
     await FirebaseCrashlytics.instance.recordFlutterError(details);
   }
 
   static Future<void> setUserIdentifier(String identifier) async {
+    if (kIsWeb) return;
     await FirebaseCrashlytics.instance.setUserIdentifier(identifier);
   }
 
   static Future<void> setCustomKey(String key, dynamic value) async {
+    if (kIsWeb) return;
     await FirebaseCrashlytics.instance.setCustomKey(key, value.toString());
   }
 }

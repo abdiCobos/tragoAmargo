@@ -23,11 +23,11 @@ void main() async {
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
-    if (!kDebugMode) FirebaseCrashlytics.instance.recordFlutterError(details);
+    CrashReporting.recordFlutterError(details);
   };
 
   PlatformDispatcher.instance.onError = (error, stack) {
-    if (!kDebugMode) FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    CrashReporting.recordError(error, stack, fatal: true);
     return true;
   };
 

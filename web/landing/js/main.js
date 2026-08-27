@@ -141,7 +141,11 @@ const translations = {
   }
 };
 
-let currentLang = localStorage.getItem('trago_lang') || 'es';
+let currentLang = localStorage.getItem('trago_lang');
+if (!currentLang) {
+  const browserLang = navigator.language || navigator.userLanguage;
+  currentLang = browserLang.toLowerCase().startsWith('en') ? 'en' : 'es';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();

@@ -563,6 +563,121 @@ body {
 .demo-card--small .demo-card__meta { margin-bottom: 0; }
 
 /* =============================================
+   Testimonials
+   ============================================= */
+.testimonials { background: var(--cream); }
+
+.testimonials__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.testimonial-card {
+  background: var(--white);
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--brown-100);
+  box-shadow: 0 4px 12px rgba(62, 39, 35, 0.04);
+  position: relative;
+}
+
+.testimonial-card::before {
+  content: '"';
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  font-family: var(--font-display);
+  font-size: 4rem;
+  color: var(--brown-50);
+  line-height: 1;
+  z-index: 0;
+}
+
+.testimonial-card p {
+  position: relative;
+  z-index: 1;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--brown-700);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.testimonial-author {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--brown-900);
+}
+
+/* =============================================
+   FAQ
+   ============================================= */
+.faq { background: var(--brown-50); }
+
+.faq__list {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faq-item {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--brown-100);
+  overflow: hidden;
+  transition: box-shadow var(--transition);
+}
+
+.faq-item.active {
+  box-shadow: 0 8px 24px rgba(62, 39, 35, 0.08);
+}
+
+.faq-question {
+  width: 100%;
+  text-align: left;
+  padding: 24px;
+  background: none;
+  border: none;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--brown-800);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faq-question svg {
+  transition: transform var(--transition);
+  color: var(--gold);
+}
+
+.faq-item.active .faq-question svg {
+  transform: rotate(180deg);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  background: var(--white);
+}
+
+.faq-item.active .faq-answer {
+  max-height: 200px;
+}
+
+.faq-answer p {
+  padding: 0 24px 24px;
+  color: var(--gray-600);
+  line-height: 1.7;
+}
+
+/* =============================================
    About
    ============================================= */
 .about { background: var(--cream); }

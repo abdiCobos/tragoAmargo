@@ -8,6 +8,7 @@ import '../notifications/notifications_screen.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
 import '../../l10n/app_localizations.dart';
+import '../../widgets/locale_switcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,8 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
           appBar: _currentIndex == 0
               ? AppBar(
                   automaticallyImplyLeading: false,
+                  centerTitle: true,
                   title: Text(l10n.appTitle),
                   actions: [
+                    const LocaleSwitcher(),
                     if (auth.isAuthenticated) _notificationBell(context, auth, theme),
                     if (!auth.isAuthenticated)
                       TextButton.icon(

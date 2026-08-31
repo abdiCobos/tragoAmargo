@@ -3,10 +3,12 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../app.dart';
 import '../../l10n/app_localizations.dart';
 import 'widgets/google_sign_in_button.dart';
 import 'register_screen.dart';
+import '../../widgets/locale_switcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -103,7 +105,13 @@ class _LoginScreenState extends State<LoginScreen> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.login)),
+      appBar: AppBar(
+        title: Text(l10n.login),
+        centerTitle: true,
+        actions: const [
+          LocaleSwitcher(),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

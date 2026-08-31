@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aviso Legal y Privacidad - Trago Amargo">
+  <meta name="theme-color" content="#3E2723">
+  <title>Aviso Legal - Trago Amargo</title>
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="header" id="header">
+    <nav class="nav container">
+      <a href="index.html" class="nav__logo">
+        <span class="nav__logo-icon">☕</span>
+        Trago Amargo
+      </a>
+      <ul class="nav__menu" id="nav-menu">
+        <li><a href="index.html" class="nav__link" data-i18n="nav_home">Inicio</a></li>
+        <li><a href="index.html#features" class="nav__link" data-i18n="nav_features">¿Qué hacemos?</a></li>
+        <li><a href="index.html#about" class="nav__link" data-i18n="nav_about">Nosotros</a></li>
+      </ul>
+      <a href="/app" class="nav__cta button button--small" data-i18n="nav_enter">Entrar</a>
+      <button class="lang-toggle" id="lang-toggle">EN</button>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main style="padding-top: 100px; padding-bottom: 60px;"> 
+    <section class="legal section" id="legal">
+      <div class="container">
+        <h2 class="section__title fade-in" data-i18n="legal_title">Aviso legal y privacidad</h2>
+        <div class="legal__content fade-in delay-1">
+          <h3 data-i18n="legal_1_title">1. Información que recopilamos</h3>
+          <p data-i18n="legal_1_p">Para el funcionamiento de la plataforma, recopilamos únicamente:</p>
+          <ul>
+            <li><strong data-i18n="legal_1_li1_str">Correo electrónico:</strong> <span data-i18n="legal_1_li1">utilizado exclusivamente para autenticar tu cuenta y permitir el inicio de sesión.</span></li>
+            <li><strong data-i18n="legal_1_li2_str">Nombre de usuario:</strong> <span data-i18n="legal_1_li2">el nombre que elijas para mostrar en tus reseñas y perfil público.</span></li>
+            <li><strong data-i18n="legal_1_li3_str">Foto de perfil (opcional):</strong> <span data-i18n="legal_1_li3">puedes subir una imagen para personalizar tu cuenta.</span></li>
+            <li><strong data-i18n="legal_1_li4_str">Reseñas y calificaciones:</strong> <span data-i18n="legal_1_li4">el contenido que publiques sobre cafeterías es público por naturaleza.</span></li>
+          </ul>
+
+          <h3 data-i18n="legal_2_title">2. Uso de la información</h3>
+          <p data-i18n="legal_2_p">Tu información personal <strong>nunca</strong> será vendida, compartida con terceros ni utilizada para fines publicitarios. El correo electrónico se usa exclusivamente para:</p>
+          <ul>
+            <li data-i18n="legal_2_li1">Autenticación de cuenta (inicio de sesión)</li>
+            <li data-i18n="legal_2_li2">Recuperación de contraseña</li>
+            <li data-i18n="legal_2_li3">Notificaciones relacionadas con tu actividad (respuestas a reseñas, reclamaciones de cafeterías)</li>
+          </ul>
+
+          <h3 data-i18n="legal_3_title">3. Contenido generado por usuarios</h3>
+          <p data-i18n="legal_3_p">Las reseñas, fotos y calificaciones que publiques son visibles para otros usuarios de la plataforma. Eres responsable del contenido que compartes. Nos reservamos el derecho de eliminar contenido que infrinja nuestras normas comunitarias (spam, contenido ofensivo, información falsa).</p>
+
+          <h3 data-i18n="legal_4_title">4. Protección de datos</h3>
+          <p data-i18n="legal_4_p">Utilizamos Firebase (Google Cloud Platform) para almacenar datos. Tus credenciales de acceso están protegidas mediante los estándares de seguridad de Firebase Authentication. No almacenamos contraseñas en texto plano.</p>
+
+          <h3 data-i18n="legal_5_title">5. Cookies y seguimiento</h3>
+          <p data-i18n="legal_5_p"><strong>No utilizamos cookies de terceros ni sistemas de tracking.</strong> La plataforma solo utiliza las cookies técnicas necesarias para mantener tu sesión iniciada (Firebase Auth). No recolectamos datos de navegación ni perfilamos usuarios.</p>
+
+          <h3 data-i18n="legal_6_title">6. Eliminación de cuenta</h3>
+          <p data-i18n="legal_6_p">Puedes solicitar la eliminación de tu cuenta y todos tus datos asociados en cualquier momento contactándonos. Una vez eliminada, tus reseñas se anonimizarán y tus datos personales serán borrados permanentemente.</p>
+
+          <h3 data-i18n="legal_7_title">7. Contacto</h3>
+          <p data-i18n="legal_7_p">Para cualquier duda sobre este aviso legal o para ejercer tus derechos de acceso, rectificación o eliminación de datos, contáctanos a través de los canales disponibles en la plataforma.</p>
+
+          <p class="legal__updated" data-i18n="legal_updated">Última actualización: Junio 2026</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div class="footer__brand">
+        <span class="footer__logo">☕ Trago Amargo</span>
+        <p data-i18n="footer_slogan">Muchas cafeterías, poca calidad y sabor.</p>
+      </div>
+      <div class="footer__links">
+        <a href="index.html" data-i18n="nav_home">Inicio</a>
+        <a href="index.html#features" data-i18n="nav_features">¿Qué hacemos?</a>
+        <a href="index.html#about" data-i18n="nav_about">Nosotros</a>
+        <a href="/app" data-i18n="footer_app">App</a>
+      </div>
+      <div class="footer__copy">
+        <p data-i18n="footer_copy">&copy; 2026 Trago Amargo. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

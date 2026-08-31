@@ -65,6 +65,17 @@ const translations = {
     legal_6_p: "Puedes solicitar la eliminación de tu cuenta y todos tus datos asociados en cualquier momento contactándonos. Una vez eliminada, tus reseñas se anonimizarán y tus datos personales serán borrados permanentemente.",
     legal_7_title: "7. Contacto",
     legal_7_p: "Para cualquier duda sobre este aviso legal o para ejercer tus derechos de acceso, rectificación o eliminación de datos, contáctanos a través de los canales disponibles en la plataforma.",
+    testi_title: "Lo que dice la comunidad",
+    testi_1: "Por fin una app que me dice si el café sabe a quemado antes de gastar mi dinero.",
+    testi_2: "Me encanta ver si una cafetería tiene buen Wi-Fi y además un espresso decente.",
+    testi_3: "Las reseñas de Trago Amargo me han salvado de muchas cafeterías que solo ofrecen batidos bonitos o muy dulces.",
+    faq_title: "Preguntas Frecuentes",
+    faq_1_q: "¿Tiene algún costo registrarme?",
+    faq_1_a: "No, Trago Amargo es 100% gratuito para los usuarios.",
+    faq_2_q: "¿Cualquiera puede reseñar?",
+    faq_2_a: "Sí, siempre y cuando te crees una cuenta y sigas nuestras normas de comunidad.",
+    faq_3_q: "Soy dueño de una cafetería, ¿puedo reclamar mi perfil?",
+    faq_3_a: "¡Claro! Los dueños pueden reclamar su negocio en la plataforma para responder reseñas y actualizar su información.",
     legal_updated: "Última actualización: Junio 2026",
     footer_slogan: "Muchas cafeterías, poca calidad y sabor.",
     footer_app: "App",
@@ -134,6 +145,17 @@ const translations = {
     legal_6_p: "You can request the deletion of your account and all associated data at any time by contacting us. Once deleted, your reviews will be anonymized and your personal data will be permanently erased.",
     legal_7_title: "7. Contact",
     legal_7_p: "For any questions about this legal notice or to exercise your rights of access, rectification, or deletion of data, contact us through the channels available on the platform.",
+    testi_title: "What the community says",
+    testi_1: "Finally an app that tells me if the coffee tastes burnt before spending my money.",
+    testi_2: "I love seeing if a shop has good Wi-Fi and also a decent espresso.",
+    testi_3: "Trago Amargo reviews have saved me from many coffee shops that only offer pretty or overly sweet milkshakes.",
+    faq_title: "Frequently Asked Questions",
+    faq_1_q: "Does it cost anything to register?",
+    faq_1_a: "No, Trago Amargo is 100% free for users.",
+    faq_2_q: "Can anyone leave a review?",
+    faq_2_a: "Yes, as long as you create an account and follow our community guidelines.",
+    faq_3_q: "I'm a coffee shop owner, can I claim my profile?",
+    faq_3_a: "Sure! Owners can claim their business on the platform to reply to reviews and update their info.",
     legal_updated: "Last updated: June 2026",
     footer_slogan: "Many coffee shops, poor quality & taste.",
     footer_app: "App",
@@ -153,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeaderScroll();
   initCountAnimation();
   initLanguageToggle();
+  initFAQ();
   applyTranslations();
 });
 
@@ -234,4 +257,17 @@ function initCountAnimation() {
     });
   }, { threshold: 0.5 });
   numbers.forEach(n => observer.observe(n));
+}
+
+/* ---- FAQ Accordion ---- */
+function initFAQ() {
+  const items = document.querySelectorAll('.faq-item');
+  items.forEach(item => {
+    const question = item.querySelector('.faq-question');
+    if (question) {
+      question.addEventListener('click', () => {
+        item.classList.toggle('active');
+      });
+    }
+  });
 }

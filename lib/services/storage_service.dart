@@ -11,7 +11,7 @@ class StorageService {
     if (kIsWeb) {
       return const String.fromEnvironment('IMGBB_API_KEY', defaultValue: '');
     }
-    return '2138a891968bd4fca786ab8cff4d1ba4';
+    return 'ff323192c406894e2bd3ba54dd9f9f16';
   }
 
   Future<String> uploadImageBytes(Uint8List bytes, {String? name}) async {
